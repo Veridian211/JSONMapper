@@ -1,4 +1,4 @@
-unit ObjectToJSON.IgnoreAttributes_Test;
+unit ObjectToJSON.IgnoreAttribute_Test;
 
 interface
 
@@ -11,7 +11,7 @@ uses
 
 type
   [TestFixture]
-  TObjectToJSON_IgnoreAttribute_Test = class
+  TIgnoreAttribute_Test = class
   private
     obj: TUserWithIgnoreAttribute;
   public
@@ -25,26 +25,26 @@ type
 
 implementation
 
-procedure TObjectToJSON_IgnoreAttribute_Test.Setup;
+procedure TIgnoreAttribute_Test.Setup;
 begin
   obj := TUserWithIgnoreAttribute.Create();
 end;
 
-procedure TObjectToJSON_IgnoreAttribute_Test.TearDown;
+procedure TIgnoreAttribute_Test.TearDown;
 begin
   obj.Free;
 end;
 
-procedure TObjectToJSON_IgnoreAttribute_Test.TestIgnoreAttribute;
+procedure TIgnoreAttribute_Test.TestIgnoreAttribute;
 var
   json: TJSONObject;
   _: TJSONValue;
 begin
-  json := TJSONMapper.objectToJSON<TUserWithIgnoreAttribute>(obj);
+  json := TJSONMapper.objectToJSON(obj);
   Assert.IsFalse(json.TryGetValue('id', _));
 end;
 
 initialization
-  TDUnitX.RegisterTestFixture(TObjectToJSON_IgnoreAttribute_Test);
+  TDUnitX.RegisterTestFixture(TIgnoreAttribute_Test);
 
 end.

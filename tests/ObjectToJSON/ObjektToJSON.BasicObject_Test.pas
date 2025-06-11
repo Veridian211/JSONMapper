@@ -11,7 +11,7 @@ uses
 
 type
   [TestFixture]
-  TObjektToJSON_Test = class
+  TBasicObjektToJSON_Test = class
   private
     obj: TUser;
   public
@@ -26,19 +26,19 @@ type
 
 implementation
 
-procedure TObjektToJSON_Test.Setup;
+procedure TBasicObjektToJSON_Test.Setup;
 begin
   obj := TUser.Create();
 end;
 
-procedure TObjektToJSON_Test.TearDown;
+procedure TBasicObjektToJSON_Test.TearDown;
 begin
   obj.Free;
 end;
 
-procedure TObjektToJSON_Test.TestBasicObject;
+procedure TBasicObjektToJSON_Test.TestBasicObject;
 const
-  EXPECTED_JSON = '';
+  EXPECTED_JSON = '{"id":1,"name":"John Doe","isAdmin":true}';
 var
   actual_json: string;
 begin
@@ -46,11 +46,11 @@ begin
   obj.name := 'John Doe';
   obj.isAdmin := true;
 
-  actual_json := JSONToString(TJSONMapper.objectToJSON<TUser>(obj));
+  actual_json := JSONToString(TJSONMapper.objectToJSON(obj));
   Assert.AreEqual(EXPECTED_JSON, actual_json);
 end;
 
 initialization
-  TDUnitX.RegisterTestFixture(TObjektToJSON_Test);
+  TDUnitX.RegisterTestFixture(TBasicObjektToJSON_Test);
 
 end.

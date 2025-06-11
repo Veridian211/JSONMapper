@@ -98,8 +98,10 @@
         <DCCReference Include="ObjectToJSON\TestObjects.pas"/>
         <DCCReference Include="helper\TestHelper.pas"/>
         <DCCReference Include="ObjectToJSON\ObjektToJSON.BasicObject_Test.pas"/>
-        <DCCReference Include="ObjectToJSON\ObjectToJSON.IgnoreAttributes_Test.pas"/>
+        <DCCReference Include="ObjectToJSON\ObjectToJSON.IgnoreAttribute_Test.pas"/>
         <DCCReference Include="JSONToObject\JSONToObject_Test.pas"/>
+        <DCCReference Include="ObjectToJSON\ObjectToJSON.NestedObject_Test.pas"/>
+        <DCCReference Include="ObjectToJSON\ObjectToJSON.GenericList_Test.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

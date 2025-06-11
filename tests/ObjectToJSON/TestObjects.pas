@@ -3,7 +3,8 @@ unit TestObjects;
 interface
 
 uses
-  JSONMapper.Attributes;
+  JSONMapper.Attributes,
+  System.Generics.Collections;
 
 type
   TUser = class
@@ -22,6 +23,25 @@ type
     isAdmin: boolean;
   end;
 
+  TNestedUser = class
+  public
+    user: TUser;
+    constructor Create();
+  end;
+
+  TUserWithList = class
+  public
+    userList: TList<TUser>;
+  end;
+
 implementation
+
+{ TNestedUser }
+
+constructor TNestedUser.Create;
+begin
+  inherited;
+  user := TUser.Create();
+end;
 
 end.

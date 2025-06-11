@@ -19,16 +19,16 @@ uses
   TestObjects in 'ObjectToJSON\TestObjects.pas',
   TestHelper in 'helper\TestHelper.pas',
   ObjektToJSON.BasicObject_Test in 'ObjectToJSON\ObjektToJSON.BasicObject_Test.pas',
-  ObjectToJSON.IgnoreAttributes_Test in 'ObjectToJSON\ObjectToJSON.IgnoreAttributes_Test.pas',
-  JSONToObject_Test in 'JSONToObject\JSONToObject_Test.pas';
+  ObjectToJSON.IgnoreAttribute_Test in 'ObjectToJSON\ObjectToJSON.IgnoreAttribute_Test.pas',
+  JSONToObject_Test in 'JSONToObject\JSONToObject_Test.pas',
+  ObjectToJSON.NestedObject_Test in 'ObjectToJSON\ObjectToJSON.NestedObject_Test.pas',
+  ObjectToJSON.GenericList_Test in 'ObjectToJSON\ObjectToJSON.GenericList_Test.pas';
 
-{$IFNDEF TESTINSIGHT}
 var
   runner: ITestRunner;
   results: IRunResults;
   logger: ITestLogger;
   nunitLogger : ITestLogger;
-{$ENDIF}
 begin
 {$IFDEF TESTINSIGHT}
   TestInsight.DUnitX.RunRegisteredTests;
