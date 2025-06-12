@@ -3,7 +3,6 @@
 interface
 
 uses
-  System.Generics.Collections,
   System.JSON,
   System.Rtti,
   System.TypInfo,
@@ -24,7 +23,19 @@ type
     ): TJSONValue; overload; static;
     class function createJSONValue(value: TValue): TJSONValue; overload; static;
   public
+    /// <summary> Maps the public fields of a generic object into a TJSONObject.
+    ///  <para> <c>TJSONString</c> - String, Char, WChar, LString, WString, UString </para>
+    ///  <para> <c>TJSONNumber</c> - Integer, Int64, Float </para>
+    ///  <para> <c>TJSONBool</c> - Boolean </para>
+    ///  <para> <c>TJSONObject</c> - Object, Record </para>
+    ///  <para> <c>TJSONArray</c> - Array, Dynamic Array, TList, TEnumerable in general </para>
+    /// </summary>
+    /// <remarks>
+    /// A Field can be ignored by adding the <c>IgnoreFieldAttribute</c> to it.
+    /// </remarks>
     class function objectToJSON(const obj: TObject): TJSONObject;
+
+    /// <summary> Maps a generic TList/TEnumerable into a TJSONArray. </summary>
     class function listToJSON(const list: TObject): TJSONArray;
 
     class function jsonToObject<T: class, constructor>(const jsonObject: TJSONObject): T;
@@ -121,6 +132,15 @@ var
   obj: TObject;
 begin
   case value.Kind of
+    tkString,
+    tkChar,
+    tkWChar,
+    tkLString,
+    tkWString,
+    tkUString: begin
+      exit(TJSONString.Create(value.AsString));
+    end;
+
     tkInteger: begin
       exit(TJSONNumber.Create(value.AsInteger));
     end;
@@ -129,15 +149,6 @@ begin
     end;
     tkFloat: begin
       exit(TJSONNumber.Create(value.AsExtended));
-    end;
-
-    tkString,
-    tkChar,
-    tkWChar,
-    tkLString,
-    tkWString,
-    tkUString: begin
-      exit(TJSONString.Create(value.AsString));
     end;
 
     tkEnumeration: begin

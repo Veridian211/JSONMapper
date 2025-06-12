@@ -55,13 +55,10 @@ begin
     end;
 
     enumerator := getEnumMethod.Invoke(enumerable, []);
-//    .
+
     enumeratorType := rttiContext.GetType(enumerator.TypeInfo);
     moveNextMethod := enumeratorType.GetMethod('MoveNext');
     currentProperty := enumeratorType.GetProperty('Current');
-
-  //  enumerator.TypeInfo^.RttiType.GetMethod('MoveNext');
-  //  enumerator.TypeInfo^.RttiType.GetProperty('Current');
     if not Assigned(moveNextMethod) or not Assigned(currentProperty) then begin
       raise EJSONMapperFaultyEnumerator.Create(enumerableType);
     end;
