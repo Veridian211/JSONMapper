@@ -10,6 +10,7 @@ uses
   System.Variants,
   System.SysUtils,
   JSONMapper.Attributes,
+  JSONMapper.Exceptions,
   RttiUtils,
   PublicFieldIterator;
 
@@ -142,7 +143,7 @@ begin
       if rttiField.FieldType.Handle = TypeInfo(Boolean) then begin
         exit(TJSONBool.Create(value.AsBoolean));
       end;
-      raise Exception.CreateFmt('Typ kann nicht in JSON gecastet werden: %s', [rttiField.FieldType.Name]);
+      raise EJSONMapperCastingException.Create(rttiField);
     end;
 
     tkVariant: begin
@@ -152,21 +153,26 @@ begin
     tkClass: begin
       exit(TJSONMapper.objectToJSON(value.AsObject));
     end;
-    
-    else begin
-      raise Exception.CreateFmt('Typ kann nicht in JSON gecastet werden: %s', [rttiField.FieldType.Name]);
+
+    tkRecord: begin
+      raise EJSONMapperNotImplementedException.Create(rttiField.FieldType);
     end;
 
+    tkArray,
+    tkDynArray: begin
+      raise EJSONMapperNotImplementedException.Create(rttiField.FieldType);
+    end;
+    
+    else begin
 //    tkUnknown: ;
 //    tkSet: ;
 //    tkMethod: ;
-//    tkArray: ;
-//    tkRecord: ;
 //    tkInterface: ;
-//    tkDynArray: ;
 //    tkClassRef: ;
 //    tkPointer: ;
 //    tkProcedure: ;
+      raise EJSONMapperCastingException.Create(rttiField);
+    end;
   end;
 end;
 

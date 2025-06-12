@@ -92,6 +92,7 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="..\src\JSONMapper\JSONMapper.pas"/>
+        <DCCReference Include="..\src\JSONMapper\JSONMapper.Exceptions.pas"/>
         <DCCReference Include="..\src\JSONMapper\JSONMapper.Attributes.pas"/>
         <DCCReference Include="..\src\JSONMapper\RttiUtils.pas"/>
         <DCCReference Include="..\src\JSONMapper\PublicFieldIterator.pas"/>

@@ -13,6 +13,7 @@ uses
   {$ENDIF }
   DUnitX.TestFramework,
   JSONMapper in '..\src\JSONMapper\JSONMapper.pas',
+  JSONMapper.Exceptions in '..\src\JSONMapper\JSONMapper.Exceptions.pas',
   JSONMapper.Attributes in '..\src\JSONMapper\JSONMapper.Attributes.pas',
   RttiUtils in '..\src\JSONMapper\RttiUtils.pas',
   PublicFieldIterator in '..\src\JSONMapper\PublicFieldIterator.pas',

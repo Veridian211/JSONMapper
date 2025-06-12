@@ -3,9 +3,6 @@
         <ProjectGuid>{47A6B1B6-1115-4274-A778-C1120FFBA98F}</ProjectGuid>
     </PropertyGroup>
     <ItemGroup>
-        <Projects Include="ObjectMapper.dproj">
-            <Dependencies/>
-        </Projects>
         <Projects Include="tests\Tests.dproj">
             <Dependencies/>
         </Projects>
@@ -17,15 +14,6 @@
             <Default.Personality/>
         </BorlandProject>
     </ProjectExtensions>
-    <Target Name="ObjectMapper">
-        <MSBuild Projects="ObjectMapper.dproj"/>
-    </Target>
-    <Target Name="ObjectMapper:Clean">
-        <MSBuild Projects="ObjectMapper.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="ObjectMapper:Make">
-        <MSBuild Projects="ObjectMapper.dproj" Targets="Make"/>
-    </Target>
     <Target Name="Tests">
         <MSBuild Projects="tests\Tests.dproj"/>
     </Target>
@@ -36,13 +24,13 @@
         <MSBuild Projects="tests\Tests.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="ObjectMapper;Tests"/>
+        <CallTarget Targets="Tests"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="ObjectMapper:Clean;Tests:Clean"/>
+        <CallTarget Targets="Tests:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="ObjectMapper:Make;Tests:Make"/>
+        <CallTarget Targets="Tests:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>
