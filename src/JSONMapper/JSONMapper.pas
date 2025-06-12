@@ -27,6 +27,8 @@ type
     class function jsonToObject<T: class, constructor>(jsonObject: TJSONObject): T;
   end;
 
+  IgnoreFieldAttribute = JSONMapper.Attributes.IgnoreFieldAttribute;
+
 implementation
 
 class function TJSONMapper.objectToJSON(obj: TObject): TJSONObject;
