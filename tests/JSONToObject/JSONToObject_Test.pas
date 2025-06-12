@@ -21,7 +21,7 @@ type
     procedure TearDown;
 
     [Test]
-    procedure Test1;
+    procedure TestBasicObject;
   end;
 
 implementation
@@ -36,7 +36,7 @@ begin
   jsonObject.Free;
 end;
 
-procedure TJSONToObject.Test1;
+procedure TJSONToObject.TestBasicObject;
 var
   jsonPair: TJSONPair;
   json: string;

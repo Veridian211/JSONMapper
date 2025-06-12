@@ -23,7 +23,8 @@ uses
   ObjectToJSON.IgnoreAttribute_Test in 'ObjectToJSON\ObjectToJSON.IgnoreAttribute_Test.pas',
   JSONToObject_Test in 'JSONToObject\JSONToObject_Test.pas',
   ObjectToJSON.NestedObject_Test in 'ObjectToJSON\ObjectToJSON.NestedObject_Test.pas',
-  ObjectToJSON.GenericList_Test in 'ObjectToJSON\ObjectToJSON.GenericList_Test.pas';
+  ObjectToJSON.GenericList_Test in 'ObjectToJSON\ObjectToJSON.GenericList_Test.pas',
+  JSONMapper.EnumerableHelper in '..\src\JSONMapper\JSONMapper.EnumerableHelper.pas';
 
 var
   runner: ITestRunner;

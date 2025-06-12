@@ -9,8 +9,9 @@ uses
   System.TypInfo,
   System.Variants,
   System.SysUtils,
-  JSONMapper.Attributes,
   JSONMapper.Exceptions,
+  JSONMapper.Attributes,
+  JSONMapper.EnumerableHelper,
   RttiUtils,
   PublicFieldIterator;
 
@@ -20,19 +21,20 @@ type
     class function createJSONValue(
       element: TObject;
       rttiField: TRttiField
-    ): TJSONValue; static;
+    ): TJSONValue; overload; static;
+    class function createJSONValue(value: TValue): TJSONValue; overload; static;
   public
-    class function objectToJSON(obj: TObject): TJSONObject;
-    class function objectListToJSON(list: TList<TObject>): TJSONArray;
+    class function objectToJSON(const obj: TObject): TJSONObject;
+    class function listToJSON(const list: TObject): TJSONArray;
 
-    class function jsonToObject<T: class, constructor>(jsonObject: TJSONObject): T;
+    class function jsonToObject<T: class, constructor>(const jsonObject: TJSONObject): T;
   end;
 
   IgnoreFieldAttribute = JSONMapper.Attributes.IgnoreFieldAttribute;
 
 implementation
 
-class function TJSONMapper.objectToJSON(obj: TObject): TJSONObject;
+class function TJSONMapper.objectToJSON(const obj: TObject): TJSONObject;
 var
   jsonObject: TJSONObject;
 
@@ -68,39 +70,33 @@ begin
   exit(jsonObject);
 end;
 
-class function TJSONMapper.objectListToJSON(list: TList<TObject>): TJSONArray;
+class function TJSONMapper.listToJSON(const list: TObject): TJSONArray;
 var
   jsonArray: TJSONArray;
 
   rttiContext: TRttiContext;
-  rttiInstanceType: TRttiInstanceType;
-  rttiFields: TArray<TRttiField>;
-  rttiField: TRttiField;
-  jsonKey: string;
-  element: TObject;
+  enumerator: TValue;
+  currentProperty: TRttiProperty;
+  moveNextMethod: TRttiMethod;
 
-  jsonObject: TJSONObject;
+  current: TValue;
   jsonValue: TJSONValue;
-  jsonPair: TJSONPair;
 begin
   jsonArray := TJSONArray.Create();
   try
     rttiContext := TRttiContext.Create();
     try
-      for element in list do begin
-        rttiInstanceType := rttiContext.GetType(element.ClassType) as TRttiInstanceType;
-        rttiFields := rttiInstanceType.GetPublicFields();
+      getEnumeratorMethods(
+        list,
+        enumerator,
+        currentProperty,
+        moveNextMethod
+      );
 
-        jsonObject := TJSONObject.Create();
-        jsonArray.AddElement(jsonObject);
-
-        for rttiField in rttiFields do begin
-          jsonKey := rttiField.Name;
-          jsonValue := createJSONValue(element, rttiField);
-
-          jsonPair := TJSONPair.Create(jsonKey, jsonValue);
-          jsonObject.AddPair(jsonPair);
-        end;
+      while moveNextMethod.Invoke(enumerator, []).AsBoolean do begin
+        current := currentProperty.GetValue(enumerator.AsObject);
+        jsonValue := createJSONValue(current);
+        jsonArray.AddElement(jsonValue);
       end;
     finally
       rttiContext.Free;
@@ -109,17 +105,22 @@ begin
     jsonArray.Free;
     raise;
   end;
-
   exit(jsonArray);
 end;
 
 class function TJSONMapper.createJSONValue(element: TObject; rttiField: TRttiField): TJSONValue;
 var
-  value: TValue; 
+  value: TValue;
 begin
   value := rttiField.GetValue(TObject(element));
-  
-  case rttiField.FieldType.TypeKind of
+  exit(createJSONValue(value));
+end;
+
+class function TJSONMapper.createJSONValue(value: TValue): TJSONValue;
+var
+  obj: TObject;
+begin
+  case value.Kind of
     tkInteger: begin
       exit(TJSONNumber.Create(value.AsInteger));
     end;
@@ -129,7 +130,7 @@ begin
     tkFloat: begin
       exit(TJSONNumber.Create(value.AsExtended));
     end;
-    
+
     tkString,
     tkChar,
     tkWChar,
@@ -140,10 +141,10 @@ begin
     end;
 
     tkEnumeration: begin
-      if rttiField.FieldType.Handle = TypeInfo(Boolean) then begin
+      if value.TypeInfo = TypeInfo(Boolean) then begin
         exit(TJSONBool.Create(value.AsBoolean));
       end;
-      raise EJSONMapperCastingException.Create(rttiField);
+      raise EJSONMapperCastingException.Create(value.TypeInfo);
     end;
 
     tkVariant: begin
@@ -151,18 +152,22 @@ begin
     end;
 
     tkClass: begin
-      exit(TJSONMapper.objectToJSON(value.AsObject));
+      obj := value.AsObject;
+      if isGenericTEnumerable(obj) then begin
+        exit(TJSONMapper.listToJSON(obj));
+      end;
+      exit(TJSONMapper.objectToJSON(obj));
     end;
 
     tkRecord: begin
-      raise EJSONMapperNotImplementedException.Create(rttiField.FieldType);
+      raise EJSONMapperNotImplementedException.Create(value.TypeInfo);
     end;
 
     tkArray,
     tkDynArray: begin
-      raise EJSONMapperNotImplementedException.Create(rttiField.FieldType);
+      raise EJSONMapperNotImplementedException.Create(value.TypeInfo);
     end;
-    
+
     else begin
 //    tkUnknown: ;
 //    tkSet: ;
@@ -171,13 +176,13 @@ begin
 //    tkClassRef: ;
 //    tkPointer: ;
 //    tkProcedure: ;
-      raise EJSONMapperCastingException.Create(rttiField);
+      raise EJSONMapperCastingException.Create(value.TypeInfo);
     end;
   end;
 end;
 
 class function TJSONMapper.jsonToObject<T>(
-  jsonObject: TJSONObject
+  const jsonObject: TJSONObject
 ): T;
 var
   obj: T;

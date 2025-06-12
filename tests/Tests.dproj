@@ -103,6 +103,7 @@
         <DCCReference Include="JSONToObject\JSONToObject_Test.pas"/>
         <DCCReference Include="ObjectToJSON\ObjectToJSON.NestedObject_Test.pas"/>
         <DCCReference Include="ObjectToJSON\ObjectToJSON.GenericList_Test.pas"/>
+        <DCCReference Include="..\src\JSONMapper\JSONMapper.EnumerableHelper.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

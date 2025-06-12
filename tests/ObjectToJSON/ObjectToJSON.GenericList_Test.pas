@@ -53,15 +53,26 @@ begin
 end;
 
 procedure TGenericList_Test.TestGenericList;
+const
+  EXPECTED_VALUE = '[{"id":0,"name":"","isAdmin":false},{"id":1,"name":"","isAdmin":false},{"id":2,"name":"","isAdmin":false}]';
 var
-  json: TJSONArray;
+  jsonArray: TJSONArray;
 begin
-//  json := TJSONMapper.objectListToJSON(userList);
+  jsonArray := TJSONMapper.listToJSON(userList);
+
+  Assert.AreEqual(EXPECTED_VALUE, jsonArray.ToJSON());
 end;
 
 procedure TGenericList_Test.TestObjectWithGenericList;
+const
+  EXPECTED_VALUE = '{}';
+var
+  jsonObject: TJSONObject;
 begin
+  jsonObject := TJSONObject.Create();
+//  jsonObject := TJSONMapper.objectToJSON(userWithList);
 
+  Assert.AreEqual(EXPECTED_VALUE, jsonObject.ToJSON());
 end;
 
 initialization
