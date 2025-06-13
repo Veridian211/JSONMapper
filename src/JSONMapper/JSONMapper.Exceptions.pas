@@ -12,6 +12,7 @@ type
 
   EJSONMapperCastingException = class(EJSONMapperException)
   public
+    constructor Create(rttiField: TRttiField); reintroduce; overload;
     constructor Create(typeInfo: PTypeInfo); reintroduce; overload;
   end;
 
@@ -34,21 +35,23 @@ implementation
 
 { EJSONMapperCastingException }
 
-//constructor EJSONMapperCastingException.Create(rttiField: TRttiField);
-//const
-//  ERROR_MESSAGE = 'Field "%s" of type "%s" cannot be casted into JSON. Consider ignoring the field.';
-//var
-//  fieldName: string;
-//  fieldType: string;
-//begin
-//  fieldName := rttiField.Name;
-//  fieldType := rttiField.FieldType.Name;
-//  inherited CreateFmt(ERROR_MESSAGE, [fieldName, fieldType]);
-//end;
+constructor EJSONMapperCastingException.Create(rttiField: TRttiField);
+const
+ ERROR_MESSAGE = 'Field "%s.%s" of type "%s" cannot be casted into JSON. Consider ignoring it.';
+var
+ fieldName: string;
+ fieldParentName: string;
+ fieldType: string;
+begin
+ fieldName := rttiField.Name;
+ fieldParentName := rttiField.Parent.Name;
+ fieldType := rttiField.FieldType.Name;
+ inherited CreateFmt(ERROR_MESSAGE, [fieldParentName, fieldName, fieldType]);
+end;
 
 constructor EJSONMapperCastingException.Create(typeInfo: PTypeInfo);
 const
-  ERROR_MESSAGE = 'Type "%s" cannot be casted into JSON. Consider ignoring the field.';
+  ERROR_MESSAGE = 'Type "%s" cannot be casted into JSON.';
 begin
   inherited CreateFmt(ERROR_MESSAGE, [typeInfo.Name]);
 end;

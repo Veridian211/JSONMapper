@@ -18,7 +18,7 @@ type
   TJSONMapper = class
   protected
     class function createJSONValue(
-      element: TObject;
+      obj: TObject;
       rttiField: TRttiField
     ): TJSONValue; overload; static;
     class function createJSONValue(value: TValue): TJSONValue; overload; static;
@@ -121,12 +121,20 @@ begin
   exit(jsonArray);
 end;
 
-class function TJSONMapper.createJSONValue(element: TObject; rttiField: TRttiField): TJSONValue;
+class function TJSONMapper.createJSONValue(obj: TObject; rttiField: TRttiField): TJSONValue;
 var
   value: TValue;
 begin
-  value := rttiField.GetValue(TObject(element));
-  exit(createJSONValue(value));
+  value := rttiField.GetValue(obj);
+
+  try
+    exit(createJSONValue(value));
+  except
+    on E: EJSONMapperCastingException do begin
+      raise EJSONMapperCastingException.Create(rttiField);
+    end;
+    raise;
+  end;
 end;
 
 class function TJSONMapper.createJSONValue(value: TValue): TJSONValue;
