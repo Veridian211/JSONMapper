@@ -25,7 +25,8 @@ uses
   ObjectToJSON.NestedObject in 'ObjectToJSON\ObjectToJSON.NestedObject.pas',
   ObjectToJSON.GenericList_ObjectList in 'ObjectToJSON\ObjectToJSON.GenericList_ObjectList.pas',
   JSONMapper.EnumerableHelper in '..\src\JSONMapper\JSONMapper.EnumerableHelper.pas',
-  ObjectToJSON.GenericList_BasicDatatypes in 'ObjectToJSON\ObjectToJSON.GenericList_BasicDatatypes.pas';
+  ObjectToJSON.GenericList_BasicDatatypes in 'ObjectToJSON\ObjectToJSON.GenericList_BasicDatatypes.pas',
+  ObjectToJSON.BasicRecord in 'ObjectToJSON\ObjectToJSON.BasicRecord.pas';
 
 var
   runner: ITestRunner;
