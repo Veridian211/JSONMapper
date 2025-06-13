@@ -17,7 +17,6 @@ uses
   JSONMapper.Attributes in '..\src\JSONMapper\JSONMapper.Attributes.pas',
   JSONMapper.ClassFieldHelper in '..\src\JSONMapper\JSONMapper.ClassFieldHelper.pas',
   PublicFieldIterator in '..\src\JSONMapper\PublicFieldIterator.pas',
-  TestObjects in 'ObjectToJSON\TestObjects.pas',
   TestHelper in 'helper\TestHelper.pas',
   ObjektToJSON.BasicObject in 'ObjectToJSON\ObjektToJSON.BasicObject.pas',
   ObjectToJSON.IgnoreAttribute in 'ObjectToJSON\ObjectToJSON.IgnoreAttribute.pas',

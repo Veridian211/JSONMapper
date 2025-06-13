@@ -6,12 +6,18 @@ uses
   System.Generics.Collections,
   System.JSON,
   DUnitX.TestFramework,
-  JSONMapper,
-  TestObjects;
+  JSONMapper;
 
 type
+  TUser = class
+  public
+    id: integer;
+    name: string;
+    isAdmin: boolean;
+  end;
+
   [TestFixture]
-  TGenericList_Test = class
+  TList_ObjectList = class
   private
     userList: TList<TUser>;
 //    userWithList: TUserWithList;
@@ -29,7 +35,7 @@ type
 
 implementation
 
-procedure TGenericList_Test.Setup;
+procedure TList_ObjectList.Setup;
 var
   user: TUser;
   i: Integer;
@@ -43,7 +49,7 @@ begin
   end;
 end;
 
-procedure TGenericList_Test.TearDown;
+procedure TList_ObjectList.TearDown;
 var
   i: Integer;
 begin
@@ -53,7 +59,7 @@ begin
   userList.Free;
 end;
 
-procedure TGenericList_Test.TestGenericList;
+procedure TList_ObjectList.TestGenericList;
 const
   EXPECTED_VALUE = '[{"id":0,"name":"","isAdmin":false},{"id":1,"name":"","isAdmin":false},{"id":2,"name":"","isAdmin":false}]';
 var
@@ -67,7 +73,7 @@ begin
   end;
 end;
 
-procedure TGenericList_Test.TestObjectWithGenericList;
+procedure TList_ObjectList.TestObjectWithGenericList;
 const
   EXPECTED_VALUE = '{}';
 var
@@ -83,6 +89,6 @@ begin
 end;
 
 initialization
-  TDUnitX.RegisterTestFixture(TGenericList_Test);
+  TDUnitX.RegisterTestFixture(TList_ObjectList);
 
 end.

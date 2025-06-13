@@ -11,7 +11,7 @@ uses
 
 type
   [TestFixture]
-  TList_BasicDatatypes_Test = class
+  TList_BasicDatatypes = class
   private
     integerList: TList<integer>;
     stringList: TList<string>;
@@ -32,7 +32,7 @@ type
 
 implementation
 
-procedure TList_BasicDatatypes_Test.Setup;
+procedure TList_BasicDatatypes.Setup;
 var
   i: Integer;
   isBiggerThanZero: boolean;
@@ -54,14 +54,14 @@ begin
   end;
 end;
 
-procedure TList_BasicDatatypes_Test.TearDown;
+procedure TList_BasicDatatypes.TearDown;
 begin
   integerList.Free;
   stringList.Free;
   boolList.Free;
 end;
 
-procedure TList_BasicDatatypes_Test.TestIntegerList;
+procedure TList_BasicDatatypes.TestIntegerList;
 const
   EXPECTED_VALUE = '[0,1,2,3]';
 var
@@ -75,7 +75,7 @@ begin
   end;
 end;
 
-procedure TList_BasicDatatypes_Test.TestStringList;  
+procedure TList_BasicDatatypes.TestStringList;
 const
   EXPECTED_VALUE = '["0","1","2","3"]';
 var
@@ -89,7 +89,7 @@ begin
   end;
 end;  
 
-procedure TList_BasicDatatypes_Test.TestBoolList;
+procedure TList_BasicDatatypes.TestBoolList;
 const
   EXPECTED_VALUE = '[false,true,true,true]';
 var
@@ -104,6 +104,6 @@ begin
 end;
 
 initialization
-  TDUnitX.RegisterTestFixture(TList_BasicDatatypes_Test);
+  TDUnitX.RegisterTestFixture(TList_BasicDatatypes);
 
 end.

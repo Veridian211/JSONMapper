@@ -19,7 +19,7 @@ type
   end;
 
   [TestFixture]
-  TRecordToJSON_Test = class
+  TRecordToJSON = class
   private
     userWrapper: TUserWrapper;
   public
@@ -34,7 +34,7 @@ type
 
 implementation
 
-procedure TRecordToJSON_Test.Setup;
+procedure TRecordToJSON.Setup;
 begin
   userWrapper := TUserWrapper.Create();
 
@@ -43,12 +43,12 @@ begin
   userWrapper.user.isAdmin := true;
 end;
 
-procedure TRecordToJSON_Test.TearDown;
+procedure TRecordToJSON.TearDown;
 begin
   userWrapper.Free;
 end;
 
-procedure TRecordToJSON_Test.TestBasicRecord;
+procedure TRecordToJSON.TestBasicRecord;
 const
   EXPECTED_VALUE = '{"user":{"id":1,"name":"John Doe","isAdmin":true}}';
 var
@@ -63,6 +63,6 @@ begin
 end;
 
 initialization
-  TDUnitX.RegisterTestFixture(TRecordToJSON_Test);
+  TDUnitX.RegisterTestFixture(TRecordToJSON);
 
 end.

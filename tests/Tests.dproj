@@ -96,7 +96,6 @@
         <DCCReference Include="..\src\JSONMapper\JSONMapper.Attributes.pas"/>
         <DCCReference Include="..\src\JSONMapper\JSONMapper.ClassFieldHelper.pas"/>
         <DCCReference Include="..\src\JSONMapper\PublicFieldIterator.pas"/>
-        <DCCReference Include="ObjectToJSON\TestObjects.pas"/>
         <DCCReference Include="helper\TestHelper.pas"/>
         <DCCReference Include="ObjectToJSON\ObjektToJSON.BasicObject.pas"/>
         <DCCReference Include="ObjectToJSON\ObjectToJSON.IgnoreAttribute.pas"/>

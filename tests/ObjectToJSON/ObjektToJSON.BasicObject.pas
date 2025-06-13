@@ -5,15 +5,20 @@ interface
 uses
   DUnitX.TestFramework,
   System.JSON,
-  TestObjects,
-  JSONMapper,
-  TestHelper;
+  JSONMapper;
 
 type
+  TUser = class
+  public
+    id: integer;
+    name: string;
+    isAdmin: boolean;
+  end;
+
   [TestFixture]
-  TBasicObjektToJSON_Test = class
+  TBasicObjektToJSON = class
   private
-    obj: TUser;
+    user: TUser;
   public
     [Setup]
     procedure Setup;
@@ -26,27 +31,27 @@ type
 
 implementation
 
-procedure TBasicObjektToJSON_Test.Setup;
+procedure TBasicObjektToJSON.Setup;
 begin
-  obj := TUser.Create();
+  user := TUser.Create();
 end;
 
-procedure TBasicObjektToJSON_Test.TearDown;
+procedure TBasicObjektToJSON.TearDown;
 begin
-  obj.Free;
+  user.Free;
 end;
 
-procedure TBasicObjektToJSON_Test.TestBasicObject;
+procedure TBasicObjektToJSON.TestBasicObject;
 const
   EXPECTED_JSON = '{"id":1,"name":"John Doe","isAdmin":true}';
 var
   jsonObject: TJSONObject;
 begin
-  obj.id := 1;
-  obj.name := 'John Doe';
-  obj.isAdmin := true;
+  user.id := 1;
+  user.name := 'John Doe';
+  user.isAdmin := true;
 
-  jsonObject := TJSONMapper.objectToJSON(obj);
+  jsonObject := TJSONMapper.objectToJSON(user);
   try
     Assert.AreEqual(EXPECTED_JSON, jsonObject.ToJSON());
   finally
@@ -55,6 +60,6 @@ begin
 end;
 
 initialization
-  TDUnitX.RegisterTestFixture(TBasicObjektToJSON_Test);
+  TDUnitX.RegisterTestFixture(TBasicObjektToJSON);
 
 end.

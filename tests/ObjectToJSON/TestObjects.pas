@@ -14,15 +14,6 @@ type
     isAdmin: boolean;
   end;
 
-  TUserWithIgnoreAttribute = class
-  public
-    [IgnoreField]
-    id: integer;
-
-    name: string;
-    isAdmin: boolean;
-  end;
-
   TNestedUser = class
   public
     user: TUser;

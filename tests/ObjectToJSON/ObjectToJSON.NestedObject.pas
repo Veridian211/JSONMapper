@@ -5,14 +5,27 @@ interface
 uses
   DUnitX.TestFramework,
   System.JSON,
-  TestObjects,
   JSONMapper;
 
 type
+  TUser = class
+  public
+    id: integer;
+    name: string;
+    isAdmin: boolean;
+  end;
+
+  TNestedUser = class
+  public
+    user: TUser;
+    constructor Create();
+    destructor Destroy(); override;
+  end;
+
   [TestFixture]
-  TNestedObject_Test = class
+  TNestedObject = class
   private
-    obj: TNestedUser;
+    nestedUser: TNestedUser;
   public
     [Setup]
     procedure Setup;
@@ -25,17 +38,17 @@ type
 
 implementation
 
-procedure TNestedObject_Test.Setup;
+procedure TNestedObject.Setup;
 begin
-  obj := TNestedUser.Create();
+  nestedUser := TNestedUser.Create();
 end;
 
-procedure TNestedObject_Test.TearDown;
+procedure TNestedObject.TearDown;
 begin
-  obj.Free;
+  nestedUser.Free;
 end;
 
-procedure TNestedObject_Test.TestNestedObject;
+procedure TNestedObject.TestNestedObject;
 const
   EXPECTED_VALUE = 1;
 var
@@ -43,9 +56,9 @@ var
   userObj: TJSONObject;
   userId: integer;
 begin
-  obj.user.id := EXPECTED_VALUE;
+  nestedUser.user.id := EXPECTED_VALUE;
 
-  jsonObject := TJSONMapper.objectToJSON(obj);
+  jsonObject := TJSONMapper.objectToJSON(nestedUser);
   try
     jsonObject.TryGetValue<TJSONObject>('user', userObj);
     userObj.TryGetValue<integer>('id', userId);
@@ -56,7 +69,21 @@ begin
   end;
 end;
 
+{ TNestedUser }
+
+constructor TNestedUser.Create;
+begin
+  inherited;
+  user := TUser.Create();
+end;
+
+destructor TNestedUser.Destroy;
+begin
+  user.Free;
+  inherited;
+end;
+
 initialization
-  TDUnitX.RegisterTestFixture(TNestedObject_Test);
+  TDUnitX.RegisterTestFixture(TNestedObject);
 
 end.

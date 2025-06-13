@@ -5,10 +5,16 @@ interface
 uses
   DUnitX.TestFramework,
   System.JSON,
-  TestObjects,
   JSONMapper;
 
 type
+  TUser = class
+  public
+    id: integer;
+    name: string;
+    isAdmin: boolean;
+  end;
+
   [TestFixture]
   TJSONToObject = class
   private

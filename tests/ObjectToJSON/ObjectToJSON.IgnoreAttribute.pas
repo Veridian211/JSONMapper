@@ -5,15 +5,21 @@ interface
 uses
   DUnitX.TestFramework,
   System.JSON,
-  TestObjects,
-  TestHelper,
   JSONMapper;
 
 type
+  TUser = class
+  public
+    [IgnoreField]
+    id: integer;
+    name: string;
+    isAdmin: boolean;
+  end;
+
   [TestFixture]
-  TIgnoreAttribute_Test = class
+  TIgnoreAttribute = class
   private
-    obj: TUserWithIgnoreAttribute;
+    user: TUser;
   public
     [Setup]
     procedure Setup;
@@ -25,22 +31,22 @@ type
 
 implementation
 
-procedure TIgnoreAttribute_Test.Setup;
+procedure TIgnoreAttribute.Setup;
 begin
-  obj := TUserWithIgnoreAttribute.Create();
+  user := TUser.Create();
 end;
 
-procedure TIgnoreAttribute_Test.TearDown;
+procedure TIgnoreAttribute.TearDown;
 begin
-  obj.Free;
+  user.Free;
 end;
 
-procedure TIgnoreAttribute_Test.TestIgnoreAttribute;
+procedure TIgnoreAttribute.TestIgnoreAttribute;
 var
   jsonObject: TJSONObject;
   _: TJSONValue;
 begin
-  jsonObject := TJSONMapper.objectToJSON(obj);
+  jsonObject := TJSONMapper.objectToJSON(user);
   try
     Assert.IsFalse(jsonObject.TryGetValue('id', _));
   finally
@@ -49,6 +55,6 @@ begin
 end;
 
 initialization
-  TDUnitX.RegisterTestFixture(TIgnoreAttribute_Test);
+  TDUnitX.RegisterTestFixture(TIgnoreAttribute);
 
 end.
