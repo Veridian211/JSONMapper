@@ -22,6 +22,8 @@ type
       rttiField: TRttiField
     ): TJSONValue; overload; static;
     class function createJSONValue(value: TValue): TJSONValue; overload; static;
+    class function recordToJSON(const rec: TValue): TJSONObject; static;
+    class function arrayToJSON(const arr: TValue): TJSONArray; static;
   public
     /// <summary> Maps the public fields of a generic object into a TJSONObject.
     ///  <para> <c>TJSONString</c> - String, Char, WChar, LString, WString, UString </para>
@@ -171,12 +173,12 @@ begin
     end;
 
     tkRecord: begin
-      raise EJSONMapperNotImplementedException.Create(value.TypeInfo);
+      exit(TJSONMapper.recordToJSON(value));
     end;
 
     tkArray,
     tkDynArray: begin
-      raise EJSONMapperNotImplementedException.Create(value.TypeInfo);
+      exit(TJSONMapper.arrayToJSON(value));
     end;
 
     else begin
