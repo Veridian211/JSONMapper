@@ -40,7 +40,7 @@ type
     /// <summary> Maps a generic TList/TEnumerable into a TJSONArray. </summary>
     class function listToJSON(const list: TObject): TJSONArray;
 
-    class function jsonToObject<T: class, constructor>(const jsonObject: TJSONObject): T;
+    class function jsonToObject<T: class, constructor>(const jsonObject: TJSONObject): T; static;
   end;
 
   IgnoreFieldAttribute = JSONMapper.Attributes.IgnoreFieldAttribute;
@@ -118,6 +118,7 @@ begin
     jsonArray.Free;
     raise;
   end;
+
   exit(jsonArray);
 end;
 
@@ -132,8 +133,9 @@ begin
   except
     on E: EJSONMapperCastingException do begin
       raise EJSONMapperCastingException.Create(rttiField);
+    end else begin
+      raise;
     end;
-    raise;
   end;
 end;
 
@@ -200,6 +202,16 @@ begin
       raise EJSONMapperCastingException.Create(value.TypeInfo);
     end;
   end;
+end;
+
+class function TJSONMapper.recordToJSON(const rec: TValue): TJSONObject;
+begin
+
+end;
+
+class function TJSONMapper.arrayToJSON(const arr: TValue): TJSONArray;
+begin
+
 end;
 
 class function TJSONMapper.jsonToObject<T>(
