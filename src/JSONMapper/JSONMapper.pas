@@ -106,10 +106,14 @@ begin
         moveNextMethod
       );
 
-      while moveNextMethod.Invoke(enumerator, []).AsBoolean do begin
-        current := currentProperty.GetValue(enumerator.AsObject);
-        jsonValue := createJSONValue(current);
-        jsonArray.AddElement(jsonValue);
+      try
+        while moveNextMethod.Invoke(enumerator, []).AsBoolean do begin
+          current := currentProperty.GetValue(enumerator.AsObject);
+          jsonValue := createJSONValue(current);
+          jsonArray.AddElement(jsonValue);
+        end;
+      finally
+        enumerator.AsObject.Free;
       end;
     finally
       rttiContext.Free;
