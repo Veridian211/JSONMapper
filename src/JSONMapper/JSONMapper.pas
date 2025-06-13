@@ -10,8 +10,8 @@ uses
   System.SysUtils,
   JSONMapper.Exceptions,
   JSONMapper.Attributes,
+  JSONMapper.ClassFieldHelper,
   JSONMapper.EnumerableHelper,
-  RttiUtils,
   PublicFieldIterator;
 
 type

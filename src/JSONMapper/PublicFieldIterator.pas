@@ -4,7 +4,7 @@ interface
 
 uses
   System.Rtti,
-  RttiUtils,
+  JSONMapper.ClassFieldHelper,
   JSONMapper.Attributes;
 
 type

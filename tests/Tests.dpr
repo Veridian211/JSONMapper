@@ -15,7 +15,7 @@ uses
   JSONMapper in '..\src\JSONMapper\JSONMapper.pas',
   JSONMapper.Exceptions in '..\src\JSONMapper\JSONMapper.Exceptions.pas',
   JSONMapper.Attributes in '..\src\JSONMapper\JSONMapper.Attributes.pas',
-  RttiUtils in '..\src\JSONMapper\RttiUtils.pas',
+  JSONMapper.ClassFieldHelper in '..\src\JSONMapper\JSONMapper.ClassFieldHelper.pas',
   PublicFieldIterator in '..\src\JSONMapper\PublicFieldIterator.pas',
   TestObjects in 'ObjectToJSON\TestObjects.pas',
   TestHelper in 'helper\TestHelper.pas',
