@@ -1,4 +1,4 @@
-unit JSONToObject_Test;
+unit JSONToObject.BasicObject;
 
 interface
 

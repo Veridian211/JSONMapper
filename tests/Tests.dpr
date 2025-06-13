@@ -16,16 +16,16 @@ uses
   JSONMapper.Exceptions in '..\src\JSONMapper\JSONMapper.Exceptions.pas',
   JSONMapper.Attributes in '..\src\JSONMapper\JSONMapper.Attributes.pas',
   JSONMapper.ClassFieldHelper in '..\src\JSONMapper\JSONMapper.ClassFieldHelper.pas',
+  JSONMapper.EnumerableHelper in '..\src\JSONMapper\JSONMapper.EnumerableHelper.pas',
   PublicFieldIterator in '..\src\JSONMapper\PublicFieldIterator.pas',
-  TestHelper in 'helper\TestHelper.pas',
   ObjektToJSON.BasicObject in 'ObjectToJSON\ObjektToJSON.BasicObject.pas',
   ObjectToJSON.IgnoreAttribute in 'ObjectToJSON\ObjectToJSON.IgnoreAttribute.pas',
-  JSONToObject_Test in 'JSONToObject\JSONToObject_Test.pas',
   ObjectToJSON.NestedObject in 'ObjectToJSON\ObjectToJSON.NestedObject.pas',
   ObjectToJSON.GenericList_ObjectList in 'ObjectToJSON\ObjectToJSON.GenericList_ObjectList.pas',
-  JSONMapper.EnumerableHelper in '..\src\JSONMapper\JSONMapper.EnumerableHelper.pas',
   ObjectToJSON.GenericList_BasicDatatypes in 'ObjectToJSON\ObjectToJSON.GenericList_BasicDatatypes.pas',
-  ObjectToJSON.BasicRecord in 'ObjectToJSON\ObjectToJSON.BasicRecord.pas';
+  ObjectToJSON.BasicRecord in 'ObjectToJSON\ObjectToJSON.BasicRecord.pas',
+  ObjectToJSON.Arrays in 'ObjectToJSON\ObjectToJSON.Arrays.pas',
+  JSONToObject.BasicObject in 'JSONToObject\JSONToObject.BasicObject.pas';
 
 var
   runner: ITestRunner;

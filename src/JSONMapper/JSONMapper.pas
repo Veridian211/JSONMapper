@@ -130,7 +130,6 @@ var
   value: TValue;
 begin
   value := rttiField.GetValue(obj);
-
   try
     exit(createJSONValue(value));
   except
@@ -144,7 +143,6 @@ var
   value: TValue;
 begin
   value := rttiField.GetValue(rec.GetReferenceToRawData);
-
   try
     exit(createJSONValue(value));
   except
@@ -178,10 +176,10 @@ begin
     end;
 
     tkEnumeration: begin
-      if value.TypeInfo = TypeInfo(Boolean) then begin
-        exit(TJSONBool.Create(value.AsBoolean));
+      if not (value.TypeInfo = TypeInfo(Boolean)) then begin
+        raise EJSONMapperCastingException.Create(value.TypeInfo);
       end;
-      raise EJSONMapperCastingException.Create(value.TypeInfo);
+      exit(TJSONBool.Create(value.AsBoolean));
     end;
 
     tkVariant: begin
@@ -255,14 +253,38 @@ end;
 
 class function TJSONMapper.arrayToJSON(const arr: TValue): TJSONArray;
 var
-  rttiContext: TRttiContext;
-begin
-  rttiContext := TRttiContext.Create();
-  try
+  jsonArray: TJSONArray;
 
-  finally
-    rttiContext.Free;
+  rttiContext: TRttiContext;
+  arrayType: TRttiType;
+  arrayLength: integer;
+
+  i: Integer;
+  element: TValue;
+  jsonValue: TJSONValue;
+begin
+  jsonArray := TJSONArray.Create();
+  try
+    rttiContext := TRttiContext.Create();
+    try
+      arrayType := rttiContext.GetType(arr.TypeInfo);
+      arrayLength := arr.GetArrayLength();
+
+      for i := 0 to arrayLength - 1 do begin
+        element := arr.GetArrayElement(i);
+
+        jsonValue := createJSONValue(element);
+        jsonArray.AddElement(jsonValue);
+      end;
+    finally
+      rttiContext.Free;
+    end;
+  except
+    jsonArray.Free;
+    raise;
   end;
+
+  exit(jsonArray);
 end;
 
 class function TJSONMapper.jsonToObject<T>(

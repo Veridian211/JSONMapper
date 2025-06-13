@@ -40,14 +40,14 @@ procedure getEnumeratorMethods(
 );
 var
   rttiContext: TRttiContext;
-  enumerableType: TRttiType;
+  enumerableType: TRttiInstanceType;
 
   getEnumMethod: TRttiMethod;
-  enumeratorType: TRttiType;
+  enumeratorType: TRttiInstanceType;
 begin
   rttiContext := TRttiContext.Create();
   try
-    enumerableType := rttiContext.GetType(enumerable.ClassType);
+    enumerableType := rttiContext.GetType(enumerable.ClassType) as TRttiInstanceType;
 
     getEnumMethod := enumerableType.GetMethod('GetEnumerator');
     if not Assigned(getEnumMethod) then begin
@@ -56,7 +56,7 @@ begin
 
     enumerator := getEnumMethod.Invoke(enumerable, []);
 
-    enumeratorType := rttiContext.GetType(enumerator.TypeInfo);
+    enumeratorType := rttiContext.GetType(enumerator.TypeInfo) as TRttiInstanceType;
     moveNextMethod := enumeratorType.GetMethod('MoveNext');
     currentProperty := enumeratorType.GetProperty('Current');
     if not Assigned(moveNextMethod) or not Assigned(currentProperty) then begin

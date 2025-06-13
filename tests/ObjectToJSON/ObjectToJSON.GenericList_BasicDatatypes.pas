@@ -15,7 +15,7 @@ type
   private
     integerList: TList<integer>;
     stringList: TList<string>;
-    boolList: TList<boolean>;
+    booleanList: TList<boolean>;
   public
     [Setup]
     procedure Setup;
@@ -47,10 +47,10 @@ begin
     stringList.Add(IntToStr(i));
   end;
 
-  boolList := TList<boolean>.Create();
+  booleanList := TList<boolean>.Create();
   for i := 0 to 3 do begin
     isBiggerThanZero := i > 0;
-    boolList.Add(isBiggerThanZero);
+    booleanList.Add(isBiggerThanZero);
   end;
 end;
 
@@ -58,7 +58,7 @@ procedure TList_BasicDatatypes.TearDown;
 begin
   integerList.Free;
   stringList.Free;
-  boolList.Free;
+  booleanList.Free;
 end;
 
 procedure TList_BasicDatatypes.TestIntegerList;
@@ -95,7 +95,7 @@ const
 var
   jsonArray: TJSONArray;
 begin
-  jsonArray := TJSONMapper.listToJSON(boolList);
+  jsonArray := TJSONMapper.listToJSON(booleanList);
   try
     Assert.AreEqual(EXPECTED_VALUE, jsonArray.ToJSON());    
   finally
