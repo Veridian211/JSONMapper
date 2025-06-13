@@ -27,6 +27,7 @@ type
   public
     user: TUser;
     constructor Create();
+    destructor Destroy(); override;
   end;
 
   TUserWithList = class
@@ -42,6 +43,12 @@ constructor TNestedUser.Create;
 begin
   inherited;
   user := TUser.Create();
+end;
+
+destructor TNestedUser.Destroy;
+begin
+  user.Free;
+  inherited;
 end;
 
 end.

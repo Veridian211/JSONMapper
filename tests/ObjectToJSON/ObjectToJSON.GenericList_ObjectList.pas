@@ -1,4 +1,4 @@
-unit ObjectToJSON.GenericList_Test;
+unit ObjectToJSON.GenericList_ObjectList;
 
 interface
 
@@ -37,8 +37,9 @@ begin
   userList := TList<TUser>.Create();
   for i := 0 to 2 do begin
     user := TUser.Create();
-    user.Id := i;
     userList.Add(user);
+
+    user.Id := i;
   end;
 end;
 
@@ -59,8 +60,11 @@ var
   jsonArray: TJSONArray;
 begin
   jsonArray := TJSONMapper.listToJSON(userList);
-
-  Assert.AreEqual(EXPECTED_VALUE, jsonArray.ToJSON());
+  try
+    Assert.AreEqual(EXPECTED_VALUE, jsonArray.ToJSON());
+  finally
+    jsonArray.Free;
+  end;
 end;
 
 procedure TGenericList_Test.TestObjectWithGenericList;
@@ -71,8 +75,11 @@ var
 begin
   jsonObject := TJSONObject.Create();
 //  jsonObject := TJSONMapper.objectToJSON(userWithList);
-
-  Assert.AreEqual(EXPECTED_VALUE, jsonObject.ToJSON());
+  try
+    Assert.AreEqual(EXPECTED_VALUE, jsonObject.ToJSON());
+  finally
+    jsonObject.Free;
+  end;
 end;
 
 initialization

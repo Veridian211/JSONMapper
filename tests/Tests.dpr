@@ -19,12 +19,13 @@ uses
   PublicFieldIterator in '..\src\JSONMapper\PublicFieldIterator.pas',
   TestObjects in 'ObjectToJSON\TestObjects.pas',
   TestHelper in 'helper\TestHelper.pas',
-  ObjektToJSON.BasicObject_Test in 'ObjectToJSON\ObjektToJSON.BasicObject_Test.pas',
-  ObjectToJSON.IgnoreAttribute_Test in 'ObjectToJSON\ObjectToJSON.IgnoreAttribute_Test.pas',
+  ObjektToJSON.BasicObject in 'ObjectToJSON\ObjektToJSON.BasicObject.pas',
+  ObjectToJSON.IgnoreAttribute in 'ObjectToJSON\ObjectToJSON.IgnoreAttribute.pas',
   JSONToObject_Test in 'JSONToObject\JSONToObject_Test.pas',
-  ObjectToJSON.NestedObject_Test in 'ObjectToJSON\ObjectToJSON.NestedObject_Test.pas',
-  ObjectToJSON.GenericList_Test in 'ObjectToJSON\ObjectToJSON.GenericList_Test.pas',
-  JSONMapper.EnumerableHelper in '..\src\JSONMapper\JSONMapper.EnumerableHelper.pas';
+  ObjectToJSON.NestedObject in 'ObjectToJSON\ObjectToJSON.NestedObject.pas',
+  ObjectToJSON.GenericList_ObjectList in 'ObjectToJSON\ObjectToJSON.GenericList_ObjectList.pas',
+  JSONMapper.EnumerableHelper in '..\src\JSONMapper\JSONMapper.EnumerableHelper.pas',
+  ObjectToJSON.GenericList_BasicDatatypes in 'ObjectToJSON\ObjectToJSON.GenericList_BasicDatatypes.pas';
 
 var
   runner: ITestRunner;
@@ -32,6 +33,7 @@ var
   logger: ITestLogger;
   nunitLogger : ITestLogger;
 begin
+  ReportMemoryLeaksOnShutdown := true;
 {$IFDEF TESTINSIGHT}
   TestInsight.DUnitX.RunRegisteredTests;
 {$ELSE}

@@ -1,4 +1,4 @@
-unit ObjectToJSON.IgnoreAttribute_Test;
+unit ObjectToJSON.IgnoreAttribute;
 
 interface
 
@@ -37,11 +37,15 @@ end;
 
 procedure TIgnoreAttribute_Test.TestIgnoreAttribute;
 var
-  json: TJSONObject;
+  jsonObject: TJSONObject;
   _: TJSONValue;
 begin
-  json := TJSONMapper.objectToJSON(obj);
-  Assert.IsFalse(json.TryGetValue('id', _));
+  jsonObject := TJSONMapper.objectToJSON(obj);
+  try
+    Assert.IsFalse(jsonObject.TryGetValue('id', _));
+  finally
+    jsonObject.Free;
+  end;
 end;
 
 initialization

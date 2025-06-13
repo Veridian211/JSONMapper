@@ -1,4 +1,4 @@
-unit ObjektToJSON.BasicObject_Test;
+unit ObjektToJSON.BasicObject;
 
 interface
 
@@ -40,14 +40,18 @@ procedure TBasicObjektToJSON_Test.TestBasicObject;
 const
   EXPECTED_JSON = '{"id":1,"name":"John Doe","isAdmin":true}';
 var
-  actual_json: string;
+  jsonObject: TJSONObject;
 begin
   obj.id := 1;
   obj.name := 'John Doe';
   obj.isAdmin := true;
 
-  actual_json := JSONToString(TJSONMapper.objectToJSON(obj));
-  Assert.AreEqual(EXPECTED_JSON, actual_json);
+  jsonObject := TJSONMapper.objectToJSON(obj);
+  try
+    Assert.AreEqual(EXPECTED_JSON, jsonObject.ToJSON());
+  finally
+    jsonObject.Free;
+  end;
 end;
 
 initialization

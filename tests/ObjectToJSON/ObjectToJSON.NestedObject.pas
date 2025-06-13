@@ -1,4 +1,4 @@
-unit ObjectToJSON.NestedObject_Test;
+unit ObjectToJSON.NestedObject;
 
 interface
 
@@ -39,16 +39,21 @@ procedure TNestedObject_Test.TestNestedObject;
 const
   EXPECTED_VALUE = 1;
 var
-  json: TJSONObject;
+  jsonObject: TJSONObject;
   userObj: TJSONObject;
   userId: integer;
 begin
   obj.user.id := EXPECTED_VALUE;
 
-  json := TJSONMapper.objectToJSON(obj);
-  json.TryGetValue<TJSONObject>('user', userObj);
-  userObj.TryGetValue<integer>('id', userId);
-  Assert.IsTrue(userId = EXPECTED_VALUE);
+  jsonObject := TJSONMapper.objectToJSON(obj);
+  try
+    jsonObject.TryGetValue<TJSONObject>('user', userObj);
+    userObj.TryGetValue<integer>('id', userId);
+
+    Assert.IsTrue(userId = EXPECTED_VALUE);
+  finally
+    jsonObject.Free;
+  end;
 end;
 
 initialization
