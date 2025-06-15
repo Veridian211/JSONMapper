@@ -3,6 +3,7 @@ unit User.Controller;
 interface
 
 uses
+  System.JSON,
   HttpServer.ControllerAttribute,
   HttpServer.MethodAttributes,
   HttpServer.ParamAttributes,
@@ -15,14 +16,21 @@ type
   TUserController = class
   public
     [Post('create-user')]
-    procedure createUser([Request] request: TUserDto);
+    procedure createUser(
+      [Request] request: TJSONObject;
+      [Response] user: TUserDto
+    );
   end;
 
 implementation
 
-procedure TUserController.createUser(request: TUserDto);
+procedure TUserController.createUser(
+  [Request] request: TJSONObject;
+  [Response] user: TUserDto
+);
 begin
-
+  user.id := 1;
+  user.name := 'John Doe';
 end;
 
 initialization

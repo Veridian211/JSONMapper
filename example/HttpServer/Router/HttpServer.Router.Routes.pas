@@ -3,22 +3,28 @@ unit HttpServer.Router.Routes;
 interface
 
 uses
+  System.Rtti,
   System.Generics.Collections,
   Http.Exceptions,
-  HttpServer.Router.Utils;
+  HttpServer.Router.Endpoint,
+  HttpServer.Router.Utils,
+  HttpServer.MethodAttributes;
 
 type
   TRoute = class
   public
     controllerClass: TClass;
-    route: string;
-    routeSegments: TRouteURISegments;
-    constructor Create(route: string; controllerClass: TClass);
+    path: string;
+    pathSegments: TURISegments;
+    endpoints: TEndpoints;
+    constructor Create(path: string; controllerClass: TClass);
+    destructor Destroy(); override;
   end;
 
   TRoutes = class(TList<TRoute>)
   public
-    procedure Add(route: string; controllerClass: TClass); reintroduce;
+    function Add(path: string; controllerClass: TClass): TRoute; reintroduce;
+    function findRouteForURI(uri: string): TRoute;
     destructor Destroy(); override;
   end;
 
@@ -26,19 +32,30 @@ implementation
 
 { TRoute }
 
-constructor TRoute.Create(route: string; controllerClass: TClass);
+constructor TRoute.Create(path: string; controllerClass: TClass);
 begin
   inherited Create();
-  self.route := route;
+  self.path := path;
   self.controllerClass := controllerClass;
-  self.routeSegments := getRouteURISegments(route);
+  self.endpoints := TEndpoints.Create();
+  self.pathSegments := getURISegments(path);
+end;
+
+destructor TRoute.Destroy();
+begin
+  endpoints.Free;
+  inherited;
 end;
 
 { TRoutes }
 
-procedure TRoutes.Add(route: string; controllerClass: TClass);
+function TRoutes.Add(path: string; controllerClass: TClass): TRoute;
+var
+  route: TRoute;
 begin
-  inherited Add(TRoute.Create(route, controllerClass));
+  route := TRoute.Create(path, controllerClass);
+  inherited Add(route);
+  exit(route);
 end;
 
 destructor TRoutes.Destroy;
@@ -50,6 +67,19 @@ begin
   end;
 
   inherited;
+end;
+
+function TRoutes.findRouteForURI(uri: string): TRoute;
+var
+  route: TRoute;
+begin
+  for route in self do begin
+    if doPartiallyMatch(uri, route.path) then begin
+      exit(route);
+    end;
+  end;
+
+  raise ENotFoundException.Create();
 end;
 
 end.

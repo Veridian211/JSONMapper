@@ -3,7 +3,7 @@ program ExampleServer;
 uses
   Vcl.Forms,
   Main in 'Main.pas' {Form1},
-  HttpServer in 'HttpServer\HttpServer.pas',
+  Http.Server in 'HttpServer\Http.Server.pas',
   Logger in 'Logger.pas',
   Http.Exceptions in 'HttpServer\Http.Exceptions.pas',
   HttpServer.ControllerAttribute in 'HttpServer\Router\Attributes\HttpServer.ControllerAttribute.pas',
@@ -15,7 +15,9 @@ uses
   HttpServer.ParamAttributes in 'HttpServer\Router\Attributes\HttpServer.ParamAttributes.pas',
   HttpServer.Router.Registration in 'HttpServer\Router\HttpServer.Router.Registration.pas',
   HttpServer.Router.Utils in 'HttpServer\Router\HttpServer.Router.Utils.pas',
-  HttpServer.Router.Routes in 'HttpServer\Router\HttpServer.Router.Routes.pas';
+  HttpServer.Router.Routes in 'HttpServer\Router\HttpServer.Router.Routes.pas',
+  HttpServer.Router.Endpoint in 'HttpServer\Router\HttpServer.Router.Endpoint.pas',
+  Http.HTTPMethods in 'HttpServer\Http.HTTPMethods.pas';
 
 {$R *.res}
 

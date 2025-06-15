@@ -7,37 +7,67 @@ uses
   System.StrUtils;
 
 type
-  TRouteURISegments = TArray<string>;
+  TURISegments = TArray<string>;
 
-function getRouteURISegments(route: string): TRouteURISegments;
-function getRemainingRouteSegments(requestURI: string; controllerRoute: string): TRouteURISegments;
+function trimSlashes(uri: string): string;
+function getURISegments(uri: string): TURISegments;
+function doPartiallyMatch(requestURI: string; controllerPath: string): boolean;
+function getEndpointPath(requestURI: string; controllerPath: string): string;
 
 implementation
 
-function getRouteURISegments(route: string): TRouteURISegments;
+function trimSlashes(uri: string): string;
 begin
-  route := route.Trim(['/']);
-  exit(SplitString(route, '/'));
+  exit(uri.Trim(['/']));
 end;
 
-function getRemainingRouteSegments(requestURI: string; controllerRoute: string): TRouteURISegments;
+function getURISegments(uri: string): TURISegments;
+begin
+  uri := trimSlashes(uri);
+  exit(SplitString(uri, '/'));
+end;
+
+function doPartiallyMatch(requestURI: string; controllerPath: string): boolean;
 var
-  requestURISegments: TRouteURISegments;
-  controllerRouteSegments: TRouteURISegments;
+  requestURISegments: TURISegments;
+  controllerURISegments: TURISegments;
+  i: integer;
+begin
+  requestURISegments := getURISegments(requestURI);
+  controllerURISegments := getURISegments(controllerPath);
+
+  if Length(requestURISegments) < Length(controllerURISegments) then begin
+    exit(false);
+  end;
+
+  for i := 0 to Length(controllerURISegments) - 1 do begin
+    if requestURISegments[i] <> controllerURISegments[i] then begin
+      exit(false);
+    end;
+  end;
+  exit(true);
+end;
+
+function getEndpointPath(requestURI: string; controllerPath: string): string;
+var
+  requestURISegments: TURISegments;
+  controllerURISegments: TURISegments;
 
   remainingLength: integer;
-  remainingRouteSegments: TRouteURISegments;
   i: Integer;
+
+  endpointPath: string;
 begin
-  requestURISegments := getRouteURISegments(requestURI);
-  controllerRouteSegments := getRouteURISegments(controllerRoute);
+  requestURISegments := getURISegments(requestURI);
+  controllerURISegments := getURISegments(controllerPath);
 
-  remainingLength := Length(requestURISegments) - Length(controllerRouteSegments);
+  remainingLength := Length(requestURISegments) - Length(controllerURISegments);
 
-  SetLength(remainingRouteSegments, remainingLength);
-  for i := 0 to remainingLength do begin
-    remainingRouteSegments[i] := requestURISegments[Length(controllerRouteSegments) + i];
+  for i := 0 to remainingLength - 1 do begin
+    endpointPath := endpointPath + '/' + requestURISegments[Length(controllerURISegments) + i];
   end;
+
+  exit(endpointPath);
 end;
 
 end.

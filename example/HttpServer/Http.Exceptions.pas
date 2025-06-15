@@ -75,11 +75,11 @@ end;
 
 constructor ENotFoundException.Create(text: string);
 begin
-  self.code := HttpErrors.UnsupportedMediaType.CODE;
+  self.code := HttpErrors.NotFound.CODE;
   self.text := text;
 
   if text.IsEmpty() then begin
-    self.text := HttpErrors.UnsupportedMediaType.TEXT;
+    self.text := HttpErrors.NotFound.TEXT;
   end;
 end;
 

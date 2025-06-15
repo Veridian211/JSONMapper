@@ -1,10 +1,11 @@
-unit HttpServer;
+unit Http.Server;
 
 interface
 
 uses
   IdHttpServer, IdCustomHTTPServer, IdContext, System.JSON, System.Classes, SysUtils,
   Logger,
+  Http.HTTPMethods,
   Http.Exceptions,
   HttpServer.Router;
 
@@ -23,6 +24,7 @@ type
     );
     function getRequestBody(request: TIdHTTPRequestInfo): string;
     procedure handleRequest(
+      httpMethod: THttpMethod;
       uri: string;
       requestJSON: TJSONObject;
       responseJSON: TJSONObject
@@ -79,6 +81,7 @@ procedure THttpServer.onRequestReceived(
   response: TIdHTTPResponseInfo
 );
 var
+  httpMethod: THttpMethod;
   requestBody: string;
 
   requestJSON: TJSONObject;
@@ -88,25 +91,29 @@ begin
   logger.log('Request received.');
 
   try
-    if not (request.Command = 'POST') then begin
-      raise EMethodNotAllowedException.Create();
-    end;
-
     if not (request.ContentType = 'application/json') then begin
       raise EUnsupportedMediaTypeException.Create();
     end;
 
     try
+      logger.logFmt('  %s %s', [request.Command, request.URI]);
+
+      httpMethod := THttpMethod.fromIndyHttpCommand(request.CommandType);
+
       requestBody := getRequestBody(request);
       requestJSON := TJSONObject.ParseJSONValue(requestBody) as TJSONObject;
       responseJSON := TJSONObject.Create();
 
-      logger.log('URI: ' + request.URI);
       if Assigned(requestJSON) then begin
         logger.log('Request Body: ' + requestJSON.ToJSON());
       end;
 
-      handleRequest(request.URI, requestJSON, responseJSON);
+      handleRequest(
+        httpMethod,
+        request.URI,
+        requestJSON,
+        responseJSON
+      );
 
       answerRequest(response, responseJSON);
     finally
@@ -135,12 +142,18 @@ begin
 end;
 
 procedure THttpServer.handleRequest(
+  httpMethod: THttpMethod;
   uri: string;
   requestJSON: TJSONObject;
   responseJSON: TJSONObject
 );
 begin
-  httpRouter.handleRequest(uri, requestJSON, responseJSON);
+  httpRouter.handleRequest(
+    httpMethod,
+    uri,
+    requestJSON,
+    responseJSON
+  );
 end;
 
 procedure THttpServer.answerRequest(response: TIdHTTPResponseInfo; responseJSON: TJSONObject);

@@ -2,19 +2,15 @@ unit HttpServer.MethodAttributes;
 
 interface
 
-type
-  TRequestMethod = (
-    rmGet,
-    rmPost,
-    rmPut,
-    rmDelete
-  );
+uses
+  Http.HTTPMethods;
 
+type
   MethodAttribute = class(TCustomAttribute)
   public
     path: string;
-    method: TRequestMethod;
-    constructor Create(path: string; method: TRequestMethod);
+    method: THttpMethod;
+    constructor Create(path: string; method: THttpMethod);
   end;
 
   GetAttribute = class(MethodAttribute)
@@ -41,7 +37,7 @@ implementation
 
 { MethodAttribute }
 
-constructor MethodAttribute.Create(path: string; method: TRequestMethod);
+constructor MethodAttribute.Create(path: string; method: THttpMethod);
 begin
   self.path := path;
   self.method := method;
