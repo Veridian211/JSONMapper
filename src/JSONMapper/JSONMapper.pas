@@ -28,6 +28,8 @@ type
   /// </remarks>
   TJSONMapper = class
   protected
+    class function getJSONKey(rttiField: TRttiField): string;
+
     class function createJSONValue(obj: TObject; rttiField: TRttiField): TJSONValue; overload; static;
     class function createJSONValue(rec: TValue; rttiField: TRttiField): TJSONValue; overload; static;
     class function createJSONValue(value: TValue): TJSONValue; overload; static;
@@ -53,6 +55,7 @@ type
   end;
 
   IgnoreFieldAttribute = JSONMapper.Attributes.IgnoreFieldAttribute;
+  JSONKeyAttribute = JSONMapper.Attributes.JSONKeyAttribute;
 
 implementation
 
@@ -85,7 +88,7 @@ begin
     rttiInstanceType := rttiContext.GetType(obj.ClassType) as TRttiInstanceType;
 
     for rttiField in rttiInstanceType.GetPublicFields() do begin
-      jsonKey := rttiField.Name;
+      jsonKey := getJSONKey(rttiField);
       jsonValue := createJSONValue(obj, rttiField);
 
       jsonPair := TJSONPair.Create(jsonKey, jsonValue);
@@ -345,6 +348,18 @@ end;
 class procedure TJSONMapper.jsonToList<T>(const jsonArray: TJSONArray; list: TList<T>);
 begin
 
+end;
+
+class function TJSONMapper.getJSONKey(rttiField: TRttiField): string;
+var
+  jsonKeyAttrib: JSONKeyAttribute;
+  jsonKey: string;
+begin
+  jsonKeyAttrib := rttiField.GetAttribute<JSONKeyAttribute>();
+  if not Assigned(jsonKeyAttrib) then begin
+    exit(rttiField.Name);
+  end;
+  exit(jsonKeyAttrib.getKey);
 end;
 
 end.
