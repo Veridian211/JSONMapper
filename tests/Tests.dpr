@@ -25,7 +25,8 @@ uses
   ObjectToJSON.GenericList_BasicDatatypes in 'ObjectToJSON\ObjectToJSON.GenericList_BasicDatatypes.pas',
   ObjectToJSON.BasicRecord in 'ObjectToJSON\ObjectToJSON.BasicRecord.pas',
   ObjectToJSON.Arrays in 'ObjectToJSON\ObjectToJSON.Arrays.pas',
-  JSONToObject.BasicObject in 'JSONToObject\JSONToObject.BasicObject.pas';
+  JSONToObject.BasicObject in 'JSONToObject\JSONToObject.BasicObject.pas',
+  ObjectMapper in '..\src\ObjectMapper\ObjectMapper.pas';
 
 var
   runner: ITestRunner;

@@ -105,6 +105,7 @@
         <DCCReference Include="ObjectToJSON\ObjectToJSON.BasicRecord.pas"/>
         <DCCReference Include="ObjectToJSON\ObjectToJSON.Arrays.pas"/>
         <DCCReference Include="JSONToObject\JSONToObject.BasicObject.pas"/>
+        <DCCReference Include="..\src\ObjectMapper\ObjectMapper.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
