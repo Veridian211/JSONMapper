@@ -6,7 +6,6 @@ uses
   System.Rtti,
   System.Generics.Collections,
   Http.Exceptions,
-  HttpServer.Router.Endpoint,
   HttpServer.Router.Utils,
   HttpServer.MethodAttributes;
 

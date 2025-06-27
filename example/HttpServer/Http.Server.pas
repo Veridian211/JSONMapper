@@ -7,6 +7,7 @@ uses
   Logger,
   Http.HTTPMethods,
   Http.Exceptions,
+  Http.Request,
   HttpServer.Router;
 
 type
@@ -147,13 +148,20 @@ procedure THttpServer.handleRequest(
   requestJSON: TJSONObject;
   responseJSON: TJSONObject
 );
+var
+  httpRequest: THttpRequest;
 begin
-  httpRouter.handleRequest(
-    httpMethod,
-    uri,
-    requestJSON,
-    responseJSON
-  );
+  try
+    httpRequest := THttpRequest.Create(
+      httpMethod,
+      uri,
+      requestJSON,
+      responseJSON
+    );
+    httpRouter.handleRequest(httpRequest);
+  finally
+    httpRequest.Free;
+  end;
 end;
 
 procedure THttpServer.answerRequest(response: TIdHTTPResponseInfo; responseJSON: TJSONObject);

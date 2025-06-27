@@ -11,24 +11,15 @@ uses
   JSONMapper,
   Http.HTTPMethods,
   Http.Exceptions,
+  Http.Request,
   HttpServer.Router.Utils,
   HttpServer.Router.Registration,
   HttpServer.Router.Routes,
-  HttpServer.Router.Endpoint,
   HttpServer.ControllerAttribute,
   HttpServer.MethodAttributes,
-  HttpServer.ParamAttributes,
-  User.UserDataClass;
+  HttpServer.ParamAttributes;
 
 type
-  // TODO: use this instead of parameter list
-  THttpRequest = class
-    httpMethod: THttpMethod;
-    uri: string;
-    request: TJSONObject;
-    response: TJSONObject;
-  end;
-
   THttpRouter = class
   private
     logger: TLogger;
@@ -49,20 +40,12 @@ type
     ): TRttiMethod;
   public
     constructor Create(logger: TLogger);
-    procedure handleRequest(
-      httpMethod: THttpMethod;
-      uri: string;
-      request : TJSONObject;
-      response: TJSONObject
-    );
     class procedure register(httpResource: TClass);
+    procedure handleRequest(httpRequest: THttpRequest);
     destructor Destroy(); override;
   end;
 
 implementation
-
-uses
-  User.Controller;
 
 constructor THttpRouter.Create(logger: TLogger);
 begin
@@ -100,27 +83,22 @@ begin
   end;
 end;
 
-procedure THttpRouter.handleRequest(
-  httpMethod: THttpMethod;
-  uri: string;
-  request: TJSONObject;
-  response: TJSONObject
-);
+procedure THttpRouter.handleRequest(httpRequest: THttpRequest);
 var
   rttiContext: TRttiContext;
   route: TRoute;
   endpointPath: string;
   endpointMethod: TRttiMethod;
 begin
-  route := routes.findRouteForURI(uri);
-  endpointPath := getEndpointPath(uri, route.path);
+  route := routes.findRouteForURI(httpRequest.uri);
+  endpointPath := getEndpointPath(httpRequest.uri, route.path);
 
   rttiContext := TRttiContext.Create();
   try
     endpointMethod := getEndpointMethod(
       rttiContext,
       route,
-      httpMethod,
+      httpRequest.httpMethod,
       endpointPath
     );
 
@@ -128,8 +106,8 @@ begin
       rttiContext,
       route.controllerClass,
       endpointMethod,
-      request,
-      response
+      httpRequest.request,
+      httpRequest.response
     );
   finally
     rttiContext.Free;
