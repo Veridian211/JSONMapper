@@ -46,12 +46,12 @@ type
     class function listToJSON(const list: TObject): TJSONArray; overload;
 
     /// <summary> Maps a TJSONObject into a generic object. </summary>
-    class procedure jsonToObject<T: class>(const jsonObject: TJSONObject; obj: T); overload;
+    class procedure jsonToObject(const jsonObject: TJSONObject; obj: TObject); overload;
     class function jsonToObject<T: class, constructor>(const jsonObject: TJSONObject): T; overload;
 
     /// <summary> Maps a TJSONArray into a generic TList. </summary>
-    class procedure jsonToList<T: class>(const jsonArray: TJSONArray; list: TList<T>); overload;
-    class function jsonToList<T: class, constructor>(const jsonArray: TJSONArray): TList<T>; overload;
+    class procedure jsonToList(const jsonArray: TJSONArray; list: TObject); overload;
+    class function jsonToList<T: class, constructor>(const jsonArray: TJSONArray): T; overload;
   end;
 
   IgnoreFieldAttribute = JSONMapper.Attributes.IgnoreFieldAttribute;
@@ -306,15 +306,13 @@ begin
   exit(jsonArray);
 end;
 
-class function TJSONMapper.jsonToObject<T>(
-  const jsonObject: TJSONObject
-): T;
+class function TJSONMapper.jsonToObject<T>(const jsonObject: TJSONObject): T;
 var
   obj: T;
 begin
   obj := T.Create();
   try
-    jsonToObject<T>(jsonObject, obj);
+    jsonToObject(jsonObject, obj);
   except
     obj.Free;
     raise;
@@ -322,7 +320,7 @@ begin
   exit(obj);
 end;
 
-class procedure TJSONMapper.jsonToObject<T>(const jsonObject: TJSONObject; obj: T);
+class procedure TJSONMapper.jsonToObject(const jsonObject: TJSONObject; obj: TObject);
 var
   rttiContext: TRttiContext;
   rttiInstanceType: TRttiInstanceType;
@@ -330,7 +328,7 @@ var
 begin
   rttiContext := TRttiContext.Create();
   try
-    rttiInstanceType := rttiContext.GetType(T) as TRttiInstanceType;
+    rttiInstanceType := rttiContext.GetType(obj) as TRttiInstanceType;
 
     for rttiField in rttiInstanceType.GetFields() do begin
 
@@ -340,12 +338,12 @@ begin
   end;
 end;
 
-class function TJSONMapper.jsonToList<T>(const jsonArray: TJSONArray): TList<T>;
+class function TJSONMapper.jsonToList<T>(const jsonArray: TJSONArray): T;
 begin
 
 end;
 
-class procedure TJSONMapper.jsonToList<T>(const jsonArray: TJSONArray; list: TList<T>);
+class procedure TJSONMapper.jsonToList(const jsonArray: TJSONArray; list: TObject);
 begin
 
 end;
@@ -353,7 +351,6 @@ end;
 class function TJSONMapper.getJSONKey(rttiField: TRttiField): string;
 var
   jsonKeyAttrib: JSONKeyAttribute;
-  jsonKey: string;
 begin
   jsonKeyAttrib := rttiField.GetAttribute<JSONKeyAttribute>();
   if not Assigned(jsonKeyAttrib) then begin
