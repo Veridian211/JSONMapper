@@ -16,9 +16,7 @@ type
     controllerClass: TClass;
     path: string;
     pathSegments: TURISegments;
-    endpoints: TEndpoints;
     constructor Create(path: string; controllerClass: TClass);
-    destructor Destroy(); override;
   end;
 
   TRoutes = class(TList<TRoute>)
@@ -37,14 +35,7 @@ begin
   inherited Create();
   self.path := path;
   self.controllerClass := controllerClass;
-  self.endpoints := TEndpoints.Create();
   self.pathSegments := getURISegments(path);
-end;
-
-destructor TRoute.Destroy();
-begin
-  endpoints.Free;
-  inherited;
 end;
 
 { TRoutes }

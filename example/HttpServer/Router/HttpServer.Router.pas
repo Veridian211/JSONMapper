@@ -4,6 +4,7 @@ interface
 
 uses
   System.Rtti,
+  System.SysUtils,
   System.TypInfo,
   System.JSON,
   Logger,
@@ -20,17 +21,32 @@ uses
   User.UserDataClass;
 
 type
+  // TODO: use this instead of parameter list
+  THttpRequest = class
+    httpMethod: THttpMethod;
+    uri: string;
+    request: TJSONObject;
+    response: TJSONObject;
+  end;
+
   THttpRouter = class
   private
     logger: TLogger;
     routes: TRoutes;
     procedure discoverHttpResources();
     procedure invokeMethod(
+      rttiContext: TRttiContext;
       controllerClass: TClass;
-      endpoint: TEndpoint;
+      endpointMethod: TRttiMethod;
       request: TJSONObject;
       response: TJSONObject
     );
+    function getEndpointMethod(
+      rttiContext: TRttiContext;
+      route: TRoute;
+      httpMethod: THttpMethod;
+      endpointPath: string
+    ): TRttiMethod;
   public
     constructor Create(logger: TLogger);
     procedure handleRequest(
@@ -44,6 +60,9 @@ type
   end;
 
 implementation
+
+uses
+  User.Controller;
 
 constructor THttpRouter.Create(logger: TLogger);
 begin
@@ -63,9 +82,6 @@ var
   httpResource: TRttiInstanceType;
   path: string;
   controllerClass: TClass;
-  route: TRoute;
-
-  endpointMethod: TRttiMethod;
 begin
   rttiContext := TRttiContext.Create();
   try
@@ -76,38 +92,7 @@ begin
         path := httpResource.GetAttribute<ControllerAttribute>().path;
         controllerClass := httpResource.MetaclassType;
 
-        route := routes.Add(path, controllerClass);
-
-        for endpointMethod in httpResource.GetMethods() do begin
-          if endpointMethod.HasAttribute(GetAttribute) then begin
-            route.endpoints.add(
-              endpointMethod.GetAttribute<GetAttribute>().method,
-              endpointMethod.GetAttribute<GetAttribute>().path,
-              endpointMethod
-            );
-          end;
-          if endpointMethod.HasAttribute(PostAttribute) then begin
-            route.endpoints.add(
-              endpointMethod.GetAttribute<PostAttribute>().method,
-              endpointMethod.GetAttribute<PostAttribute>().path,
-              endpointMethod
-            );
-          end;
-          if endpointMethod.HasAttribute(PutAttribute) then begin
-            route.endpoints.add(
-              endpointMethod.GetAttribute<PutAttribute>().method,
-              endpointMethod.GetAttribute<PutAttribute>().path,
-              endpointMethod
-            );
-          end;
-          if endpointMethod.HasAttribute(DeleteAttribute) then begin
-            route.endpoints.add(
-              endpointMethod.GetAttribute<DeleteAttribute>().method,
-              endpointMethod.GetAttribute<DeleteAttribute>().path,
-              endpointMethod
-            );
-          end;
-        end;
+        routes.Add(path, controllerClass);
       end;
     end;
   finally
@@ -122,90 +107,136 @@ procedure THttpRouter.handleRequest(
   response: TJSONObject
 );
 var
+  rttiContext: TRttiContext;
   route: TRoute;
   endpointPath: string;
-  endpoint: TEndpoint;
+  endpointMethod: TRttiMethod;
 begin
   route := routes.findRouteForURI(uri);
-
   endpointPath := getEndpointPath(uri, route.path);
 
-  endpoint := route.endpoints.findEndpoint(
-    httpMethod,
-    endpointPath
-  );
+  rttiContext := TRttiContext.Create();
+  try
+    endpointMethod := getEndpointMethod(
+      rttiContext,
+      route,
+      httpMethod,
+      endpointPath
+    );
 
-  invokeMethod(
-    route.controllerClass,
-    endpoint,
-    request,
-    response
-  );
+    invokeMethod(
+      rttiContext,
+      route.controllerClass,
+      endpointMethod,
+      request,
+      response
+    );
+  finally
+    rttiContext.Free;
+  end;
+end;
+
+function THttpRouter.getEndpointMethod(
+  rttiContext: TRttiContext;
+  route: TRoute;
+  httpMethod: THttpMethod;
+  endpointPath: string
+): TRttiMethod;
+var
+  controller: TRttiType;
+  rttiMethod: TRttiMethod;
+  methodAttr: MethodAttribute;
+begin
+  controller := rttiContext.GetType(route.controllerClass.ClassInfo) as TRttiInstanceType;
+
+  for rttiMethod in controller.GetMethods() do begin
+    if not rttiMethod.HasAttribute(MethodAttribute) then begin
+      continue;
+    end;
+
+    methodAttr := rttiMethod.GetAttribute<MethodAttribute>();
+    if (methodAttr.method <> httpMethod)
+    or (trimSlashes(methodAttr.path) <> trimSlashes(endpointPath)) then begin
+      continue;
+    end;
+
+    exit(rttiMethod);
+  end;
+
+  raise ENotFoundException.Create();
 end;
 
 procedure THttpRouter.invokeMethod(
+  rttiContext: TRttiContext;
   controllerClass: TClass;
-  endpoint: TEndpoint;
+  endpointMethod: TRttiMethod;
   request: TJSONObject;
   response: TJSONObject
 );
 var
-  controllerInstance: TObject;
+  endpointMethodParameters: TArray<TRttiParameter>;
+  parameterValues: TArray<TValue>;
 
-  rttiContext: TRttiContext;
-  rttiType: TRttiType;
-  rttiMethod: TRttiMethod;
-
-  rttiMethodName: string;
-
+  i: integer;
   rttiParameter: TRttiParameter;
-  rttiParameterName: string;
+  parameterClass: PTypeInfo;
+  rttiInstanceType: TRttiInstanceType;
 
-  endpointMethodName: string;
-
-  requestParameterClass: PTypeInfo;
-  reqeustParameterClass_ToString: string;
-
-  requestValue: TValue;
-  user: TUser;
+  controllerInstance: TObject;
+  requestObject: TObject;
+  responseObject: TObject;
 begin
-  controllerInstance := controllerClass.Create();
   try
-    rttiContext := TRttiContext.Create();
-    try
-      rttiType := rttiContext.GetType(controllerClass.ClassInfo) as TRttiInstanceType;
+    endpointMethodParameters := endpointMethod.GetParameters();
+    SetLength(parameterValues, Length(endpointMethodParameters));
+    for i := 0 to Length(endpointMethodParameters) - 1 do begin
+      rttiParameter := endpointMethodParameters[i];
 
-      for rttiMethod in rttiType.GetMethods() do begin
-        endpointMethodName := endpoint.method.Name;
-        if rttiMethod.Name = endpoint.method.Name then begin
-          rttiMethodName := rttiMethod.Name;
-        end;
+      if not rttiParameter.HasAttribute(MethodParameterAttribute) then begin
+        raise Exception.Create('Kein Method Parameter gefunden!');
       end;
 
-      for rttiParameter in endpoint.method.GetParameters() do begin
-        rttiParameterName := rttiParameter.Name;
-        if rttiParameter.HasAttribute(RequestAttribute) then begin
-          requestParameterClass := rttiParameter.ParamType.Handle;
-          reqeustParameterClass_ToString := requestParameterClass.Name;
+      parameterClass := rttiParameter.ParamType.Handle;
+
+      if rttiParameter.HasAttribute(RequestAttribute) then begin
+        if parameterClass = TypeInfo(TJSONObject) then begin
+          parameterValues[i] := request;
+        end else begin
+          rttiInstanceType := rttiContext.GetType(parameterClass) as TRttiInstanceType;
+          requestObject := rttiInstanceType.MetaclassType.Create();
+          parameterValues[i] := requestObject;
+//          TJSONMapper.jsonToObject(request, requestObject);
         end;
+        continue;
       end;
 
-      user := TUser.Create();
-      TValue.Make(@request, request.ClassType.ClassInfo, requestValue);
-
-      endpoint.method.Invoke(
-        controllerInstance,
-        [
-          TValue.From<TJSONObject>(request),
-          TValue.From<TUser>(user)
-        ]
-      );
-    finally
-      rttiContext.Free;
+      if rttiParameter.HasAttribute(ResponseAttribute) then begin
+        if parameterClass = TypeInfo(TJSONObject) then begin
+          parameterValues[i] := response;
+        end else begin
+          rttiInstanceType := rttiContext.GetType(parameterClass) as TRttiInstanceType;
+          responseObject := rttiInstanceType.MetaclassType.Create();
+          parameterValues[i] := responseObject;
+        end;
+        continue;
+      end;
     end;
 
+    controllerInstance := controllerClass.Create();
+    try
+      endpointMethod.Invoke(
+        controllerInstance,
+        parameterValues
+      );
+    finally
+      controllerInstance.Free;
+    end;
+
+    TJSONMapper.objectToJSON(responseObject, response);
+
   finally
-    controllerInstance.Free;
+    FreeAndNil(requestObject);
+    FreeAndNil(responseObject);
   end;
 end;
 

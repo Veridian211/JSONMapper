@@ -16,11 +16,9 @@ type
     httpMethod: THttpMethod;
     path: string;
     pathSegments: TURISegments;
-    method: TRttiMethod;
     constructor Create(
       httpMethod: THttpMethod;
-      path: string;
-      method: TRttiMethod
+      path: string
     );
   end;
 
@@ -28,8 +26,7 @@ type
   public
     procedure add(
       httpMethod: THttpMethod;
-      path: string;
-      method: TRttiMethod
+      path: string
     ); reintroduce;
     function findEndpoint(httpMethod: THttpMethod; path: string): TEndpoint;
     destructor Destroy(); override;
@@ -41,26 +38,23 @@ implementation
 
 constructor TEndpoint.Create(
   httpMethod: THttpMethod;
-  path: string;
-  method: TRttiMethod
+  path: string
 );
 begin
   inherited Create();
   self.httpMethod := httpMethod;
   self.path := path;
   self.pathSegments := getURISegments(path);
-  self.method := method;
 end;
 
 { TEndpoints }
 
 procedure TEndpoints.add(
   httpMethod: THttpMethod;
-  path: string;
-  method: TRttiMethod
+  path: string
 );
 begin
-  inherited Add(TEndpoint.Create(httpMethod, path, method));
+  inherited Add(TEndpoint.Create(httpMethod, path));
 end;
 
 destructor TEndpoints.Destroy;

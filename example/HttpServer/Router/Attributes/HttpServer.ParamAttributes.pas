@@ -3,9 +3,11 @@ unit HttpServer.ParamAttributes;
 interface
 
 type
-  RequestAttribute = class(TCustomAttribute);
+  MethodParameterAttribute = class(TCustomAttribute);
 
-  ResponseAttribute = class(TCustomAttribute);
+  RequestAttribute = class(MethodParameterAttribute);
+
+  ResponseAttribute = class(MethodParameterAttribute);
 
 implementation
 
