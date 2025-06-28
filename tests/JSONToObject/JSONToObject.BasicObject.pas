@@ -18,7 +18,6 @@ type
   [TestFixture]
   TJSONToObject = class
   private
-    obj: TUser;
     jsonObject: TJSONObject;
   public
     [Setup]
@@ -45,6 +44,7 @@ end;
 procedure TJSONToObject.TestBasicObject;
 var
   jsonPair: TJSONPair;
+  obj: TUser;
 begin
   jsonPair := TJSONPair.Create('id', 1);
   jsonObject.AddPair(jsonPair);

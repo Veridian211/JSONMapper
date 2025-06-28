@@ -37,7 +37,11 @@ type
     class function recordToJSON(const rec: TValue): TJSONObject; static;
     class function arrayToJSON(const arr: TValue): TJSONArray; static;
 
-    class function createValue(const jsonValue: TJSONValue; const rttiField: TRttiField): TValue;
+    class function createValue(
+      const jsonValue: TJSONValue;
+      const rttiField: TRttiField;
+      const fieldValue: TValue
+    ): TValue;
   public
     /// <summary> Maps the public fields of a generic object into a TJSONObject. </summary>
     class procedure objectToJSON(const obj: TObject; var jsonObject: TJSONObject); overload;
@@ -330,8 +334,13 @@ var
 
   jsonKey: string;
   jsonValue: TJSONValue;
-  value: TValue;
+  fieldValue: TValue;
+  newFieldValue: TValue;
 begin
+  if obj = nil then begin
+    raise EJSONMapperObjectIsNil.Create();
+  end;
+
   rttiContext := TRttiContext.Create();
   try
     rttiInstanceType := rttiContext.GetType(obj.ClassType) as TRttiInstanceType;
@@ -344,16 +353,22 @@ begin
         continue;
       end;
 
-      value := TJSONMapper.createValue(jsonValue, rttiField);
-
-      rttiField.SetValue(obj, value);
+      fieldValue := rttiField.GetValue(obj);
+      newFieldValue := TJSONMapper.createValue(jsonValue, rttiField, fieldValue);
+      rttiField.SetValue(obj, newFieldValue);
     end;
   finally
     rttiContext.Free;
   end;
 end;
 
-class function TJSONMapper.createValue(const jsonValue: TJSONValue; const rttiField: TRttiField): TValue;
+class function TJSONMapper.createValue(
+  const jsonValue: TJSONValue;
+  const rttiField: TRttiField;
+  const fieldValue: TValue
+): TValue;
+var
+  obj: TObject;
 begin
   case rttiField.FieldType.TypeKind of
     tkString,
@@ -388,13 +403,19 @@ begin
 //      exit(TJSONString.Create(VarToStr(value.AsVariant)));
 //    end;
 
-//    tkClass: begin
-//      obj := value.AsObject;
+    tkClass: begin
+      obj := fieldValue.AsObject;
 //      if isGenericTEnumerable(obj) then begin
 //        exit(TJSONMapper.listToJSON(obj));
 //      end;
-//      exit(TJSONMapper.objectToJSON(obj));
-//    end;
+      try
+        jsonToObject(TJSONObject(jsonValue), obj);
+      except
+        on e: EJSONMapperObjectIsNil do raise EJSONMapperObjectIsNil.Create(rttiField);
+        else raise;
+      end;
+      exit(obj);
+    end;
 //
 //    tkRecord: begin
 //      exit(TJSONMapper.recordToJSON(value));

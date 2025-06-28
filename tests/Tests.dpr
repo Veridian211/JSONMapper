@@ -26,7 +26,8 @@ uses
   ObjectToJSON.BasicRecord in 'ObjectToJSON\ObjectToJSON.BasicRecord.pas',
   ObjectToJSON.Arrays in 'ObjectToJSON\ObjectToJSON.Arrays.pas',
   JSONToObject.BasicObject in 'JSONToObject\JSONToObject.BasicObject.pas',
-  ObjectMapper in '..\src\ObjectMapper\ObjectMapper.pas';
+  ObjectMapper in '..\src\ObjectMapper\ObjectMapper.pas',
+  JSONToObject.NestedObject in 'JSONToObject\JSONToObject.NestedObject.pas';
 
 var
   runner: ITestRunner;
