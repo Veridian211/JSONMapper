@@ -13,8 +13,7 @@ uses
   JSONMapper.Attributes,
   JSONMapper.ClassFieldHelper,
   JSONMapper.EnumerableHelper,
-  PublicFieldIterator,
-  JSONValue.Helper;
+  PublicFieldIterator;
 
 type
   /// <summary> JSONMapper for mapping a generic object to a TJSONObject and vice versa.
