@@ -151,13 +151,13 @@ procedure THttpServer.handleRequest(
 var
   httpRequest: THttpRequest;
 begin
+  httpRequest := THttpRequest.Create(
+    httpMethod,
+    uri,
+    requestJSON,
+    responseJSON
+  );
   try
-    httpRequest := THttpRequest.Create(
-      httpMethod,
-      uri,
-      requestJSON,
-      responseJSON
-    );
     httpRouter.handleRequest(httpRequest);
   finally
     httpRequest.Free;
