@@ -45,16 +45,19 @@ end;
 procedure TJSONToObject.TestBasicObject;
 var
   jsonPair: TJSONPair;
-  json: string;
 begin
   jsonPair := TJSONPair.Create('id', 1);
   jsonObject.AddPair(jsonPair);
-
-  json := jsonObject.ToString;
+  jsonPair := TJSONPair.Create('name', 'John Doe');
+  jsonObject.AddPair(jsonPair);
+  jsonPair := TJSONPair.Create('isAdmin', true);
+  jsonObject.AddPair(jsonPair);
 
   obj := TJSONMapper.jsonToObject<TUser>(jsonObject);
   try
     Assert.AreEqual(obj.id, 1);
+    Assert.AreEqual(obj.name, 'John Doe');
+    Assert.AreEqual(obj.isAdmin, true);
   finally
     obj.Free;
   end;
