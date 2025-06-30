@@ -63,6 +63,14 @@ type
   IgnoreFieldAttribute = JSONMapper.Attributes.IgnoreFieldAttribute;
   JSONKeyAttribute = JSONMapper.Attributes.JSONKeyAttribute;
 
+  EJSONMapperException = JSONMapper.Exceptions.EJSONMapperException;
+  EJSONMapperCastingException = JSONMapper.Exceptions.EJSONMapperCastingException;
+  EJSONMapperNotImplementedException = JSONMapper.Exceptions.EJSONMapperNotImplementedException;
+  EJSONMapperNotATListException = JSONMapper.Exceptions.EJSONMapperNotATListException;
+  EJSONMapperFaultyEnumerator = JSONMapper.Exceptions.EJSONMapperFaultyEnumerator;
+  EJSONMapperObjectIsNil = JSONMapper.Exceptions.EJSONMapperObjectIsNil;
+  EJSONMapperJSONIsNil = JSONMapper.Exceptions.EJSONMapperJSONIsNil;
+
 implementation
 
 class function TJSONMapper.objectToJSON(const obj: TObject): TJSONObject;
