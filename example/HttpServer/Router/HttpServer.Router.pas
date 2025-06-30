@@ -183,7 +183,12 @@ begin
           rttiInstanceType := rttiContext.GetType(parameterClass) as TRttiInstanceType;
           requestObject := rttiInstanceType.MetaclassType.Create();
           parameterValues[i] := requestObject;
-//          TJSONMapper.jsonToObject(request, requestObject);
+          try
+            TJSONMapper.jsonToObject(request, requestObject);
+          except
+            on e: EJSONMapperJSONIsNil do raise EBadRequest.Create()
+            else raise;
+          end;
         end;
         continue;
       end;
