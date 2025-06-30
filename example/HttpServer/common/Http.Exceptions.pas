@@ -33,6 +33,12 @@ type
     constructor Create(text: string; cause: string); reintroduce; overload;
   end;
 
+  EBadRequest = class(EHttpException)
+  public
+    constructor Create(text: string = ''); reintroduce; overload;
+    constructor Create(text: string; cause: string); reintroduce; overload;
+  end;
+
   HttpErrors = record
   type
     NotFound = record
@@ -51,6 +57,12 @@ type
     const
       CODE = 415;
       TEXT = 'Unsupported Media Type';
+    end;
+
+    BadRequest = record
+    const
+      CODE = 400;
+      TEXT = 'Bad Request';
     end;
   end;
 
@@ -120,6 +132,24 @@ begin
 end;
 
 constructor EUnsupportedMediaTypeException.Create(text: string; cause: string);
+begin
+  Create(text);
+  self.cause := cause;
+end;
+
+{ EBadRequest }
+
+constructor EBadRequest.Create(text: string);
+begin
+  self.code := HttpErrors.BadRequest.CODE;
+  self.text := text;
+
+  if text.IsEmpty() then begin
+    self.text := HttpErrors.BadRequest.TEXT;
+  end;
+end;
+
+constructor EBadRequest.Create(text: string; cause: string);
 begin
   Create(text);
   self.cause := cause;
