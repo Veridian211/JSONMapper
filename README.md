@@ -23,6 +23,7 @@ program TestProgram;
 {$APPTYPE CONSOLE}
 
 uses
+  System.SysUtils,
   System.JSON,
   JSONMapper;
 
@@ -33,20 +34,29 @@ type
     isAdmin: boolean;
   end;
 
+const
+  JSON_STRING = '{"id":1,"name":"John Doe","isAdmin":true}';
 var
   user: TUser;
   json: TJSONObject;
 begin
+  json := TJSONObject.ParseJSONValue(JSON_STRING) as TJSONObject;
   user := TUser.Create();
   try
-    user.id := 1;
-    user.name := 'John Doe';
-    user.isAdmin := true;
+    TJSONMapper.jsonToObject(json, user);
+    WriteLn(Format(
+      'id = %d, name = %s, isAdmin = %s',
+      [user.id, user.name, BoolToStr(user.isAdmin, true)]
+    ));
+    // Output: id = 1, name = John Doe, isAdmin = True
 
-    json := TJSONMapper.objectToJSON(user);
-    
+    user.id := 2;
+    user.name := 'Jane Roe';
+    user.isAdmin := false;
+
+    TJSONMapper.objectToJSON(user, json);
     WriteLn(json.ToJSON());
-    // Output: {"id":1,"name":"John Doe","isAdmin":true}
+    // Output: {"id":2,"name":"Jane Roe","isAdmin":false}
   finally
     FreeAndNil(user);
     FreeAndNil(json);
