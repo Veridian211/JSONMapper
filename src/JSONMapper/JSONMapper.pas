@@ -337,6 +337,9 @@ var
   fieldValue: TValue;
   newFieldValue: TValue;
 begin
+  if jsonObject = nil then begin
+    raise EJSONMapperJSONIsNil.Create();
+  end;
   if obj = nil then begin
     raise EJSONMapperObjectIsNil.Create();
   end;
