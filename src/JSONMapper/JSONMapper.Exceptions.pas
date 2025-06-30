@@ -37,6 +37,11 @@ type
     constructor Create(); reintroduce; overload;
   end;
 
+  EJSONMapperJSONIsNil = class(EJSONMapperException)
+  public
+    constructor Create(); reintroduce;
+  end;
+
 implementation
 
 { EJSONMapperCastingException }
@@ -106,6 +111,15 @@ begin
   fieldParentName := rttiField.Parent.Name;
   fieldType := rttiField.FieldType.Name;
   inherited CreateFmt(ERROR_MESSAGE, [fieldParentName, fieldName, fieldType]);
+end;
+
+{ EJSONMapperJSONIsNil }
+
+constructor EJSONMapperJSONIsNil.Create();
+const
+  ERROR_MESSAGE = 'TJSONObject is nil.';
+begin
+  inherited Create(ERROR_MESSAGE);
 end;
 
 end.
