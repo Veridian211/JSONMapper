@@ -388,7 +388,6 @@ begin
     tkLString,
     tkWString,
     tkUString: begin
-      var jsonValueString := jsonValue.ToString;
       exit(TJSONString(jsonValue).Value);
     end;
 
