@@ -11,9 +11,9 @@ Supported types:
 
 ## Installation
 
-1. Copy /src/JSONMapper into your project.
+1. Copy `/src/JSONMapper` into your project.
 
-2. Add <path_to_jsonmapper>/JSONMapper to Delphis searchpath.
+2. Add `<src_to_JSONMapper>/JSONMapper` to Delphis searchpath.
 
 ## Usage
 
