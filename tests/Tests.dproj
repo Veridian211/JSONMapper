@@ -91,6 +91,9 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
+        <DCCReference Include="..\src\JSONMapper\AttributeHelper.pas">
+            <Form>$IFEND</Form>
+        </DCCReference>
         <DCCReference Include="..\src\JSONMapper\JSONMapper.pas"/>
         <DCCReference Include="..\src\JSONMapper\JSONMapper.Exceptions.pas"/>
         <DCCReference Include="..\src\JSONMapper\JSONMapper.Attributes.pas"/>

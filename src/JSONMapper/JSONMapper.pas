@@ -3,6 +3,9 @@
 interface
 
 uses
+  {$IF CompilerVersion <= 34.0}
+  AttributeHelper,
+  {$IFEND}
   System.JSON,
   System.Rtti,
   System.TypInfo,

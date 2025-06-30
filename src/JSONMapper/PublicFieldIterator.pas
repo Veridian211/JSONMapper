@@ -3,6 +3,9 @@ unit PublicFieldIterator;
 interface
 
 uses
+  {$IF CompilerVersion <= 34.0}
+  AttributeHelper,
+  {$IFEND}
   System.Rtti,
   JSONMapper.ClassFieldHelper,
   JSONMapper.Attributes;
