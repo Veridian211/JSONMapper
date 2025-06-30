@@ -14,7 +14,7 @@ uses
   DUnitX.TestFramework,
   {$IF CompilerVersion <= 34.0}
   AttributeHelper in '..\src\JSONMapper\AttributeHelper.pas',
-  {$IFEND}
+  {$ENDIF}
   JSONMapper in '..\src\JSONMapper\JSONMapper.pas',
   JSONMapper.Exceptions in '..\src\JSONMapper\JSONMapper.Exceptions.pas',
   JSONMapper.Attributes in '..\src\JSONMapper\JSONMapper.Attributes.pas',

@@ -3,11 +3,12 @@ unit HttpServer.Router.Utils;
 interface
 
 uses
+  System.Types,
   System.SysUtils,
   System.StrUtils;
 
 type
-  TURISegments = TArray<string>;
+  TURISegments = TStringDynArray;
 
 function trimSlashes(uri: string): string;
 function getURISegments(uri: string): TURISegments;

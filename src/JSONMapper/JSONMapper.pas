@@ -5,7 +5,7 @@ interface
 uses
   {$IF CompilerVersion <= 34.0}
   AttributeHelper,
-  {$IFEND}
+  {$ENDIF}
   System.JSON,
   System.Rtti,
   System.TypInfo,
