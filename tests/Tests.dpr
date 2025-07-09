@@ -1,9 +1,11 @@
 program Tests;
 
 {$IFNDEF TESTINSIGHT}
-{$APPTYPE CONSOLE}
+  {$APPTYPE CONSOLE}
 {$ENDIF}
+
 {$STRONGLINKTYPES ON}
+
 uses
   System.SysUtils,
   {$IFDEF TESTINSIGHT}
@@ -20,6 +22,7 @@ uses
   JSONMapper.Attributes in '..\src\JSONMapper\JSONMapper.Attributes.pas',
   JSONMapper.ClassFieldHelper in '..\src\JSONMapper\JSONMapper.ClassFieldHelper.pas',
   JSONMapper.EnumerableHelper in '..\src\JSONMapper\JSONMapper.EnumerableHelper.pas',
+  JSONMapper.DateFormatter in '..\src\JSONMapper\JSONMapper.DateFormatter.pas',
   PublicFieldIterator in '..\src\JSONMapper\PublicFieldIterator.pas',
   ObjektToJSON.BasicObject in 'ObjectToJSON\ObjektToJSON.BasicObject.pas',
   ObjectToJSON.IgnoreAttribute in 'ObjectToJSON\ObjectToJSON.IgnoreAttribute.pas',
@@ -29,8 +32,9 @@ uses
   ObjectToJSON.BasicRecord in 'ObjectToJSON\ObjectToJSON.BasicRecord.pas',
   ObjectToJSON.Arrays in 'ObjectToJSON\ObjectToJSON.Arrays.pas',
   JSONToObject.BasicObject in 'JSONToObject\JSONToObject.BasicObject.pas',
-  ObjectMapper in '..\src\ObjectMapper\ObjectMapper.pas',
-  JSONToObject.NestedObject in 'JSONToObject\JSONToObject.NestedObject.pas';
+  JSONToObject.NestedObject in 'JSONToObject\JSONToObject.NestedObject.pas',
+  ObjektToJSON.DateTime in 'ObjectToJSON\ObjektToJSON.DateTime.pas',
+  ObjectMapper in '..\src\ObjectMapper\ObjectMapper.pas';
 
 var
   runner: ITestRunner;

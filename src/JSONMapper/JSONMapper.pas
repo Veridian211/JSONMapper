@@ -16,6 +16,7 @@ uses
   JSONMapper.Attributes,
   JSONMapper.ClassFieldHelper,
   JSONMapper.EnumerableHelper,
+  JSONMapper.DateFormatter,
   PublicFieldIterator;
 
 type
@@ -46,6 +47,8 @@ type
       const fieldValue: TValue
     ): TValue;
   public
+    class var dateFormatterClass: TDateFormatterClass;
+
     /// <summary> Maps the public fields of a generic object into a TJSONObject. </summary>
     class procedure objectToJSON(const obj: TObject; var jsonObject: TJSONObject); overload;
     class function objectToJSON(const obj: TObject): TJSONObject; overload;
@@ -65,6 +68,11 @@ type
 
   IgnoreFieldAttribute = JSONMapper.Attributes.IgnoreFieldAttribute;
   JSONKeyAttribute = JSONMapper.Attributes.JSONKeyAttribute;
+
+  /// <summary> ISO 8601 conform date conversion </summary>
+  TDateFormatter_ISO8601 = JSONMapper.DateFormatter.TDateFormatter_ISO8601;
+  /// <summary> uses current FormatSettings for date conversion </summary>
+  TDateFormatter_Local = JSONMapper.DateFormatter.TDateFormatter_Local;
 
   EJSONMapperException = JSONMapper.Exceptions.EJSONMapperException;
   EJSONMapperCastingException = JSONMapper.Exceptions.EJSONMapperCastingException;
@@ -192,6 +200,7 @@ end;
 class function TJSONMapper.createJSONValue(value: TValue): TJSONValue;
 var
   obj: TObject;
+  dateString: string;
 begin
   case value.Kind of
     tkString,
@@ -209,7 +218,16 @@ begin
     tkInt64: begin
       exit(TJSONNumber.Create(value.AsInt64));
     end;
+
     tkFloat: begin
+      if (value.TypeInfo = TypeInfo(TDateTime)) then begin
+        dateString := dateFormatterClass.dateTimeToString(value.AsExtended);
+        exit(TJSONString.Create(dateString));
+      end;
+      if (value.TypeInfo = TypeInfo(TDate)) then begin
+        dateString := dateFormatterClass.dateToString(value.AsExtended);
+        exit(TJSONString.Create(dateString));
+      end;
       exit(TJSONNumber.Create(value.AsExtended));
     end;
 
@@ -471,5 +489,8 @@ begin
   end;
   exit(jsonKeyAttrib.getKey);
 end;
+
+initialization
+  TJSONMapper.dateFormatterClass := TDateFormatter_ISO8601;
 
 end.
