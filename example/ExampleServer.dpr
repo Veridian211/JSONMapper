@@ -17,8 +17,10 @@ uses
   HttpServer.Router.Routes in 'HttpServer\Router\HttpServer.Router.Routes.pas',
   HttpServer.Router.Endpoint in 'HttpServer\Router\HttpServer.Router.Endpoint.pas',
   User.Controller in 'User\User.Controller.pas',
-  User.UserDto in 'User\User.UserDto.pas',
-  User.UserDataClass in 'User\User.UserDataClass.pas';
+  User.UserDataClass in 'User\User.UserDataClass.pas',
+  User.Repository in 'User\User.Repository.pas',
+  User.Service in 'User\User.Service.pas',
+  User.Dtos in 'User\User.Dtos.pas';
 
 {$R *.res}
 

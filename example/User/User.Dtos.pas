@@ -1,4 +1,4 @@
-unit User.UserDto;
+unit User.Dtos;
 
 interface
 
@@ -7,6 +7,10 @@ type
   public
     id: integer;
     name: string;
+  end;
+
+  TIdDto = class
+    id: integer;
   end;
 
 implementation

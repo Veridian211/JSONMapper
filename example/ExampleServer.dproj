@@ -146,8 +146,10 @@
         <DCCReference Include="HttpServer\Router\HttpServer.Router.Routes.pas"/>
         <DCCReference Include="HttpServer\Router\HttpServer.Router.Endpoint.pas"/>
         <DCCReference Include="User\User.Controller.pas"/>
-        <DCCReference Include="User\User.UserDto.pas"/>
         <DCCReference Include="User\User.UserDataClass.pas"/>
+        <DCCReference Include="User\User.Repository.pas"/>
+        <DCCReference Include="User\User.Service.pas"/>
+        <DCCReference Include="User\User.Dtos.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
