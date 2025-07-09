@@ -16,7 +16,7 @@ uses
   DUnitX.TestFramework,
   {$IF CompilerVersion <= 34.0}
   AttributeHelper in '..\src\JSONMapper\AttributeHelper.pas',
-  {$ENDIF}
+  {$ENDIF }
   JSONMapper in '..\src\JSONMapper\JSONMapper.pas',
   JSONMapper.Exceptions in '..\src\JSONMapper\JSONMapper.Exceptions.pas',
   JSONMapper.Attributes in '..\src\JSONMapper\JSONMapper.Attributes.pas',
@@ -25,15 +25,16 @@ uses
   JSONMapper.DateFormatter in '..\src\JSONMapper\JSONMapper.DateFormatter.pas',
   PublicFieldIterator in '..\src\JSONMapper\PublicFieldIterator.pas',
   ObjektToJSON.BasicObject in 'ObjectToJSON\ObjektToJSON.BasicObject.pas',
-  ObjectToJSON.IgnoreAttribute in 'ObjectToJSON\ObjectToJSON.IgnoreAttribute.pas',
   ObjectToJSON.NestedObject in 'ObjectToJSON\ObjectToJSON.NestedObject.pas',
+  ObjektToJSON.DateTime in 'ObjectToJSON\ObjektToJSON.DateTime.pas',
+  ObjectToJSON.IgnoreAttribute in 'ObjectToJSON\ObjectToJSON.IgnoreAttribute.pas',
   ObjectToJSON.GenericList_ObjectList in 'ObjectToJSON\ObjectToJSON.GenericList_ObjectList.pas',
   ObjectToJSON.GenericList_BasicDatatypes in 'ObjectToJSON\ObjectToJSON.GenericList_BasicDatatypes.pas',
   ObjectToJSON.BasicRecord in 'ObjectToJSON\ObjectToJSON.BasicRecord.pas',
   ObjectToJSON.Arrays in 'ObjectToJSON\ObjectToJSON.Arrays.pas',
   JSONToObject.BasicObject in 'JSONToObject\JSONToObject.BasicObject.pas',
   JSONToObject.NestedObject in 'JSONToObject\JSONToObject.NestedObject.pas',
-  ObjektToJSON.DateTime in 'ObjectToJSON\ObjektToJSON.DateTime.pas',
+  JSONToObject.DateTime in 'JSONToObject\JSONToObject.DateTime.pas',
   ObjectMapper in '..\src\ObjectMapper\ObjectMapper.pas';
 
 var

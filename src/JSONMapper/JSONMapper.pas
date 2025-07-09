@@ -46,6 +46,7 @@ type
       const rttiField: TRttiField;
       const fieldValue: TValue
     ): TValue;
+
   public
     class var dateFormatterClass: TDateFormatterClass;
 
@@ -75,12 +76,14 @@ type
   TDateFormatter_Local = JSONMapper.DateFormatter.TDateFormatter_Local;
 
   EJSONMapperException = JSONMapper.Exceptions.EJSONMapperException;
-  EJSONMapperCastingException = JSONMapper.Exceptions.EJSONMapperCastingException;
-  EJSONMapperNotImplementedException = JSONMapper.Exceptions.EJSONMapperNotImplementedException;
-  EJSONMapperNotATListException = JSONMapper.Exceptions.EJSONMapperNotATListException;
-  EJSONMapperFaultyEnumerator = JSONMapper.Exceptions.EJSONMapperFaultyEnumerator;
   EJSONMapperObjectIsNil = JSONMapper.Exceptions.EJSONMapperObjectIsNil;
   EJSONMapperJSONIsNil = JSONMapper.Exceptions.EJSONMapperJSONIsNil;
+  EJSONMapperCastingException = JSONMapper.Exceptions.EJSONMapperCastingException;
+  EJSONMapperInvalidDateTime = JSONMapper.Exceptions.EJSONMapperInvalidDateTime;
+  EJSONMapperInvalidDate = JSONMapper.Exceptions.EJSONMapperInvalidDate;
+  EJSONMapperNotATListException = JSONMapper.Exceptions.EJSONMapperNotATListException;
+  EJSONMapperFaultyEnumerator = JSONMapper.Exceptions.EJSONMapperFaultyEnumerator;
+  EJSONMapperNotImplementedException = JSONMapper.Exceptions.EJSONMapperNotImplementedException;
 
 implementation
 
@@ -220,11 +223,11 @@ begin
     end;
 
     tkFloat: begin
-      if (value.TypeInfo = TypeInfo(TDateTime)) then begin
+      if value.TypeInfo = TypeInfo(TDateTime) then begin
         dateString := dateFormatterClass.dateTimeToString(value.AsExtended);
         exit(TJSONString.Create(dateString));
       end;
-      if (value.TypeInfo = TypeInfo(TDate)) then begin
+      if value.TypeInfo = TypeInfo(TDate) then begin
         dateString := dateFormatterClass.dateToString(value.AsExtended);
         exit(TJSONString.Create(dateString));
       end;
@@ -401,6 +404,7 @@ class function TJSONMapper.createValue(
 ): TValue;
 var
   obj: TObject;
+  dateString: string;
 begin
   case rttiField.FieldType.TypeKind of
     tkString,
@@ -418,7 +422,16 @@ begin
     tkInt64: begin
       exit(TJSONNumber(jsonValue).AsInt64);
     end;
+
     tkFloat: begin
+      if rttiField.FieldType.Handle = TypeInfo(TDateTime) then begin
+        dateString := TJSONString(jsonValue).Value;
+        exit(dateFormatterClass.tryStringToDateTime(dateString));
+      end;
+      if rttiField.FieldType.Handle = TypeInfo(TDate) then begin
+        dateString := TJSONString(jsonValue).Value;
+        exit(dateFormatterClass.tryStringToDate(dateString));
+      end;
       exit(TJSONNumber(jsonValue).AsDouble);
     end;
 

@@ -71,12 +71,15 @@ var
   json: TJSONObject;
 begin
   TJSONMapper.dateFormatterClass := TDateFormatter_Local;
-
-  json := TJSONMapper.objectToJSON(user);
   try
-    Assert.AreEqual(EXPECTED_VALUE, json.ToJSON());
+    json := TJSONMapper.objectToJSON(user);
+    try
+      Assert.AreEqual(EXPECTED_VALUE, json.ToJSON());
+    finally
+      json.Free;
+    end;
   finally
-    json.Free;
+    TJSONMapper.dateFormatterClass := TDateFormatter_ISO8601;
   end;
 end;
 

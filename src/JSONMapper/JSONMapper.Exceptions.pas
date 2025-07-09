@@ -42,38 +42,49 @@ type
     constructor Create(); reintroduce;
   end;
 
+  EJSONMapperInvalidDate = class(EJSONMapperException)
+  public
+    constructor Create(date: string); reintroduce;
+  end;
+
+  EJSONMapperInvalidDateTime = class(EJSONMapperException)
+  public
+    constructor Create(dateTime: string); reintroduce;
+  end;
+
 implementation
 
 { EJSONMapperCastingException }
 
 constructor EJSONMapperCastingException.Create(rttiField: TRttiField);
-const
- ERROR_MESSAGE = 'Field "%s.%s" of type "%s" cannot be casted into JSON. Consider ignoring it.';
 var
- fieldName: string;
- fieldParentName: string;
- fieldType: string;
+  fieldName: string;
+  fieldParentName: string;
+  fieldType: string;
 begin
- fieldName := rttiField.Name;
- fieldParentName := rttiField.Parent.Name;
- fieldType := rttiField.FieldType.Name;
- inherited CreateFmt(ERROR_MESSAGE, [fieldParentName, fieldName, fieldType]);
+  fieldName := rttiField.Name;
+  fieldParentName := rttiField.Parent.Name;
+  fieldType := rttiField.FieldType.Name;
+
+  inherited CreateFmt(
+    'Field "%s.%s" of type "%s" cannot be casted into JSON. Consider ignoring it.',
+    [fieldParentName, fieldName, fieldType]
+  );
 end;
 
 constructor EJSONMapperCastingException.Create(typeInfo: PTypeInfo);
-const
-  ERROR_MESSAGE = 'Type "%s" cannot be casted into JSON.';
 begin
-  inherited CreateFmt(ERROR_MESSAGE, [typeInfo.Name]);
+  inherited CreateFmt('Type "%s" cannot be casted into JSON.', [typeInfo.Name]);
 end;
 
 { EJSONMapperNotImplementedException }
 
 constructor EJSONMapperNotImplementedException.Create(typeInfo: PTypeInfo);
-const
-  ERROR_MESSAGE = 'Casting of "%s" is not implemented yet.';
 begin
-  inherited CreateFmt(ERROR_MESSAGE, [typeInfo.Name]);
+  inherited CreateFmt(
+    'Casting of "%s" is not implemented yet.',
+    [typeInfo.Name]
+  );
 end;
 
 { EJSONMapperNotATListException }
@@ -86,10 +97,11 @@ end;
 { EJSONMapperEnumeratorNotFoundException }
 
 constructor EJSONMapperFaultyEnumerator.Create(rttiType: TRttiType);
-const
-  ERROR_MESSAGE = 'Method GetEnumrator() not found on type "%s" or MoveNext() and GetCurrent() methods not found on enumerator.';
 begin
-  inherited CreateFmt(ERROR_MESSAGE, [rttiType.Name]);
+  inherited CreateFmt(
+    'Method GetEnumrator() not found on type "%s" or MoveNext() and GetCurrent() methods not found on enumerator.',
+    [rttiType.Name]
+  );
 end;
 
 { EJSONMapperObjectIsNil }
@@ -100,8 +112,6 @@ begin
 end;
 
 constructor EJSONMapperObjectIsNil.Create(rttiField: TRttiField);
-const
-  ERROR_MESSAGE = '%s.%s is nil (should be instance of %s).';
 var
  fieldName: string;
  fieldParentName: string;
@@ -110,16 +120,32 @@ begin
   fieldName := rttiField.Name;
   fieldParentName := rttiField.Parent.Name;
   fieldType := rttiField.FieldType.Name;
-  inherited CreateFmt(ERROR_MESSAGE, [fieldParentName, fieldName, fieldType]);
+
+  inherited CreateFmt(
+    '%s.%s is nil (should be instance of %s).',
+    [fieldParentName, fieldName, fieldType]
+  );
 end;
 
 { EJSONMapperJSONIsNil }
 
 constructor EJSONMapperJSONIsNil.Create();
-const
-  ERROR_MESSAGE = 'TJSONObject is nil.';
 begin
-  inherited Create(ERROR_MESSAGE);
+  inherited Create('TJSONObject is nil.');
+end;
+
+{ EJSONMapperInvalidDate }
+
+constructor EJSONMapperInvalidDate.Create(date: string);
+begin
+  inherited CreateFmt('Invalid TDate: %s', [date]);
+end;
+
+{ EJSONMapperInvalidDateTime }
+
+constructor EJSONMapperInvalidDateTime.Create(dateTime: string);
+begin
+  inherited CreateFmt('Invalid TDateTime: %s', [dateTime]);
 end;
 
 end.
