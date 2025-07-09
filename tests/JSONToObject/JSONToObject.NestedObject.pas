@@ -9,31 +9,31 @@ uses
 
 type
   TUser = class
-    public
-      id: integer;
-      name: string;
-      isAdmin: boolean;
+  public
+    id: integer;
+    name: string;
+    isAdmin: boolean;
   end;
 
   TNestedUser = class
-    public
-      user: TUser;
-      constructor Create();
-      destructor Destroy(); override;
+  public
+    user: TUser;
+    constructor Create();
+    destructor Destroy(); override;
   end;
 
   [TestFixture]
   TJSONToNestedObject = class
-    private
-      nestedUserJSON: TJSONObject;
-    public
-      [Setup]
-      procedure Setup;
-      [TearDown]
-      procedure TearDown;
+  private
+    nestedUserJSON: TJSONObject;
+  public
+    [Setup]
+    procedure Setup;
+    [TearDown]
+    procedure TearDown;
 
-      [Test]
-      procedure Test();
+    [Test]
+    procedure Test();
   end;
 
 implementation
