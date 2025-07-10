@@ -4,6 +4,7 @@ JSONMapper is a lightweight Delphi library for serializing and deserializing obj
 
 Supported types:
 - primitive types (string, integer, float, boolean)
+- TDateTime & TDate
 - nested objects
 - records
 - `TList<T>` and other descendants of `TEnumerable<T>`
