@@ -48,6 +48,7 @@ end;
 procedure TDateTimeToJSON.TearDown();
 begin
   user.Free();
+  TJSONMapper.dateFormatterClass := TDateFormatter_ISO8601;
 end;
 
 procedure TDateTimeToJSON.TestTDateTime();
@@ -66,20 +67,23 @@ end;
 
 procedure TDateTimeToJSON.TestDateFormatter();
 const
-  EXPECTED_VALUE = '{"dateOfBirth":"21.01.2006","lastActive":"29.06.2025 23:28:59"}';
+  EXPECTED_JSON = '{"dateOfBirth":"%s","lastActive":"%s"}';
 var
+  expectedJSON: string;
   json: TJSONObject;
 begin
   TJSONMapper.dateFormatterClass := TDateFormatter_Local;
+
+  expectedJSON := Format(
+    EXPECTED_JSON,
+    [DateToStr(user.dateOfBirth), DateTimeToStr(user.lastActive)]
+  );
+
+  json := TJSONMapper.objectToJSON(user);
   try
-    json := TJSONMapper.objectToJSON(user);
-    try
-      Assert.AreEqual(EXPECTED_VALUE, json.ToJSON());
-    finally
-      json.Free;
-    end;
+    Assert.AreEqual(expectedJSON, json.ToJSON());
   finally
-    TJSONMapper.dateFormatterClass := TDateFormatter_ISO8601;
+    json.Free;
   end;
 end;
 

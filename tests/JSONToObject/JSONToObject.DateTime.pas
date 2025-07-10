@@ -19,6 +19,9 @@ type
   [TestFixture]
   TJSONToDateTime = class
   public
+    [TearDown]
+    procedure TearDown();
+
     [Test]
     procedure TestTDateTime();
     [Test]
@@ -31,6 +34,11 @@ type
   end;
 
 implementation
+
+procedure TJSONToDateTime.TearDown();
+begin
+  TJSONMapper.dateFormatterClass := TDateFormatter_ISO8601;
+end;
 
 procedure TJSONToDateTime.TestTDateTime();
 const
@@ -58,27 +66,38 @@ end;
 
 procedure TJSONToDateTime.TestDateFormatter();
 const
-  JSON_STRING = '{"dateOfBirth":"21.01.2006","lastActive":"29.06.2025 23:28:59"}';
+  JSON_STRING = '{"dateOfBirth":"%s","lastActive":"%s"}';
 
   EXPECTED_DATE_OF_BIRTH = '2006-01-21';
   EXPECTED_LAST_ACTIVE = '2025-06-29T23:28:59.000Z';
 var
+  expectedDateOfBirth: TDate;
+  expectedLastActive: TDateTime;
+
+  jsonString: string;
   jsonObject: TJSONObject;
   user: TUser;
 begin
-  jsonObject := TJSONObject.ParseJSONValue(JSON_STRING) as TJSONObject;
-  try
-    TJSONMapper.dateFormatterClass := TDateFormatter_Local;
+  TJSONMapper.dateFormatterClass := TDateFormatter_Local;
 
+  expectedDateOfBirth := ISO8601ToDate(EXPECTED_DATE_OF_BIRTH);
+  expectedLastActive := ISO8601ToDate(EXPECTED_LAST_ACTIVE);
+
+  jsonString := Format(
+    JSON_STRING,
+    [DateToStr(expectedDateOfBirth), DateTimeToStr(expectedLastActive)]
+  );
+
+  jsonObject := TJSONObject.ParseJSONValue(jsonString) as TJSONObject;
+  try
     user := TJSONMapper.jsonToObject<TUser>(jsonObject);
     try
-      Assert.AreEqual(user.dateOfBirth, ISO8601ToDate(EXPECTED_DATE_OF_BIRTH));
-      Assert.AreEqual(user.lastActive, ISO8601ToDate(EXPECTED_LAST_ACTIVE));
+      Assert.AreEqual(user.dateOfBirth, expectedDateOfBirth);
+      Assert.AreEqual(user.lastActive, expectedLastActive);
     finally
       user.Free;
     end;
   finally
-    TJSONMapper.dateFormatterClass := TDateFormatter_ISO8601;
     jsonObject.Free();
   end;
 end;
