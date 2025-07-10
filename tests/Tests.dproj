@@ -101,9 +101,9 @@
         <DCCReference Include="..\src\JSONMapper\JSONMapper.EnumerableHelper.pas"/>
         <DCCReference Include="..\src\JSONMapper\JSONMapper.DateFormatter.pas"/>
         <DCCReference Include="..\src\JSONMapper\PublicFieldIterator.pas"/>
-        <DCCReference Include="ObjectToJSON\ObjektToJSON.BasicObject.pas"/>
+        <DCCReference Include="ObjectToJSON\ObjectToJSON.BasicObject.pas"/>
         <DCCReference Include="ObjectToJSON\ObjectToJSON.NestedObject.pas"/>
-        <DCCReference Include="ObjectToJSON\ObjektToJSON.DateTime.pas"/>
+        <DCCReference Include="ObjectToJSON\ObjectToJSON.DateTime.pas"/>
         <DCCReference Include="ObjectToJSON\ObjectToJSON.IgnoreAttribute.pas"/>
         <DCCReference Include="ObjectToJSON\ObjectToJSON.GenericList_ObjectList.pas"/>
         <DCCReference Include="ObjectToJSON\ObjectToJSON.GenericList_BasicDatatypes.pas"/>

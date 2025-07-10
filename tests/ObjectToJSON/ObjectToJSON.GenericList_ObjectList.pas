@@ -20,7 +20,6 @@ type
   TList_ObjectList = class
   private
     userList: TList<TUser>;
-//    userWithList: TUserWithList;
   public
     [Setup]
     procedure Setup;
@@ -80,7 +79,6 @@ var
   jsonObject: TJSONObject;
 begin
   jsonObject := TJSONObject.Create();
-//  jsonObject := TJSONMapper.objectToJSON(userWithList);
   try
     Assert.AreEqual(EXPECTED_VALUE, jsonObject.ToJSON());
   finally

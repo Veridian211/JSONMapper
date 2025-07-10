@@ -1,4 +1,4 @@
-unit ObjektToJSON.BasicObject;
+unit ObjectToJSON.BasicObject;
 
 interface
 
