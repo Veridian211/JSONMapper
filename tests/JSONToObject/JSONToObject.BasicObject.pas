@@ -5,61 +5,46 @@ interface
 uses
   DUnitX.TestFramework,
   System.JSON,
+  System.SysUtils,
   JSONMapper;
 
 type
   TUser = class
   public
-    id: integer;
+    age: integer;
     name: string;
     isAdmin: boolean;
   end;
 
   [TestFixture]
   TJSONToObject = class
-  private
-    jsonObject: TJSONObject;
   public
-    [Setup]
-    procedure Setup;
-    [TearDown]
-    procedure TearDown;
-
     [Test]
     procedure TestBasicObject;
   end;
 
 implementation
 
-procedure TJSONToObject.Setup;
-begin
-  jsonObject := TJSONObject.Create();
-end;
-
-procedure TJSONToObject.TearDown;
-begin
-  jsonObject.Free;
-end;
-
 procedure TJSONToObject.TestBasicObject;
+const
+  JSON_STRING = '{"name":"John Doe","age":23,"isAdmin":true}';
 var
+  jsonObject: TJSONObject;
   jsonPair: TJSONPair;
-  obj: TUser;
+  user: TUser;
 begin
-  jsonPair := TJSONPair.Create('id', 1);
-  jsonObject.AddPair(jsonPair);
-  jsonPair := TJSONPair.Create('name', 'John Doe');
-  jsonObject.AddPair(jsonPair);
-  jsonPair := TJSONPair.Create('isAdmin', true);
-  jsonObject.AddPair(jsonPair);
-
-  obj := TJSONMapper.jsonToObject<TUser>(jsonObject);
+  jsonObject := TJSONObject.ParseJSONValue(JSON_STRING) as TJSONObject;
   try
-    Assert.AreEqual(obj.id, 1);
-    Assert.AreEqual(obj.name, 'John Doe');
-    Assert.AreEqual(obj.isAdmin, true);
+    user := TJSONMapper.jsonToObject<TUser>(jsonObject);
+
+    Assert.AreEqual(23, user.age);
+    Assert.AreEqual('John Doe', user.name);
+    Assert.AreEqual(true, user.isAdmin);
   finally
-    obj.Free;
+    if Assigned(user) then begin
+      FreeAndNil(user);
+    end;
+    jsonObject.Free;
   end;
 end;
 

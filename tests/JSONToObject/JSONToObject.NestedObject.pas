@@ -5,6 +5,7 @@ interface
 uses
   DUnitX.TestFramework,
   System.JSON,
+  System.SysUtils,
   JSONMapper;
 
 type
@@ -27,52 +28,34 @@ type
   private
     nestedUserJSON: TJSONObject;
   public
-    [Setup]
-    procedure Setup;
-    [TearDown]
-    procedure TearDown;
-
     [Test]
     procedure Test();
   end;
 
 implementation
 
-procedure TJSONToNestedObject.Setup;
-begin
-  nestedUserJSON := TJSONObject.Create();
-end;
-
-procedure TJSONToNestedObject.TearDown;
-begin
-  nestedUserJSON.Free;
-end;
-
 procedure TJSONToNestedObject.Test();
+const
+  JSON_STRING = '{"user":{"name":"John Doe","age":23,"isAdmin":true}}';
 var
   userJSON: TJSONObject;
   jsonPair: TJSONPair;
   nestedUser: TNestedUser;
   user: TUser;
 begin
-  userJSON := TJSONObject.Create();
-  jsonPair := TJSONPair.Create('age', 23);
-  userJSON.AddPair(jsonPair);
-  jsonPair := TJSONPair.Create('name', 'John Doe');
-  userJSON.AddPair(jsonPair);
-  jsonPair := TJSONPair.Create('isAdmin', true);
-  userJSON.AddPair(jsonPair);
-
-  nestedUserJSON.AddPair('user', userJSON);
-
-  nestedUser := TJSONMapper.JSONToObject<TNestedUser>(nestedUserJSON);
+  nestedUserJSON := TJSONObject.ParseJSONValue(JSON_STRING) as TJSONObject;
   try
+    nestedUser := TJSONMapper.JSONToObject<TNestedUser>(nestedUserJSON);
+
     user := nestedUser.user;
     Assert.AreEqual(user.age, 23);
     Assert.AreEqual(user.name, 'John Doe');
     Assert.AreEqual(user.isAdmin, true);
   finally
-    nestedUser.Free;
+    if Assigned(nestedUser) then begin
+      FreeAndNil(nestedUser);
+    end;
+    nestedUserJSON.Free;
   end;
 end;
 
