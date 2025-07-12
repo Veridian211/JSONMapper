@@ -19,7 +19,7 @@ type
   end;
 
   [TestFixture]
-  TJSONToObject_Variant = class
+  TJSONToVariant = class
   public
     [Test]
     procedure TestVariant();
@@ -29,7 +29,7 @@ type
 
 implementation
 
-procedure TJSONToObject_Variant.TestVariant();
+procedure TJSONToVariant.TestVariant();
 const
   JSON_STRING = '{"name":"John Doe","age":23,"rating":12.4,"isAdmin":true}';
 
@@ -59,7 +59,7 @@ begin
   end;
 end;
 
-procedure TJSONToObject_Variant.TestNull();
+procedure TJSONToVariant.TestNull();
 const
   JSON_STRING = '{"name":null,"age":null,"isAdmin":null}';
 var
@@ -84,6 +84,6 @@ begin
 end;
 
 initialization
-  TDUnitX.RegisterTestFixture(TJSONToObject_Variant);
+  TDUnitX.RegisterTestFixture(TJSONToVariant);
 
 end.

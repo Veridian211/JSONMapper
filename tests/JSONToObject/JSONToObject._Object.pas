@@ -1,4 +1,4 @@
-unit JSONToObject.NestedObject;
+unit JSONToObject._Object;
 
 interface
 
@@ -24,21 +24,45 @@ type
   end;
 
   [TestFixture]
-  TJSONToNestedObject = class
+  TJSONToObject = class
   private
-    nestedUserJSON: TJSONObject;
   public
     [Test]
-    procedure Test();
+    procedure TestBasicObject;
+    [Test]
+    procedure TestNestedObject;
   end;
 
 implementation
 
-procedure TJSONToNestedObject.Test();
+procedure TJSONToObject.TestBasicObject;
+const
+  JSON_STRING = '{"name":"John Doe","age":23,"isAdmin":true}';
+var
+  jsonObject: TJSONObject;
+  jsonPair: TJSONPair;
+  user: TUser;
+begin
+  jsonObject := TJSONObject.ParseJSONValue(JSON_STRING) as TJSONObject;
+  try
+    user := TJSONMapper.jsonToObject<TUser>(jsonObject);
+
+    Assert.AreEqual(23, user.age);
+    Assert.AreEqual('John Doe', user.name);
+    Assert.AreEqual(true, user.isAdmin);
+  finally
+    if Assigned(user) then begin
+      FreeAndNil(user);
+    end;
+    jsonObject.Free;
+  end;
+end;
+
+procedure TJSONToObject.TestNestedObject();
 const
   JSON_STRING = '{"user":{"name":"John Doe","age":23,"isAdmin":true}}';
 var
-  userJSON: TJSONObject;
+  nestedUserJSON: TJSONObject;
   jsonPair: TJSONPair;
   nestedUser: TNestedUser;
   user: TUser;
@@ -76,7 +100,6 @@ begin
 end;
 
 initialization
-
-TDUnitX.RegisterTestFixture(TJSONToNestedObject);
+  TDUnitX.RegisterTestFixture(TJSONToObject);
 
 end.
