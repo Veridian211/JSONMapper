@@ -91,24 +91,22 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="..\src\JSONMapper\AttributeHelper.pas">
-            <Form>$IFEND</Form>
-        </DCCReference>
+        <DCCReference Include="..\src\JSONMapper\AttributeHelper.pas"/>
         <DCCReference Include="..\src\JSONMapper\JSONMapper.pas"/>
         <DCCReference Include="..\src\JSONMapper\JSONMapper.Exceptions.pas"/>
         <DCCReference Include="..\src\JSONMapper\JSONMapper.Attributes.pas"/>
         <DCCReference Include="..\src\JSONMapper\JSONMapper.ClassFieldHelper.pas"/>
         <DCCReference Include="..\src\JSONMapper\JSONMapper.EnumerableHelper.pas"/>
         <DCCReference Include="..\src\JSONMapper\JSONMapper.DateFormatter.pas"/>
+        <DCCReference Include="..\src\JSONMapper\JSONMapper.Nullable.pas"/>
         <DCCReference Include="..\src\JSONMapper\PublicFieldIterator.pas"/>
-        <DCCReference Include="ObjectToJSON\ObjectToJSON.BasicObject.pas"/>
-        <DCCReference Include="ObjectToJSON\ObjectToJSON.NestedObject.pas"/>
+        <DCCReference Include="ObjectToJSON\ObjectToJSON._Object.pas"/>
         <DCCReference Include="ObjectToJSON\ObjectToJSON.DateTime.pas"/>
         <DCCReference Include="ObjectToJSON\ObjectToJSON.IgnoreAttribute.pas"/>
-        <DCCReference Include="ObjectToJSON\ObjectToJSON.GenericList_ObjectList.pas"/>
-        <DCCReference Include="ObjectToJSON\ObjectToJSON.GenericList_BasicDatatypes.pas"/>
-        <DCCReference Include="ObjectToJSON\ObjectToJSON.BasicRecord.pas"/>
+        <DCCReference Include="ObjectToJSON\ObjectToJSON.GenericList.pas"/>
+        <DCCReference Include="ObjectToJSON\ObjectToJSON._Record.pas"/>
         <DCCReference Include="ObjectToJSON\ObjectToJSON.Arrays.pas"/>
+        <DCCReference Include="ObjectToJSON\ObjectToJSON.Variant.pas"/>
         <DCCReference Include="JSONToObject\JSONToObject.BasicObject.pas"/>
         <DCCReference Include="JSONToObject\JSONToObject.NestedObject.pas"/>
         <DCCReference Include="JSONToObject\JSONToObject.DateTime.pas"/>

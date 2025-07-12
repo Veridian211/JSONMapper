@@ -1,4 +1,4 @@
-unit ObjectToJSON.BasicRecord;
+unit ObjectToJSON._Record;
 
 interface
 
@@ -24,17 +24,17 @@ type
     userWrapper: TUserWrapper;
   public
     [Setup]
-    procedure Setup;
+    procedure Setup();
     [TearDown]
-    procedure TearDown;
+    procedure TearDown();
 
     [Test]
-    procedure TestBasicRecord;
+    procedure TestBasicRecord();
   end;
 
 implementation
 
-procedure TRecordToJSON.Setup;
+procedure TRecordToJSON.Setup();
 begin
   userWrapper := TUserWrapper.Create();
 
@@ -43,12 +43,12 @@ begin
   userWrapper.user.isAdmin := true;
 end;
 
-procedure TRecordToJSON.TearDown;
+procedure TRecordToJSON.TearDown();
 begin
   userWrapper.Free;
 end;
 
-procedure TRecordToJSON.TestBasicRecord;
+procedure TRecordToJSON.TestBasicRecord();
 const
   EXPECTED_VALUE = '{"user":{"id":1,"name":"John Doe","isAdmin":true}}';
 var
