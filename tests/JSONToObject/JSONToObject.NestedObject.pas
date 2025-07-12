@@ -43,6 +43,8 @@ var
   nestedUser: TNestedUser;
   user: TUser;
 begin
+  user := nil;
+
   nestedUserJSON := TJSONObject.ParseJSONValue(JSON_STRING) as TJSONObject;
   try
     nestedUser := TJSONMapper.JSONToObject<TNestedUser>(nestedUserJSON);

@@ -50,16 +50,17 @@ var
   jsonObject: TJSONObject;
   user: TUser;
 begin
+  user := nil;
+
   jsonObject := TJSONObject.ParseJSONValue(JSON_STRING) as TJSONObject;
   try
     user := TJSONMapper.jsonToObject<TUser>(jsonObject);
-    try
-      Assert.AreEqual(user.dateOfBirth, ISO8601ToDate(EXPECTED_DATE_OF_BIRTH));
-      Assert.AreEqual(user.lastActive, ISO8601ToDate(EXPECTED_LAST_ACTIVE));
-    finally
-      user.Free();
-    end;
+    Assert.AreEqual(user.dateOfBirth, ISO8601ToDate(EXPECTED_DATE_OF_BIRTH));
+    Assert.AreEqual(user.lastActive, ISO8601ToDate(EXPECTED_LAST_ACTIVE));
   finally
+    if Assigned(user) then begin
+      FreeAndNil(user);
+    end;
     jsonObject.Free();
   end;
 end;
@@ -78,6 +79,8 @@ var
   jsonObject: TJSONObject;
   user: TUser;
 begin
+  user := nil;
+
   TJSONMapper.dateFormatterClass := TDateFormatter_Local;
 
   expectedDateOfBirth := ISO8601ToDate(EXPECTED_DATE_OF_BIRTH);
@@ -91,13 +94,12 @@ begin
   jsonObject := TJSONObject.ParseJSONValue(jsonString) as TJSONObject;
   try
     user := TJSONMapper.jsonToObject<TUser>(jsonObject);
-    try
-      Assert.AreEqual(user.dateOfBirth, expectedDateOfBirth);
-      Assert.AreEqual(user.lastActive, expectedLastActive);
-    finally
-      user.Free;
-    end;
+    Assert.AreEqual(user.dateOfBirth, expectedDateOfBirth);
+    Assert.AreEqual(user.lastActive, expectedLastActive);
   finally
+    if Assigned(user) then begin
+      FreeAndNil(user);
+    end;
     jsonObject.Free();
   end;
 end;
