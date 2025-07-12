@@ -202,7 +202,8 @@ end;
 
 class function TJSONMapper.createJSONValue(value: TValue): TJSONValue;
 var
-  obj: TObject;
+  value_Object: TObject;
+  value_Variant: Variant;
   dateString: string;
 begin
   case value.Kind of
@@ -242,15 +243,33 @@ begin
     end;
 
     tkVariant: begin
-      exit(TJSONString.Create(VarToStr(value.AsVariant)));
+      value_Variant := value.AsVariant;
+      if VarIsNull(value_Variant) then begin
+        exit(TJSONNull.Create());
+      end;
+      if FindVarData(value_Variant)^.VType = varBoolean then begin
+        exit(TJSONBool.Create(Boolean(value_Variant)));
+      end;
+      if FindVarData(value_Variant)^.VType = varDate then begin
+        dateString := dateFormatterClass.dateTimeToString(TDateTime(value_Variant));
+        exit(TJSONString.Create(dateString));
+      end;
+      if VarIsOrdinal(value_Variant) then begin
+        exit(TJSONNumber.Create(Int64(value_Variant)));
+      end;
+      if VarIsFloat(value_Variant) then begin
+        exit(TJSONNumber.Create(Double(value_Variant)));
+      end;
+
+      exit(TJSONString.Create(VarToStr(value_Variant)));
     end;
 
     tkClass: begin
-      obj := value.AsObject;
-      if isGenericTEnumerable(obj) then begin
-        exit(TJSONMapper.listToJSON(obj));
+      value_Object := value.AsObject;
+      if isGenericTEnumerable(value_Object) then begin
+        exit(TJSONMapper.listToJSON(value_Object));
       end;
-      exit(TJSONMapper.objectToJSON(obj));
+      exit(TJSONMapper.objectToJSON(value_Object));
     end;
 
     tkRecord: begin
@@ -405,6 +424,8 @@ class function TJSONMapper.createValue(
 var
   obj: TObject;
   dateString: string;
+  value_Integer: Int64;
+  value_Double: double;
 begin
   case rttiField.FieldType.TypeKind of
     tkString,
@@ -442,10 +463,34 @@ begin
       exit(TJSONBool(jsonValue).AsBoolean);
     end;
 
-    // TODO: Decorator für Variants, um echten Typen zu mappen
-//    tkVariant: begin
-//      exit(TJSONString.Create(VarToStr(value.AsVariant)));
-//    end;
+    tkVariant: begin
+      if jsonValue is TJSONNull then begin
+        exit(TValue.FromVariant(Null));
+      end;
+
+      if jsonValue is TJSONNumber then begin
+        if TryStrToInt64(TJSONNumber(JsonValue).Value, value_Integer) then begin
+          if (value_Integer >= Low(Integer)) and (value_Integer <= High(Integer)) then begin
+            exit(TValue.From<Integer>(Integer(value_Integer)));
+          end else begin
+            exit(TValue.From<Int64>(value_Integer));
+          end;
+        end else begin
+          value_Double := TJSONNumber(JsonValue).AsDouble;
+          exit(TValue.From<Double>(value_Double));
+        end;
+      end;
+
+      if jsonValue is TJSONBool then begin
+        exit(TValue.From<Boolean>(TJSONBool(jsonValue).AsBoolean));
+      end;
+
+      if jsonValue is TJSONString then begin
+        exit(TValue.From<String>(TJSONString(jsonValue).Value));
+      end;
+
+      // TODO: theoretisch fehlt TDate / TDateTime
+    end;
 
     tkClass: begin
       obj := fieldValue.AsObject;
