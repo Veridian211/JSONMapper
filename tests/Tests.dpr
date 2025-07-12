@@ -6,15 +6,20 @@ program Tests;
 
 {$STRONGLINKTYPES ON}
 
+{$IF CompilerVersion <= 34.0}
+{$DEFINE USE_ATTRIBUTE_HELPER}
+{$ENDIF}
+
+
 uses
   System.SysUtils,
+  DUnitX.TestFramework,
   {$IFDEF TESTINSIGHT}
   TestInsight.DUnitX,
   {$ELSE}
   DUnitX.Loggers.Console,
   {$ENDIF }
-  DUnitX.TestFramework,
-  {$IF CompilerVersion <= 34.0}
+  {$IFDEF USE_ATTRIBUTE_HELPER}
   AttributeHelper in '..\src\JSONMapper\AttributeHelper.pas',
   {$ENDIF }
   JSONMapper in '..\src\JSONMapper\JSONMapper.pas',
