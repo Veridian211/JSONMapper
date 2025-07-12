@@ -12,8 +12,8 @@ uses
 type
   TUser = class
   public
-    id: integer;
     name: string;
+    age: integer;
     isAdmin: boolean;
   end;
 
@@ -72,7 +72,7 @@ begin
     user := TUser.Create();
     userList.Add(user);
 
-    user.Id := i;
+    user.age := i;
   end;
 end;
 
@@ -134,7 +134,7 @@ end;
 
 procedure TList_BasicDatatypes.TestGenericList;
 const
-  EXPECTED_VALUE = '[{"id":0,"name":"","isAdmin":false},{"id":1,"name":"","isAdmin":false},{"id":2,"name":"","isAdmin":false}]';
+  EXPECTED_VALUE = '[{"name":"","age":0,"isAdmin":false},{"name":"","age":1,"isAdmin":false},{"name":"","age":2,"isAdmin":false}]';
 var
   jsonArray: TJSONArray;
 begin

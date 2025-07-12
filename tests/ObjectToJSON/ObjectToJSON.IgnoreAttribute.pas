@@ -10,9 +10,9 @@ uses
 type
   TUser = class
   public
-    [IgnoreField]
-    id: integer;
     name: string;
+    [IgnoreField]
+    age: integer;
     isAdmin: boolean;
   end;
 
@@ -49,7 +49,7 @@ var
 begin
   jsonObject := TJSONMapper.objectToJSON(user);
   try
-    Assert.IsFalse(jsonObject.TryGetValue('id', _));
+    Assert.IsFalse(jsonObject.TryGetValue('age', _));
   finally
     jsonObject.Free;
   end;

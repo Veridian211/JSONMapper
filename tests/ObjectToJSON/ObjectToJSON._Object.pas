@@ -5,13 +5,16 @@ interface
 uses
   DUnitX.TestFramework,
   System.JSON,
+  System.DateUtils,
   JSONMapper;
 
 type
   TUser = class
   public
-    id: integer;
     name: string;
+    age: integer;
+    dateOfBirth: TDate;
+    rating: double;
     isAdmin: boolean;
   end;
 
@@ -27,42 +30,45 @@ type
   private
     user: TUser;
     nestedUser: TNestedUser;
-    procedure TestNestedObject;
   public
     [Setup]
-    procedure Setup;
+    procedure Setup();
     [TearDown]
-    procedure TearDown;
+    procedure TearDown();
 
     [Test]
-    procedure TestBasicObject;
+    procedure TestBasicObject();
+    [Test]
+    procedure TestNestedObject();
   end;
 
 implementation
 
 { TBasicObjektToJSON }
 
-procedure TBasicObjektToJSON.Setup;
+procedure TBasicObjektToJSON.Setup();
 begin
   user := TUser.Create();
   nestedUser := TNestedUser.Create();
 end;
 
-procedure TBasicObjektToJSON.TearDown;
+procedure TBasicObjektToJSON.TearDown();
 begin
   user.Free;
   nestedUser.Free;
 end;
 
-procedure TBasicObjektToJSON.TestBasicObject;
+procedure TBasicObjektToJSON.TestBasicObject();
 const
-  EXPECTED_JSON = '{"id":1,"name":"John Doe","isAdmin":true}';
+  EXPECTED_JSON = '{"name":"John Doe","age":32,"dateOfBirth":"2006-10-23","rating":12.4,"isAdmin":true}';
 var
   jsonObject: TJSONObject;
 begin
-  user.id := 1;
   user.name := 'John Doe';
+  user.age := 32;
   user.isAdmin := true;
+  user.dateOfBirth := ISO8601ToDate('2006-10-23');
+  user.rating := 12.4;
 
   jsonObject := TJSONMapper.objectToJSON(user);
   try
@@ -74,20 +80,20 @@ end;
 
 procedure TBasicObjektToJSON.TestNestedObject();
 const
-  EXPECTED_VALUE = 1;
+  EXPECTED_AGE = 23;
 var
   jsonObject: TJSONObject;
   userObj: TJSONObject;
-  userId: integer;
+  userAge: integer;
 begin
-  nestedUser.user.id := EXPECTED_VALUE;
+  nestedUser.user.age := EXPECTED_AGE;
 
   jsonObject := TJSONMapper.objectToJSON(nestedUser);
   try
     jsonObject.TryGetValue<TJSONObject>('user', userObj);
-    userObj.TryGetValue<integer>('id', userId);
+    userObj.TryGetValue<integer>('age', userAge);
 
-    Assert.IsTrue(userId = EXPECTED_VALUE);
+    Assert.AreEqual(EXPECTED_AGE, userAge);
   finally
     jsonObject.Free;
   end;

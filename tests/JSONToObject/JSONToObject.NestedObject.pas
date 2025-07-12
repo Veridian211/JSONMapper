@@ -10,8 +10,8 @@ uses
 type
   TUser = class
   public
-    id: integer;
     name: string;
+    age: integer;
     isAdmin: boolean;
   end;
 
@@ -56,7 +56,7 @@ var
   user: TUser;
 begin
   userJSON := TJSONObject.Create();
-  jsonPair := TJSONPair.Create('id', 1);
+  jsonPair := TJSONPair.Create('age', 23);
   userJSON.AddPair(jsonPair);
   jsonPair := TJSONPair.Create('name', 'John Doe');
   userJSON.AddPair(jsonPair);
@@ -68,7 +68,7 @@ begin
   nestedUser := TJSONMapper.JSONToObject<TNestedUser>(nestedUserJSON);
   try
     user := nestedUser.user;
-    Assert.AreEqual(user.id, 1);
+    Assert.AreEqual(user.age, 23);
     Assert.AreEqual(user.name, 'John Doe');
     Assert.AreEqual(user.isAdmin, true);
   finally
