@@ -3,7 +3,7 @@
 interface
 
 uses
-  {$IF CompilerVersion <= 34.0}
+  {$IF USE_ATTRIBUTE_HELPER}
   AttributeHelper,
   {$ENDIF}
   System.JSON,
