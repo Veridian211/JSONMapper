@@ -9,6 +9,7 @@ Supported types:
 - records
 - `TList<T>` and other descendants of `TEnumerable<T>`
 - arrays
+- Variant
 
 ## Installation
 
