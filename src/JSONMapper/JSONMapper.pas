@@ -17,6 +17,7 @@ uses
   JSONMapper.ClassFieldHelper,
   JSONMapper.EnumerableHelper,
   JSONMapper.DateFormatter,
+  JSONMapper.Nullable,
   PublicFieldIterator;
 
 type
@@ -84,6 +85,12 @@ type
   EJSONMapperNotATListException = JSONMapper.Exceptions.EJSONMapperNotATListException;
   EJSONMapperFaultyEnumerator = JSONMapper.Exceptions.EJSONMapperFaultyEnumerator;
   EJSONMapperNotImplementedException = JSONMapper.Exceptions.EJSONMapperNotImplementedException;
+
+  TNullString = JSONMapper.Nullable.TNullString;
+  TNullInteger = JSONMapper.Nullable.TNullInteger;
+  TNullDouble = JSONMapper.Nullable.TNullDouble;
+  TNullBoolean = JSONMapper.Nullable.TNullBoolean;
+  TNullDateTime = JSONMapper.Nullable.TNullDateTime;
 
 implementation
 

@@ -28,6 +28,7 @@ uses
   JSONMapper.ClassFieldHelper in '..\src\JSONMapper\JSONMapper.ClassFieldHelper.pas',
   JSONMapper.EnumerableHelper in '..\src\JSONMapper\JSONMapper.EnumerableHelper.pas',
   JSONMapper.DateFormatter in '..\src\JSONMapper\JSONMapper.DateFormatter.pas',
+  JSONMapper.Nullable in '..\src\JSONMapper\JSONMapper.Nullable.pas',
   PublicFieldIterator in '..\src\JSONMapper\PublicFieldIterator.pas',
   ObjectToJSON._Object in 'ObjectToJSON\ObjectToJSON._Object.pas',
   ObjectToJSON.DateTime in 'ObjectToJSON\ObjectToJSON.DateTime.pas',
