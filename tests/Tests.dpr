@@ -40,7 +40,12 @@ uses
   JSONToObject._Object in 'JSONToObject\JSONToObject._Object.pas',
   JSONToObject.DateTime in 'JSONToObject\JSONToObject.DateTime.pas',
   JSONToObject.Variant in 'JSONToObject\JSONToObject.Variant.pas',
-  ObjectMapper in '..\src\ObjectMapper\ObjectMapper.pas';
+  ObjectMapper in '..\src\ObjectMapper\ObjectMapper.pas',
+  QueryMapper in '..\src\QueryMapper\QueryMapper.pas',
+  QueryMapper.Attributes in '..\src\QueryMapper\QueryMapper.Attributes.pas',
+  QueryMapper.DatasetEnumerator in '..\src\QueryMapper\QueryMapper.DatasetEnumerator.pas',
+  QueryMapper.RowMapper in '..\src\QueryMapper\QueryMapper.RowMapper.pas',
+  QueryMapper.Test in 'QueryMapper\QueryMapper.Test.pas';
 
 var
   runner: ITestRunner;
