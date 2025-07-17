@@ -4,6 +4,7 @@ interface
 
 uses
   System.SysUtils,
+  System.Generics.Collections,
   System.Rtti,
   Data.DB,
   QueryMapper.RowMapper;
@@ -33,7 +34,16 @@ type
   end;
 
 
-  TEnumerableDataset<T: class, constructor> = class(TInterfacedObject, IEnumerable<T>)
+  IEnumerableDataset<T: class> = interface(IEnumerable)
+    function GetEnumerator(): IEnumerator<T>;
+
+    function asList(): TList<T>;
+    function asObjectList(): TObjectList<T>;
+    procedure populateList(list: TList<T>);
+  end;
+
+
+  TEnumerableDataset<T: class, constructor> = class(TInterfacedObject, IEnumerableDataset<T>)
   private
     dataset: TDataSet;
     datasetRowMapper: TDatasetRowMapper<T>;
@@ -42,7 +52,11 @@ type
     function GetEnumerator(): IEnumerator;
     function GetEnumeratorGeneric(): IEnumerator<T>;
 
-    function IEnumerable<T>.GetEnumerator = GetEnumeratorGeneric;
+    function IEnumerableDataset<T>.GetEnumerator = GetEnumeratorGeneric;
+
+    function asList: TList<T>;
+    function asObjectList(): TObjectList<T>;
+    procedure populateList(list: TList<T>);
 
     destructor Destroy(); override;
   end;
@@ -97,8 +111,9 @@ end;
 procedure TDatasetEnumerator<T>.Reset();
 begin
   if ownsCurrent then begin
-    current.Free;
+    FreeAndNil(current);
   end;
+  ownsCurrent := false;
 
   dataset.First();
 end;
@@ -132,9 +147,52 @@ begin
   Result := TDatasetEnumerator<T>.Create(dataset, datasetRowMapper);
 end;
 
-destructor TEnumerableDataset<T>.Destroy;
+function TEnumerableDataset<T>.asList(): TList<T>;
+var
+  item: T;
 begin
-  datasetRowMapper.Free;
+  Result := TList<T>.Create();
+  try
+    populateList(Result);
+  except
+    for item in Result do begin
+      item.Free;
+    end;
+    Result.Free;
+    raise;
+  end;
+end;
+
+function TEnumerableDataset<T>.asObjectList(): TObjectList<T>;
+var
+  item: T;
+begin
+  Result := TObjectList<T>.Create();
+  try
+    populateList(Result);
+  except
+    Result.Free;
+    raise;
+  end;
+end;
+
+procedure TEnumerableDataset<T>.populateList(list: TList<T>);
+begin
+  try
+    dataset.Open();
+    dataset.First();
+    while not dataset.Eof do begin
+      list.Add(datasetRowMapper.mapRow(dataset));
+      dataset.Next();
+    end;
+  finally
+    dataset.Close();
+  end;
+end;
+
+destructor TEnumerableDataset<T>.Destroy();
+begin
+  datasetRowMapper.Free();
   inherited;
 end;
 

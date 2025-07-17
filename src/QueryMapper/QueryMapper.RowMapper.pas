@@ -7,7 +7,8 @@ uses
   System.Rtti,
   System.Generics.Collections,
   Data.DB,
-  QueryMapper.Attributes;
+  QueryMapper.Attributes,
+  QueryMapper.Exceptions;
 
 type
   TRowField = record
@@ -34,16 +35,13 @@ type
 
   TDatasetRowMapperFactory = class
   private
+    // global rttiContext, not thread safe
     class var rttiContext: TRttiContext;
+
     class procedure Initialize();
     class procedure Finalize();
   public
     class function createRowMapper<T: class>(): TDatasetRowMapper<T>;
-  end;
-
-  EQueryMapper_NoEmptyConstructorFound = class(Exception)
-  public
-    constructor Create(metaClassType: TClass); reintroduce;
   end;
 
 implementation
@@ -151,13 +149,6 @@ end;
 class procedure TDatasetRowMapperFactory.Finalize();
 begin
   rttiContext.Free();
-end;
-
-{ EQueryMapper_NoEmptyConstructorFound }
-
-constructor EQueryMapper_NoEmptyConstructorFound.Create(metaClassType: TClass);
-begin
-  inherited CreateFmt('"%s" has no empty constructor.', [metaClassType.QualifiedClassName]);
 end;
 
 initialization

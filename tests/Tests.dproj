@@ -115,6 +115,7 @@
         <DCCReference Include="..\src\QueryMapper\QueryMapper.Attributes.pas"/>
         <DCCReference Include="..\src\QueryMapper\QueryMapper.DatasetEnumerator.pas"/>
         <DCCReference Include="..\src\QueryMapper\QueryMapper.RowMapper.pas"/>
+        <DCCReference Include="..\src\QueryMapper\QueryMapper.Exceptions.pas"/>
         <DCCReference Include="QueryMapper\QueryMapper.Test.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>

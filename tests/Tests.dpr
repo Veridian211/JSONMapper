@@ -45,6 +45,7 @@ uses
   QueryMapper.Attributes in '..\src\QueryMapper\QueryMapper.Attributes.pas',
   QueryMapper.DatasetEnumerator in '..\src\QueryMapper\QueryMapper.DatasetEnumerator.pas',
   QueryMapper.RowMapper in '..\src\QueryMapper\QueryMapper.RowMapper.pas',
+  QueryMapper.Exceptions in '..\src\QueryMapper\QueryMapper.Exceptions.pas',
   QueryMapper.Test in 'QueryMapper\QueryMapper.Test.pas';
 
 var

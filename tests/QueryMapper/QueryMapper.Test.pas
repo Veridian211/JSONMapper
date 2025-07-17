@@ -5,6 +5,7 @@ interface
 uses
   DUnitX.TestFramework,
   System.SysUtils,
+  System.Generics.Collections,
   Data.DB,
   Datasnap.DBClient,
   QueryMapper;
@@ -28,7 +29,13 @@ type
     procedure TearDown();
 
     [Test]
-    procedure Test();
+    procedure TestEnumeration();
+    [Test]
+    procedure TestAsList();
+    [Test]
+    procedure TestAsObjectList();
+    [Test]
+    procedure TestCount();
   end;
 
 implementation
@@ -57,7 +64,7 @@ begin
   dataset.Free();
 end;
 
-procedure TQueryMapperTest.Test();
+procedure TQueryMapperTest.TestEnumeration();
 var
   user: TUser;
   index: integer;
@@ -76,7 +83,47 @@ begin
   end;
 end;
 
+procedure TQueryMapperTest.TestAsList();
+var
+  userList: TList<TUser>;
+  user: TUser;
+begin
+  userList := dataset.Rows<TUser>.asList();
+  try
+    Assert.AreEqual('Max', userList[0].name);
+    Assert.AreEqual(32, userList[0].age);
+    Assert.AreEqual('Anna', userList[1].name);
+    Assert.AreEqual(23, userList[1].age);
+  finally
+    for user in userList do begin
+      user.Free;
+    end;
+    userList.Free;
+  end;
+end;
+
+procedure TQueryMapperTest.TestAsObjectList;
+var
+  userList: TObjectList<TUser>;
+begin
+  userList := dataset.Rows<TUser>.asObjectList();
+  try
+    Assert.AreEqual('Max', userList[0].name);
+    Assert.AreEqual(32, userList[0].age);
+    Assert.AreEqual('Anna', userList[1].name);
+    Assert.AreEqual(23, userList[1].age);
+  finally
+    userList.Free;
+  end;
+end;
+
+procedure TQueryMapperTest.TestCount;
+begin
+  Assert.AreEqual(2, dataset.Count());
+end;
+
 initialization
   TDUnitX.RegisterTestFixture(TQueryMapperTest);
 
 end.
+
