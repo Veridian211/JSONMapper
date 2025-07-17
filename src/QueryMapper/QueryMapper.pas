@@ -3,6 +3,9 @@
 interface
 
 uses
+  {$IF USE_ATTRIBUTE_HELPER}
+  AttributeHelper,
+  {$ENDIF}
   System.Generics.Collections,
   System.SysUtils,
   System.TypInfo,

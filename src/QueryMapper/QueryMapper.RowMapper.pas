@@ -3,6 +3,9 @@ unit QueryMapper.RowMapper;
 interface
 
 uses
+  {$IF USE_ATTRIBUTE_HELPER}
+  AttributeHelper,
+  {$ENDIF}
   System.SysUtils,
   System.Rtti,
   System.Generics.Collections,
