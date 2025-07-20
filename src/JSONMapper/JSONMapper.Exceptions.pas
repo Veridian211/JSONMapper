@@ -100,7 +100,7 @@ constructor EJSONMapperFaultyEnumerator.Create(rttiType: TRttiType);
 begin
   inherited CreateFmt(
     'Method GetEnumrator() not found on type "%s" or MoveNext() and GetCurrent() methods not found on enumerator.',
-    [rttiType.Name]
+    [rttiType.ClassType.QualifiedClassName]
   );
 end;
 

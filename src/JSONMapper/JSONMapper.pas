@@ -63,6 +63,9 @@ type
     class procedure jsonToObject(const jsonObject: TJSONObject; const obj: TObject); overload;
     class function jsonToObject<T: class, constructor>(const jsonObject: TJSONObject): T; overload;
 
+    /// <summary> Maps a TJSONObject into a record. </summary>
+    class function jsonToRecord(const rec: Pointer; const typeInfo: PTypeInfo; const jsonObject: TJSONObject): TValue; static;
+
     /// <summary> Maps a TJSONArray into a generic TList. </summary>
     class procedure jsonToList(const jsonArray: TJSONArray; const list: TObject); overload;
     class function jsonToList<T: class, constructor>(const jsonArray: TJSONArray): T; overload;
@@ -519,11 +522,11 @@ begin
       end;
       exit(obj);
     end;
-//
-//    tkRecord: begin
-//      exit(TJSONMapper.recordToJSON(value));
-//    end;
-//
+
+    tkRecord: begin
+      exit(jsonToRecord(fieldValue.GetReferenceToRawData, rttiField.FieldType.Handle, TJSONObject(jsonValue)));
+    end;
+
 //    tkArray,
 //    tkDynArray: begin
 //      exit(TJSONMapper.arrayToJSON(value));
@@ -541,6 +544,39 @@ begin
   end;
 end;
 
+class function TJSONMapper.jsonToRecord(const rec: Pointer; const typeInfo: PTypeInfo; const jsonObject: TJSONObject): TValue;
+var
+  rttiContext: TRttiContext;
+  recordType: TRttiRecordType;
+  rttiField: TRttiField;
+
+  jsonKey: string;
+  jsonValue: TJSONValue;
+  fieldValue: TValue;
+  newFieldValue: TValue;
+begin
+  rttiContext := TRttiContext.Create();
+  try
+    recordType := rttiContext.GetType(typeInfo) as TRttiRecordType;
+
+    for rttiField in recordType.GetFields() do begin
+      jsonKey := getJSONKey(rttiField);
+      jsonValue := jsonObject.GetValue(jsonKey);
+
+      if jsonValue = nil then begin
+        continue;
+      end;
+
+      fieldValue := rttiField.GetValue(rec);
+      newFieldValue := TJSONMapper.createValue(jsonValue, rttiField, fieldValue);
+      rttiField.SetValue(rec, newFieldValue);
+    end;
+  finally
+    rttiContext.Free();
+  end;
+  TValue.Make(rec, typeInfo, Result);
+end;
+
 class function TJSONMapper.jsonToList<T>(const jsonArray: TJSONArray): T;
 begin
 
@@ -556,7 +592,7 @@ var
   jsonKeyAttrib: JSONKeyAttribute;
 begin
   jsonKeyAttrib := rttiField.GetAttribute<JSONKeyAttribute>();
-  if not Assigned(jsonKeyAttrib) then begin
+  if jsonKeyAttrib = nil then begin
     exit(rttiField.Name);
   end;
   exit(jsonKeyAttrib.getKey);

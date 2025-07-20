@@ -38,6 +38,7 @@ uses
   ObjectToJSON.Arrays in 'ObjectToJSON\ObjectToJSON.Arrays.pas',
   ObjectToJSON.Variant in 'ObjectToJSON\ObjectToJSON.Variant.pas',
   JSONToObject._Object in 'JSONToObject\JSONToObject._Object.pas',
+  JSONToObject._Record in 'JSONToObject\JSONToObject._Record.pas',
   JSONToObject.DateTime in 'JSONToObject\JSONToObject.DateTime.pas',
   JSONToObject.Variant in 'JSONToObject\JSONToObject.Variant.pas',
   ObjectMapper in '..\src\ObjectMapper\ObjectMapper.pas',
