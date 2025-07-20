@@ -9,11 +9,11 @@ uses
   JSONMapper.Exceptions;
 
   function isGenericTEnumerable(const obj: TObject): Boolean;
-  procedure getEnumeratorMethods(
+  procedure getEnumerableMethods(
     const enumerable: TObject;
     out enumerator: TValue;
-    out currentProperty: TRttiProperty;
-    out moveNextMethod: TRttiMethod
+    out current: TRttiProperty;
+    out moveNext: TRttiMethod
   );
 
 implementation
@@ -32,34 +32,34 @@ begin
   end;
 end;
 
-procedure getEnumeratorMethods(
+procedure getEnumerableMethods(
   const enumerable: TObject;
   out enumerator: TValue;
-  out currentProperty: TRttiProperty;
-  out moveNextMethod: TRttiMethod
+  out current: TRttiProperty;
+  out moveNext: TRttiMethod
 );
 var
   rttiContext: TRttiContext;
   enumerableType: TRttiInstanceType;
 
-  getEnumMethod: TRttiMethod;
+  getEnumeratorMethod: TRttiMethod;
   enumeratorType: TRttiInstanceType;
 begin
   rttiContext := TRttiContext.Create();
   try
     enumerableType := rttiContext.GetType(enumerable.ClassType) as TRttiInstanceType;
 
-    getEnumMethod := enumerableType.GetMethod('GetEnumerator');
-    if not Assigned(getEnumMethod) then begin
+    getEnumeratorMethod := enumerableType.GetMethod('GetEnumerator');
+    if getEnumeratorMethod = nil then begin
       raise EJSONMapperFaultyEnumerator.Create(enumerableType);
     end;
 
-    enumerator := getEnumMethod.Invoke(enumerable, []);
+    enumerator := getEnumeratorMethod.Invoke(enumerable, []);
 
     enumeratorType := rttiContext.GetType(enumerator.TypeInfo) as TRttiInstanceType;
-    moveNextMethod := enumeratorType.GetMethod('MoveNext');
-    currentProperty := enumeratorType.GetProperty('Current');
-    if not Assigned(moveNextMethod) or not Assigned(currentProperty) then begin
+    moveNext := enumeratorType.GetMethod('MoveNext');
+    current := enumeratorType.GetProperty('Current');
+    if (moveNext = nil) or (current = nil) then begin
       raise EJSONMapperFaultyEnumerator.Create(enumerableType);
     end;
   finally

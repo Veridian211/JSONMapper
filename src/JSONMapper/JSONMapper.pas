@@ -145,25 +145,25 @@ class procedure TJSONMapper.listToJSON(const list: TObject; var jsonArray: TJSON
 var
   rttiContext: TRttiContext;
   enumerator: TValue;
-  currentProperty: TRttiProperty;
-  moveNextMethod: TRttiMethod;
+  current: TRttiProperty;
+  moveNext: TRttiMethod;
 
-  current: TValue;
+  currentValue: TValue;
   jsonValue: TJSONValue;
 begin
   rttiContext := TRttiContext.Create();
   try
-    getEnumeratorMethods(
+    getEnumerableMethods(
       list,
       enumerator,
-      currentProperty,
-      moveNextMethod
+      current,
+      moveNext
     );
 
     try
-      while moveNextMethod.Invoke(enumerator, []).AsBoolean do begin
-        current := currentProperty.GetValue(enumerator.AsObject);
-        jsonValue := createJSONValue(current);
+      while moveNext.Invoke(enumerator, []).AsBoolean do begin
+        currentValue := current.GetValue(enumerator.AsObject);
+        jsonValue := createJSONValue(currentValue);
         jsonArray.AddElement(jsonValue);
       end;
     finally
