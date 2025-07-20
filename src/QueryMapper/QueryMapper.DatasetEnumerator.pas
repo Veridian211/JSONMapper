@@ -54,7 +54,7 @@ type
 
     function IEnumerableDataset<T>.GetEnumerator = GetEnumeratorGeneric;
 
-    function asList: TList<T>;
+    function asList(): TList<T>;
     function asObjectList(): TObjectList<T>;
     procedure populateList(list: TList<T>);
 
@@ -156,9 +156,9 @@ begin
     populateList(Result);
   except
     for item in Result do begin
-      item.Free;
+      item.Free();
     end;
-    Result.Free;
+    Result.Free();
     raise;
   end;
 end;
@@ -171,7 +171,7 @@ begin
   try
     populateList(Result);
   except
-    Result.Free;
+    Result.Free();
     raise;
   end;
 end;

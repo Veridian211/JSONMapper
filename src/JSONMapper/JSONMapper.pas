@@ -102,7 +102,7 @@ begin
   try
     objectToJSON(obj, jsonObject);
   except
-    jsonObject.Free;
+    jsonObject.Free();
     raise;
   end;
   exit(jsonObject);
@@ -137,7 +137,7 @@ begin
       jsonObject.AddPair(jsonPair);
     end;
   finally
-    rttiContext.Free;
+    rttiContext.Free();
   end;
 end;
 
@@ -167,10 +167,10 @@ begin
         jsonArray.AddElement(jsonValue);
       end;
     finally
-      enumerator.AsObject.Free;
+      enumerator.AsObject.Free();
     end;
   finally
-    rttiContext.Free;
+    rttiContext.Free();
   end;
 end;
 
@@ -182,7 +182,7 @@ begin
   try
     listToJSON(list, jsonArray);
   except
-    jsonArray.Free;
+    jsonArray.Free();
     raise;
   end;
   exit(jsonArray);
@@ -334,10 +334,10 @@ begin
         jsonObject.AddPair(jsonPair);
       end;
     finally
-      rttiContext.Free;
+      rttiContext.Free();
     end;
   except
-    jsonObject.Free;
+    jsonObject.Free();
   end;
 
   exit(jsonObject);
@@ -367,10 +367,10 @@ begin
         jsonArray.AddElement(jsonValue);
       end;
     finally
-      rttiContext.Free;
+      rttiContext.Free();
     end;
   except
-    jsonArray.Free;
+    jsonArray.Free();
     raise;
   end;
 
@@ -385,7 +385,7 @@ begin
   try
     jsonToObject(jsonObject, obj);
   except
-    obj.Free;
+    obj.Free();
     raise;
   end;
   exit(obj);
@@ -426,7 +426,7 @@ begin
       rttiField.SetValue(obj, newFieldValue);
     end;
   finally
-    rttiContext.Free;
+    rttiContext.Free();
   end;
 end;
 

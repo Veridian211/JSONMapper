@@ -55,7 +55,7 @@ begin
     if Assigned(user) then begin
       FreeAndNil(user);
     end;
-    jsonObject.Free;
+    jsonObject.Free();
   end;
 end;
 
@@ -79,7 +79,7 @@ begin
     if Assigned(user) then begin
       FreeAndNil(user);
     end;
-    jsonObject.Free;
+    jsonObject.Free();
   end;
 end;
 

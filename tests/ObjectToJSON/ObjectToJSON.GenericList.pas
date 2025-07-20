@@ -26,26 +26,26 @@ type
     userList: TList<TUser>;
   public
     [Setup]
-    procedure Setup;
+    procedure Setup();
     [TearDown]
-    procedure TearDown;
+    procedure TearDown();
 
     [Test]
-    procedure TestIntegerList;
+    procedure TestIntegerList();
     [Test]
-    procedure TestStringList;
+    procedure TestStringList();
     [Test]
-    procedure TestBoolList;
+    procedure TestBoolList();
 
     [Test]
-    procedure TestGenericList;
+    procedure TestGenericList();
     [Test]
-    procedure TestObjectWithGenericList;
+    procedure TestObjectWithGenericList();
   end;
 
 implementation
 
-procedure TList_BasicDatatypes.Setup;
+procedure TList_BasicDatatypes.Setup();
 var
   i: Integer;
   isBiggerThanZero: boolean;
@@ -76,7 +76,7 @@ begin
   end;
 end;
 
-procedure TList_BasicDatatypes.TearDown;
+procedure TList_BasicDatatypes.TearDown();
 var
   i: Integer;
 begin
@@ -85,12 +85,12 @@ begin
   booleanList.Free;
 
   for i := 0 to userList.Count-1 do begin
-    userList[i].Free;
+    userList[i].Free();
   end;
-  userList.Free;
+  userList.Free();
 end;
 
-procedure TList_BasicDatatypes.TestIntegerList;
+procedure TList_BasicDatatypes.TestIntegerList();
 const
   EXPECTED_VALUE = '[0,1,2,3]';
 var
@@ -100,11 +100,11 @@ begin
   try
     Assert.AreEqual(EXPECTED_VALUE, jsonArray.ToJSON());    
   finally
-    jsonArray.Free;
+    jsonArray.Free();
   end;
 end;
 
-procedure TList_BasicDatatypes.TestStringList;
+procedure TList_BasicDatatypes.TestStringList();
 const
   EXPECTED_VALUE = '["0","1","2","3"]';
 var
@@ -114,11 +114,11 @@ begin
   try
     Assert.AreEqual(EXPECTED_VALUE, jsonArray.ToJSON());    
   finally
-    jsonArray.Free;
+    jsonArray.Free();
   end;
 end;  
 
-procedure TList_BasicDatatypes.TestBoolList;
+procedure TList_BasicDatatypes.TestBoolList();
 const
   EXPECTED_VALUE = '[false,true,true,true]';
 var
@@ -128,11 +128,11 @@ begin
   try
     Assert.AreEqual(EXPECTED_VALUE, jsonArray.ToJSON());    
   finally
-    jsonArray.Free;
+    jsonArray.Free();
   end;
 end;
 
-procedure TList_BasicDatatypes.TestGenericList;
+procedure TList_BasicDatatypes.TestGenericList();
 const
   EXPECTED_VALUE = '[{"name":"","age":0,"isAdmin":false},{"name":"","age":1,"isAdmin":false},{"name":"","age":2,"isAdmin":false}]';
 var
@@ -142,11 +142,11 @@ begin
   try
     Assert.AreEqual(EXPECTED_VALUE, jsonArray.ToJSON());
   finally
-    jsonArray.Free;
+    jsonArray.Free();
   end;
 end;
 
-procedure TList_BasicDatatypes.TestObjectWithGenericList;
+procedure TList_BasicDatatypes.TestObjectWithGenericList();
 const
   EXPECTED_VALUE = '{}';
 var
@@ -156,7 +156,7 @@ begin
   try
     Assert.AreEqual(EXPECTED_VALUE, jsonObject.ToJSON());
   finally
-    jsonObject.Free;
+    jsonObject.Free();
   end;
 end;
 

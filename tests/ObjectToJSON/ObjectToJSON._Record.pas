@@ -45,7 +45,7 @@ end;
 
 procedure TRecordToJSON.TearDown();
 begin
-  userWrapper.Free;
+  userWrapper.Free();
 end;
 
 procedure TRecordToJSON.TestBasicRecord();
@@ -58,7 +58,7 @@ begin
   try
     Assert.AreEqual(EXPECTED_VALUE, jsonObject.ToJSON());
   finally
-    jsonObject.Free;
+    jsonObject.Free();
   end;
 end;
 

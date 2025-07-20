@@ -23,12 +23,12 @@ var
   rttiContext: TRttiContext;
   rttiType: TRttiType;
 begin
-  rttiContext := TRttiContext.Create;
+  rttiContext := TRttiContext.Create();
   try
     rttiType := rttiContext.GetType(obj.ClassType);
     exit(rttiType.Name.StartsWith('TEnumerable<'));
   finally
-    rttiContext.Free;
+    rttiContext.Free();
   end;
 end;
 
@@ -63,7 +63,7 @@ begin
       raise EJSONMapperFaultyEnumerator.Create(enumerableType);
     end;
   finally
-    rttiContext.Free;
+    rttiContext.Free();
   end;
 end;
 

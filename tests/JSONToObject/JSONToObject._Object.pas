@@ -28,9 +28,9 @@ type
   private
   public
     [Test]
-    procedure TestBasicObject;
+    procedure TestBasicObject();
     [Test]
-    procedure TestNestedObject;
+    procedure TestNestedObject();
   end;
 
 implementation
@@ -54,7 +54,7 @@ begin
     if Assigned(user) then begin
       FreeAndNil(user);
     end;
-    jsonObject.Free;
+    jsonObject.Free();
   end;
 end;
 
@@ -81,21 +81,21 @@ begin
     if Assigned(nestedUser) then begin
       FreeAndNil(nestedUser);
     end;
-    nestedUserJSON.Free;
+    nestedUserJSON.Free();
   end;
 end;
 
 { TNestedUser }
 
-constructor TNestedUser.Create;
+constructor TNestedUser.Create();
 begin
   inherited;
   user := TUser.Create();
 end;
 
-destructor TNestedUser.Destroy;
+destructor TNestedUser.Destroy();
 begin
-  user.Free;
+  user.Free();
   inherited;
 end;
 

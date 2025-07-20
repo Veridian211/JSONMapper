@@ -61,7 +61,7 @@ begin
   try
     Assert.AreEqual(EXPECTED_VALUE, json.ToJSON());
   finally
-    json.Free;
+    json.Free();
   end;
 end;
 
@@ -83,7 +83,7 @@ begin
   try
     Assert.AreEqual(expectedJSON, json.ToJSON());
   finally
-    json.Free;
+    json.Free();
   end;
 end;
 

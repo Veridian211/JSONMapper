@@ -21,17 +21,17 @@ type
     arrayWrapper: TArrayWrapper;
   public
     [Setup]
-    procedure Setup;
+    procedure Setup();
     [TearDown]
-    procedure TearDown;
+    procedure TearDown();
 
     [Test]
-    procedure TestBasicArray;
+    procedure TestBasicArray();
   end;
 
 implementation
 
-procedure TArrayToJSON.Setup;
+procedure TArrayToJSON.Setup();
 var
   i: Integer;
   isBiggerThanZero: boolean;
@@ -55,12 +55,12 @@ begin
   end;
 end;
 
-procedure TArrayToJSON.TearDown;
+procedure TArrayToJSON.TearDown();
 begin
-  arrayWrapper.Free;
+  arrayWrapper.Free();
 end;
 
-procedure TArrayToJSON.TestBasicArray;
+procedure TArrayToJSON.TestBasicArray();
 const
   EXPECTED_INTEGER_ARRAY = '[0,1,2]';
   EXPECTED_STRING_ARRAY = '["0","1","2"]';
@@ -80,7 +80,7 @@ begin
     jsonObject.TryGetValue<TJSONArray>('booleanArray', jsonArray);
     Assert.AreEqual(EXPECTED_BOOLEAN_ARRAY, jsonArray.ToJSON());
   finally
-    jsonObject.Free;
+    jsonObject.Free();
   end;
 end;
 

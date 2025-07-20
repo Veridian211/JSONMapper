@@ -54,8 +54,8 @@ end;
 
 procedure TBasicObjektToJSON.TearDown();
 begin
-  user.Free;
-  nestedUser.Free;
+  user.Free();
+  nestedUser.Free();
 end;
 
 procedure TBasicObjektToJSON.TestBasicObject();
@@ -74,7 +74,7 @@ begin
   try
     Assert.AreEqual(EXPECTED_JSON, jsonObject.ToJSON());
   finally
-    jsonObject.Free;
+    jsonObject.Free();
   end;
 end;
 
@@ -95,21 +95,21 @@ begin
 
     Assert.AreEqual(EXPECTED_AGE, userAge);
   finally
-    jsonObject.Free;
+    jsonObject.Free();
   end;
 end;
 
 { TNestedUser }
 
-constructor TNestedUser.Create;
+constructor TNestedUser.Create();
 begin
   inherited;
   user := TUser.Create();
 end;
 
-destructor TNestedUser.Destroy;
+destructor TNestedUser.Destroy();
 begin
-  user.Free;
+  user.Free();
   inherited;
 end;
 

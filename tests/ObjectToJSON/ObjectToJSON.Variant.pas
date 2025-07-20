@@ -45,7 +45,7 @@ end;
 
 procedure TVariantToJSON.Teardown();
 begin
-  user.Free;
+  user.Free();
 end;
 
 procedure TVariantToJSON.TestNull();
@@ -64,7 +64,7 @@ begin
   try
     Assert.AreEqual(EXPECTED_JSON, json.ToJSON());
   finally
-    json.Free;
+    json.Free();
   end;
 end;
 
@@ -84,7 +84,7 @@ begin
   try
     Assert.AreEqual(EXPECTED_JSON, jsonObject.ToJSON());
   finally
-    jsonObject.Free;
+    jsonObject.Free();
   end;
 end;
 

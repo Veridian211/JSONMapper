@@ -96,13 +96,13 @@ begin
     Assert.AreEqual(23, userList[1].age);
   finally
     for user in userList do begin
-      user.Free;
+      user.Free();
     end;
-    userList.Free;
+    userList.Free();
   end;
 end;
 
-procedure TQueryMapperTest.TestAsObjectList;
+procedure TQueryMapperTest.TestAsObjectList();
 var
   userList: TObjectList<TUser>;
 begin
@@ -113,11 +113,11 @@ begin
     Assert.AreEqual('Anna', userList[1].name);
     Assert.AreEqual(23, userList[1].age);
   finally
-    userList.Free;
+    userList.Free();
   end;
 end;
 
-procedure TQueryMapperTest.TestCount;
+procedure TQueryMapperTest.TestCount();
 begin
   Assert.AreEqual(2, dataset.Count());
 end;

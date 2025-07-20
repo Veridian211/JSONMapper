@@ -22,27 +22,27 @@ type
     user: TUser;
   public
     [Setup]
-    procedure Setup;
+    procedure Setup();
     [TearDown]
-    procedure TearDown;
+    procedure TearDown();
 
     [Test]
-    procedure TestIgnoreAttribute;
+    procedure TestIgnoreAttribute();
   end;
 
 implementation
 
-procedure TIgnoreAttribute.Setup;
+procedure TIgnoreAttribute.Setup();
 begin
   user := TUser.Create();
 end;
 
-procedure TIgnoreAttribute.TearDown;
+procedure TIgnoreAttribute.TearDown();
 begin
-  user.Free;
+  user.Free();
 end;
 
-procedure TIgnoreAttribute.TestIgnoreAttribute;
+procedure TIgnoreAttribute.TestIgnoreAttribute();
 var
   jsonObject: TJSONObject;
   _: TJSONValue;
@@ -51,7 +51,7 @@ begin
   try
     Assert.IsFalse(jsonObject.TryGetValue('age', _));
   finally
-    jsonObject.Free;
+    jsonObject.Free();
   end;
 end;
 

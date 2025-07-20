@@ -116,7 +116,7 @@ begin
       end;
     end;
   except
-    Result.Free;
+    Result.Free();
     raise;
   end;
 end;
