@@ -17,8 +17,8 @@ uses
   JSONMapper.ClassFieldHelper,
   JSONMapper.EnumerableHelper,
   JSONMapper.DateFormatter,
-  JSONMapper.Nullable,
-  PublicFieldIterator;
+  PublicFieldIterator,
+  Nullable;
 
 type
   /// <summary> JSONMapper for mapping a generic object to a TJSONObject and vice versa.
@@ -89,11 +89,11 @@ type
   EJSONMapperFaultyEnumerator = JSONMapper.Exceptions.EJSONMapperFaultyEnumerator;
   EJSONMapperNotImplementedException = JSONMapper.Exceptions.EJSONMapperNotImplementedException;
 
-  TNullString = JSONMapper.Nullable.TNullString;
-  TNullInteger = JSONMapper.Nullable.TNullInteger;
-  TNullDouble = JSONMapper.Nullable.TNullDouble;
-  TNullBoolean = JSONMapper.Nullable.TNullBoolean;
-  TNullDateTime = JSONMapper.Nullable.TNullDateTime;
+  TNullString = Nullable.TNullString;
+  TNullInteger = Nullable.TNullInteger;
+  TNullDouble = Nullable.TNullDouble;
+  TNullBoolean = Nullable.TNullBoolean;
+  TNullDateTime = Nullable.TNullDateTime;
 
 implementation
 

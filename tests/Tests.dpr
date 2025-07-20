@@ -28,7 +28,6 @@ uses
   JSONMapper.ClassFieldHelper in '..\src\JSONMapper\JSONMapper.ClassFieldHelper.pas',
   JSONMapper.EnumerableHelper in '..\src\JSONMapper\JSONMapper.EnumerableHelper.pas',
   JSONMapper.DateFormatter in '..\src\JSONMapper\JSONMapper.DateFormatter.pas',
-  JSONMapper.Nullable in '..\src\JSONMapper\JSONMapper.Nullable.pas',
   PublicFieldIterator in '..\src\JSONMapper\PublicFieldIterator.pas',
   ObjectToJSON._Object in 'ObjectToJSON\ObjectToJSON._Object.pas',
   ObjectToJSON.DateTime in 'ObjectToJSON\ObjectToJSON.DateTime.pas',
@@ -47,7 +46,9 @@ uses
   QueryMapper.DatasetEnumerator in '..\src\QueryMapper\QueryMapper.DatasetEnumerator.pas',
   QueryMapper.RowMapper in '..\src\QueryMapper\QueryMapper.RowMapper.pas',
   QueryMapper.Exceptions in '..\src\QueryMapper\QueryMapper.Exceptions.pas',
-  QueryMapper.Test in 'QueryMapper\QueryMapper.Test.pas';
+  QueryMapper.Test in 'QueryMapper\QueryMapper.Test.pas',
+  Nullable in '..\src\Nullable\Nullable.pas',
+  Nullable.Test in 'Nullable\Nullable.Test.pas';
 
 var
   runner: ITestRunner;

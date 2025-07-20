@@ -98,7 +98,6 @@
         <DCCReference Include="..\src\JSONMapper\JSONMapper.ClassFieldHelper.pas"/>
         <DCCReference Include="..\src\JSONMapper\JSONMapper.EnumerableHelper.pas"/>
         <DCCReference Include="..\src\JSONMapper\JSONMapper.DateFormatter.pas"/>
-        <DCCReference Include="..\src\JSONMapper\JSONMapper.Nullable.pas"/>
         <DCCReference Include="..\src\JSONMapper\PublicFieldIterator.pas"/>
         <DCCReference Include="ObjectToJSON\ObjectToJSON._Object.pas"/>
         <DCCReference Include="ObjectToJSON\ObjectToJSON.DateTime.pas"/>
@@ -118,6 +117,8 @@
         <DCCReference Include="..\src\QueryMapper\QueryMapper.RowMapper.pas"/>
         <DCCReference Include="..\src\QueryMapper\QueryMapper.Exceptions.pas"/>
         <DCCReference Include="QueryMapper\QueryMapper.Test.pas"/>
+        <DCCReference Include="..\src\Nullable\Nullable.pas"/>
+        <DCCReference Include="Nullable\Nullable.Test.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

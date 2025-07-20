@@ -1,4 +1,4 @@
-unit JSONMapper.Nullable;
+unit Nullable;
 
 interface
 
