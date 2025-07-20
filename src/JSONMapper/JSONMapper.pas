@@ -118,6 +118,13 @@ var
   jsonValue: TJSONValue;
   jsonPair: TJSONPair;
 begin
+  if obj = nil then begin
+    raise EJSONMapperObjectIsNil.Create();
+  end;
+  if jsonObject = nil then begin
+    raise EJSONMapperJSONIsNil.Create();
+  end;
+
   rttiContext := TRttiContext.Create();
   try
     rttiInstanceType := rttiContext.GetType(obj.ClassType) as TRttiInstanceType;
