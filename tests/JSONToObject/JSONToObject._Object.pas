@@ -40,7 +40,6 @@ const
   JSON_STRING = '{"name":"John Doe","age":23,"isAdmin":true}';
 var
   jsonObject: TJSONObject;
-  jsonPair: TJSONPair;
   user: TUser;
 begin
   jsonObject := TJSONObject.ParseJSONValue(JSON_STRING) as TJSONObject;
@@ -63,11 +62,10 @@ const
   JSON_STRING = '{"user":{"name":"John Doe","age":23,"isAdmin":true}}';
 var
   nestedUserJSON: TJSONObject;
-  jsonPair: TJSONPair;
   nestedUser: TNestedUser;
   user: TUser;
 begin
-  user := nil;
+  nestedUser := nil;
 
   nestedUserJSON := TJSONObject.ParseJSONValue(JSON_STRING) as TJSONObject;
   try
