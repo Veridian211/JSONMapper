@@ -12,10 +12,12 @@ uses
 
 type
   TUser = class
+  private
+    _age: integer;
   public
     [FieldName('Name')]
-    name: string;
-    age: integer;
+    fullName: string;
+    property age: integer read _age write _age;
   end;
 
   [TestFixture]
@@ -72,11 +74,11 @@ begin
   index := 0;
   for user in dataset.Rows<TUser> do begin
     if index = 0 then begin
-      Assert.AreEqual('Max', user.name);
+      Assert.AreEqual('Max', user.fullName);
       Assert.AreEqual(32, user.age);
     end;
     if index = 1 then begin
-      Assert.AreEqual('Anna', user.name);
+      Assert.AreEqual('Anna', user.fullName);
       Assert.AreEqual(23, user.age);
     end;
     inc(index);
@@ -90,9 +92,9 @@ var
 begin
   userList := dataset.Rows<TUser>.asList();
   try
-    Assert.AreEqual('Max', userList[0].name);
+    Assert.AreEqual('Max', userList[0].fullName);
     Assert.AreEqual(32, userList[0].age);
-    Assert.AreEqual('Anna', userList[1].name);
+    Assert.AreEqual('Anna', userList[1].fullName);
     Assert.AreEqual(23, userList[1].age);
   finally
     for user in userList do begin
@@ -108,9 +110,9 @@ var
 begin
   userList := dataset.Rows<TUser>.asObjectList();
   try
-    Assert.AreEqual('Max', userList[0].name);
+    Assert.AreEqual('Max', userList[0].fullName);
     Assert.AreEqual(32, userList[0].age);
-    Assert.AreEqual('Anna', userList[1].name);
+    Assert.AreEqual('Anna', userList[1].fullName);
     Assert.AreEqual(23, userList[1].age);
   finally
     userList.Free();

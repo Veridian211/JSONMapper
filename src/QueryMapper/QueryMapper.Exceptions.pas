@@ -18,7 +18,7 @@ type
 
   EQueryMapper_NoEmptyConstructorFound = class(Exception)
   public
-    constructor Create(metaClassType: TClass); reintroduce;
+    constructor Create(classType: TClass); reintroduce;
   end;
 
 implementation
@@ -32,9 +32,9 @@ end;
 
 { EQueryMapper_NoEmptyConstructorFound }
 
-constructor EQueryMapper_NoEmptyConstructorFound.Create(metaClassType: TClass);
+constructor EQueryMapper_NoEmptyConstructorFound.Create(classType: TClass);
 begin
-  inherited CreateFmt('"%s" has no empty constructor.', [metaClassType.QualifiedClassName]);
+  inherited CreateFmt('"%s" has no empty constructor.', [classType.QualifiedClassName]);
 end;
 
 end.

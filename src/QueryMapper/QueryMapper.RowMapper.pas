@@ -14,38 +14,28 @@ uses
   QueryMapper.Exceptions;
 
 type
+  TFieldMappingType = (fmField, fmProperty);
+
   TFieldMapping = record
   public
-    field: TRttiField;
-    constructor Create(field: TRttiField);
+    fieldName: string;
+    constructor Create(fieldName: string; field: TRttiField); overload;
+    constructor Create(fieldName: string; prop: TRttiProperty); overload;  
+  case fieldType: TFieldMappingType of
+    fmField: (field: TRttiField);
+    fmProperty: (prop: TRttiProperty);
   end;
 
   TFieldMappings = TList<TFieldMapping>;
 
   TConstructorMethod = reference to function: TObject;
 
-  TDatasetRowMapperOptions = record
-  private
-    const
-      DEFAULT_CASE_SENSITIVE = false;
-  public
-    caseSensitive: boolean;
-    constructor Create(caseSensitive: boolean);
-    class function DefaultConfig(): TDatasetRowMapperOptions; static;
-  end;
-
   TDatasetRowMapper<T: class> = class
   private
     constructorMethod: TConstructorMethod;
     fieldMappings: TFieldMappings;
-    options: TDatasetRowMapperOptions;
-    function getDatasetFieldName(field: TField): string;
-    function getFieldName(field: TRttiField): string;
   public
-    constructor Create(
-      constructorMethod: TConstructorMethod;
-      options: TDatasetRowMapperOptions
-    ); reintroduce;
+    constructor Create(constructorMethod: TConstructorMethod); reintroduce;
     function mapRow(dataset: TDataSet): T;
     destructor Destroy(); override;
   end;
@@ -55,9 +45,9 @@ type
     // global rttiContext, not thread safe
     class var rttiContext: TRttiContext;
 
-    class var options: TDatasetRowMapperOptions;
-
     class function getConstructorMethod<T: class>(): TConstructorMethod;
+    class function getFieldName(field: TRttiField): string; overload; static;
+    class function getFieldName(prop: TRttiProperty): string; overload; static;
 
     class procedure Initialize();
     class procedure Finalize();
@@ -67,23 +57,26 @@ type
 
 implementation
 
-{ TRowField }
+{ TFieldMapping }
 
-constructor TFieldMapping.Create(field: TRttiField);
+constructor TFieldMapping.Create(fieldName: string; field: TRttiField);
 begin
+  self.fieldName := fieldName;
   self.field := field;
+end;     
+
+constructor TFieldMapping.Create(fieldName: string; prop: TRttiProperty);
+begin
+  self.fieldName := fieldName;
+  self.prop := prop;
 end;
 
 { TDatasetRowMapper<T> }
 
-constructor TDatasetRowMapper<T>.Create(
-  constructorMethod: TConstructorMethod;
-  options: TDatasetRowMapperOptions
-);
+constructor TDatasetRowMapper<T>.Create(constructorMethod: TConstructorMethod);
 begin
   inherited Create();
   self.constructorMethod := constructorMethod;
-  self.options := options;
 
   self.fieldMappings := TFieldMappings.Create();
 end;
@@ -91,7 +84,6 @@ end;
 function TDatasetRowMapper<T>.mapRow(dataset: TDataSet): T;
 var
   field: TField;
-  fieldName: string;
   fieldValue: TValue;
   fieldMapping: TFieldMapping;
   rowFieldName: string;
@@ -99,20 +91,18 @@ begin
   Result := constructorMethod() as T;
   try
     for fieldMapping in fieldMappings do begin
-      rowFieldName := getFieldName(fieldMapping.field);
+      field := dataset.FindField(fieldMapping.fieldName);
+      if field = nil then begin
+        continue;
+      end;
 
-      for field in dataset.Fields do begin
-        if fieldMapping.field.HasAttribute(FieldNameAttribute) then begin
-          fieldName := field.DisplayName;
-        end else begin
-          fieldName := getDatasetFieldName(field);
-        end;
+      fieldValue := TValue.FromVariant(field.Value);
 
-        if (rowFieldName = fieldName) then begin
-          fieldValue := TValue.FromVariant(field.Value);
+      case fieldMapping.fieldType of
+        fmField:
           fieldMapping.field.SetValue(TObject(Result), fieldValue);
-          break;
-        end;
+        fmProperty: 
+          fieldMapping.prop.SetValue(TObject(Result), fieldValue);
       end;
     end;
   except
@@ -121,45 +111,10 @@ begin
   end;
 end;
 
-function TDatasetRowMapper<T>.getDatasetFieldName(field: TField): string;
-begin
-  if options.caseSensitive then begin
-    exit(field.DisplayName);
-  end;
-  exit(LowerCase(field.DisplayName));
-end;
-
-function TDatasetRowMapper<T>.getFieldName(field: TRttiField): string;
-begin
-  if field.HasAttribute(FieldNameAttribute) then begin
-    exit(FieldNameAttribute(field.GetAttribute(FieldNameAttribute)).fieldName);
-  end;
-
-  if options.caseSensitive then begin
-    exit(field.Name);
-  end;
-
-  exit(LowerCase(field.Name));
-end;
-
 destructor TDatasetRowMapper<T>.Destroy();
 begin
   fieldMappings.Free();
   inherited;
-end;
-
-{ TDatasetRowMapperOptions }
-
-constructor TDatasetRowMapperOptions.Create(caseSensitive: boolean);
-begin
-  self.caseSensitive := caseSensitive;
-end;
-
-class function TDatasetRowMapperOptions.DefaultConfig(): TDatasetRowMapperOptions;
-begin
-  Result := TDatasetRowMapperOptions.Create(
-    TDatasetRowMapperOptions.DEFAULT_CASE_SENSITIVE
-  );
 end;
 
 { TDatasetRowMapperFactory }
@@ -170,16 +125,26 @@ var
   constructorMethod: TConstructorMethod;
 
   rowMapper: TDatasetRowMapper<T>;
-  rttiField: TRttiField;
+  field: TRttiField;
+  fieldName: string;
   fieldMapping: TFieldMapping;
+
+  prop: TRttiProperty;
 begin
   constructorMethod := getConstructorMethod<T>();
 
-  rowMapper := TDatasetRowMapper<T>.Create(constructorMethod, options);
+  rowMapper := TDatasetRowMapper<T>.Create(constructorMethod);
   try
     rttiType := rttiContext.GetType(T) as TRttiInstanceType;
-    for rttiField in rttiType.GetFields() do begin
-      fieldMapping := TFieldMapping.Create(rttiField);
+    for field in rttiType.GetFields() do begin
+      fieldName := getFieldName(field);
+      fieldMapping := TFieldMapping.Create(fieldName, field);
+      rowMapper.fieldMappings.Add(fieldMapping);
+    end;
+
+    for prop in rttiType.GetProperties() do begin
+      fieldName := getFieldName(prop);
+      fieldMapping := TFieldMapping.Create(fieldName, prop);
       rowMapper.fieldMappings.Add(fieldMapping);
     end;
   except
@@ -217,10 +182,27 @@ begin
   Result := constructorMethod;
 end;
 
+class function TDatasetRowMapperFactory.getFieldName(field: TRttiField): string;
+begin
+  if field.HasAttribute(FieldNameAttribute) then begin
+    exit(FieldNameAttribute(field.GetAttribute(FieldNameAttribute)).fieldName);
+  end;
+
+  exit(field.Name);
+end;
+
+class function TDatasetRowMapperFactory.getFieldName(prop: TRttiProperty): string;
+begin
+  if prop.HasAttribute(FieldNameAttribute) then begin
+    exit(FieldNameAttribute(prop.GetAttribute(FieldNameAttribute)).fieldName);
+  end;
+
+  exit(prop.Name);
+end;
+
 class procedure TDatasetRowMapperFactory.Initialize();
 begin
   rttiContext := TRttiContext.Create();
-  options := TDatasetRowMapperOptions.DefaultConfig();
 end;
 
 class procedure TDatasetRowMapperFactory.Finalize();
