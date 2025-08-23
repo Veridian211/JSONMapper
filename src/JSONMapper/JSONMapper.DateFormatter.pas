@@ -23,7 +23,7 @@ type
   end;
 
 
-  /// <summary> ISO 8601 conform date conversion </summary>
+  /// <summary> ISO 8601 conform date conversion. </summary>
   TDateFormatter_ISO8601 = class(TDateFormatter)
   public
     class function stringToDateTime(dateTime: string): TDateTime; override;
@@ -32,7 +32,7 @@ type
     class function dateToString(date: TDate): string; override;
   end;
 
-  /// <summary> uses current FormatSettings for date conversion </summary>
+  /// <summary> Uses current FormatSettings for date conversion. </summary>
   TDateFormatter_Local = class(TDateFormatter)
   public
     class function stringToDateTime(dateTime: string): TDateTime; override;
