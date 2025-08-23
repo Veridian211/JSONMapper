@@ -5,28 +5,32 @@ interface
 uses
   System.SysUtils,
   System.Variants,
+  System.TypInfo,
   System.Generics.Defaults,
   System.Rtti;
 
 type
   TNullable<T> = record
   private
-    _value: T;
-    _isNull: Boolean;
-  public
-    constructor Create(const value: T); overload;
-    constructor Create(const value: Variant); overload;
-
+    fValue: T;
+    fIsNull: Boolean;
     function getValue(): T;
+  public
+    constructor Create(const value: T);
+    class function Null(): TNullable<T>; static;
+    class function fromVariant(const value: Variant): TNullable<T>; static;
+
     function getValueOrDefault(): T; overload;
     function getValueOrDefault(const default: T): T; overload;
     function isNull(): Boolean;
-    function asVariant(): Variant;
+    function toVariant(): Variant;
+    function toString(): string;
 
+    property value: T read getValue;
+
+    // :=
     class operator Implicit(value: T): TNullable<T>; overload;
-    class operator Implicit(value: Variant): TNullable<T>; overload;
     class operator Implicit(value: TNullable<T>): T; overload;
-    class operator Explicit(nullable: TNullable<T>): T;
 
     // =
     function equals(const value: TNullable<T>): Boolean; overload;
@@ -34,17 +38,11 @@ type
     class operator Equal(left: TNullable<T>; right: TNullable<T>): boolean; overload;
     class operator Equal(left: TNullable<T>; right: T): boolean; overload;
     class operator Equal(left: T; right: TNullable<T>): boolean; overload;
-    class operator Equal(left: TNullable<T>; right: Variant): boolean; overload;
-    class operator Equal(left: Variant; right: TNullable<T>): boolean; overload;
 
     // <>
     class operator NotEqual(left: TNullable<T>; right: TNullable<T>): boolean; overload;
     class operator NotEqual(left: TNullable<T>; right: T): Boolean; overload;
     class operator NotEqual(left: T; right: TNullable<T>): Boolean; overload;
-    class operator NotEqual(left: TNullable<T>; right: Variant): Boolean; overload;
-    class operator NotEqual(left: Variant; right: TNullable<T>): Boolean; overload;
-
-    property value: T read getValue;
   end;
 
   TNullString = TNullable<string>;
@@ -53,9 +51,17 @@ type
   TNullBoolean = TNullable<Boolean>;
   TNullDateTime = TNullable<TDateTime>;
 
-  ENullableIsNull = class(Exception)
+
+  ENullableException = class(Exception);
+
+  ENullable_ValueIsNull = class(ENullableException)
   public
     constructor Create(); reintroduce;
+  end;
+
+  ENullable_VariantIsNotFromTypeT = class(ENullableException)
+  public
+    constructor Create(typInfo: PTypeInfo); reintroduce;
   end;
 
 implementation
@@ -64,21 +70,39 @@ implementation
 
 constructor TNullable<T>.Create(const value: T);
 begin
-  _value := value;
-  _isNull := False;
+  fValue := value;
+  fIsNull := False;
 end;
 
-constructor TNullable<T>.Create(const value: Variant);
+class function TNullable<T>.Null(): TNullable<T>;
 begin
-  _isNull := True;
+  Result.fIsNull := true;
+end;
+
+class function TNullable<T>.fromVariant(const value: Variant): TNullable<T>;
+var
+  valueAsTValue: TValue;
+  valueAsT: T;
+begin
+  if value = System.Variants.Null then begin
+    Result.fIsNull := true;
+    exit();
+  end;
+
+  valueAsTValue := TValue.FromVariant(value);
+  if not valueAsTValue.TryAsType<T>(valueAsT) then begin
+    raise ENullable_VariantIsNotFromTypeT.Create(TypeInfo(T));
+  end;
+
+  Result := TNullable<T>.Create(valueAsT);
 end;
 
 function TNullable<T>.getValue(): T;
 begin
-  if _isNull then begin
-    raise ENullableIsNull.Create();
+  if fIsNull then begin
+    raise ENullable_ValueIsNull.Create();
   end;
-  Result := _value;
+  Result := fValue;
 end;
 
 function TNullable<T>.getValueOrDefault(): T;
@@ -88,31 +112,34 @@ end;
 
 function TNullable<T>.getValueOrDefault(const default: T): T;
 begin
-  if _isNull then begin
+  if fIsNull then begin
     exit(default);
   end;
-  Result := _value;
+  Result := fValue;
 end;
 
 function TNullable<T>.isNull(): Boolean;
 begin
-  Result := _isNull;
+  Result := fIsNull;
 end;
 
-function TNullable<T>.asVariant(): Variant;
+function TNullable<T>.toVariant(): Variant;
 begin
-  if _isNull then begin
-    exit(null);
+  if fIsNull then begin
+    exit(System.Variants.Null);
   end;
-  exit(TValue.From<T>(_value).AsVariant);
+  exit(TValue.From<T>(fValue).AsVariant);
+end;
+
+function TNullable<T>.toString(): string;
+begin
+  if fIsNull then begin
+    exit(EmptyStr);
+  end;
+  exit(TValue.From<T>(fValue).ToString);
 end;
 
 class operator TNullable<T>.Implicit(value: T): TNullable<T>;
-begin
-  Result := TNullable<T>.Create(value);
-end;
-
-class operator TNullable<T>.Implicit(value: Variant): TNullable<T>;
 begin
   Result := TNullable<T>.Create(value);
 end;
@@ -122,22 +149,17 @@ begin
   Result := value.getValue();
 end;
 
-class operator TNullable<T>.Explicit(nullable: TNullable<T>): T;
-begin
-  Result := nullable.getValue();
-end;
-
 function TNullable<T>.equals(const value: TNullable<T>): Boolean;
 begin
-  if (not isNull) and (not Value.isNull) then begin
-    exit(TEqualityComparer<T>.Default.Equals(Self.Value, Value.Value));
+  if (not isNull) and (not value.isNull) then begin
+    exit(TEqualityComparer<T>.Default.Equals(self.Value, value.Value));
   end;
-  Result := (not isNull) = (not Value.isNull);
+  Result := (isNull) = (value.isNull);
 end;
 
 function TNullable<T>.equals(const value: T): Boolean;
 begin
-  if _isNull then begin
+  if fIsNull then begin
     exit(false);
   end;
   exit(TEqualityComparer<T>.Default.Equals(self.value, value));
@@ -158,26 +180,6 @@ begin
   Result := right.equals(left);
 end;
 
-class operator TNullable<T>.Equal(left: TNullable<T>; right: Variant): Boolean;
-var
-  val: TValue;
-begin
-  if left.isNull then begin
-    if (right = Null)then begin
-      exit(true);
-    end;
-    exit(false);
-  end;
-
-  val := TValue.From<T>(left.getValue());
-  exit(val.AsVariant = right);
-end;
-
-class operator TNullable<T>.Equal(left: Variant; right: TNullable<T>): Boolean;
-begin
-  Result := right.equals(left);
-end;
-
 class operator TNullable<T>.NotEqual(left, right: TNullable<T>): boolean;
 begin
   Result := not left.equals(right);
@@ -193,21 +195,18 @@ begin
   Result := not right.equals(left);
 end;
 
-class operator TNullable<T>.NotEqual(left: TNullable<T>; right: Variant): Boolean;
+{ ENullable_ValueIsNull }
+
+constructor ENullable_ValueIsNull.Create();
 begin
-  Result := not left.equals(right);
+  inherited Create('TNullable is null.');
 end;
 
-class operator TNullable<T>.NotEqual(left: Variant; right: TNullable<T>): Boolean;
-begin
-  Result := not right.equals(left);
-end;
+{ ENullable_VariantIsNotFromTypeT }
 
-{ ENullableIsNull }
-
-constructor ENullableIsNull.Create();
+constructor ENullable_VariantIsNotFromTypeT.Create(typInfo: PTypeInfo);
 begin
-  inherited Create('TNullable: Value is null');
+  inherited CreateFmt('Variant is not from type "%s"', [typInfo.Name]);
 end;
 
 end.
