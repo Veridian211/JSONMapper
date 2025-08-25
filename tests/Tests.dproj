@@ -98,6 +98,8 @@
         <DCCReference Include="..\src\JSONMapper\JSONMapper.ClassFieldHelper.pas"/>
         <DCCReference Include="..\src\JSONMapper\JSONMapper.EnumerableHelper.pas"/>
         <DCCReference Include="..\src\JSONMapper\JSONMapper.DateFormatter.pas"/>
+        <DCCReference Include="..\src\JSONMapper\JSONMapper.CustomMapping.pas"/>
+        <DCCReference Include="..\src\JSONMapper\JSONMapper.Settings.pas"/>
         <DCCReference Include="..\src\JSONMapper\PublicFieldIterator.pas"/>
         <DCCReference Include="ObjectToJSON\ObjectToJSON._Object.pas"/>
         <DCCReference Include="ObjectToJSON\ObjectToJSON.DateTime.pas"/>
