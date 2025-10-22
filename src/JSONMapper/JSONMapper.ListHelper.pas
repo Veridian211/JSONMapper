@@ -1,4 +1,4 @@
-unit JSONMapper.EnumerableHelper;
+unit JSONMapper.ListHelper;
 
 interface
 
@@ -14,6 +14,11 @@ uses
     out enumerator: TValue;
     out current: TRttiProperty;
     out moveNext: TRttiMethod
+  );
+  procedure getAddMethod(
+    const listType: TRttiInstanceType;
+    out addMethod: TRttiMethod;
+    out elementType: TRttiType
   );
 
 implementation
@@ -76,6 +81,29 @@ begin
   finally
     rttiContext.Free();
   end;
+end;
+
+procedure getAddMethod(
+  const listType: TRttiInstanceType;
+  out addMethod: TRttiMethod;
+  out elementType: TRttiType
+);
+var
+  addMethodParameters: TArray<TRttiParameter>;
+begin
+  addMethod := listType.GetMethod('Add');
+  if addMethod = nil then begin
+    raise EJSONMapperException.CreateFmt(
+      '%s does not contain an Add() method.',
+      [listType.Name]
+    );
+  end;
+
+  addMethodParameters := addMethod.GetParameters();
+  if Length(addMethodParameters) <> 1 then begin
+    raise EJSONMapperException.Create('Add() does not accept exact 1 argument.');
+  end;
+  elementType := addMethodParameters[0].ParamType;
 end;
 
 end.

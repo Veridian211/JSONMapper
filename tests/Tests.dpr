@@ -25,7 +25,7 @@ uses
   JSONMapper.Exceptions in '..\src\JSONMapper\JSONMapper.Exceptions.pas',
   JSONMapper.Attributes in '..\src\JSONMapper\JSONMapper.Attributes.pas',
   JSONMapper.ClassFieldHelper in '..\src\JSONMapper\JSONMapper.ClassFieldHelper.pas',
-  JSONMapper.EnumerableHelper in '..\src\JSONMapper\JSONMapper.EnumerableHelper.pas',
+  JSONMapper.ListHelper in '..\src\JSONMapper\JSONMapper.ListHelper.pas',
   JSONMapper.DateFormatter in '..\src\JSONMapper\JSONMapper.DateFormatter.pas',
   JSONMapper.CustomMapping in '..\src\JSONMapper\JSONMapper.CustomMapping.pas',
   JSONMapper.Settings in '..\src\JSONMapper\JSONMapper.Settings.pas',

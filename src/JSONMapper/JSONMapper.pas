@@ -15,7 +15,7 @@ uses
   JSONMapper.Exceptions,
   JSONMapper.Attributes,
   JSONMapper.ClassFieldHelper,
-  JSONMapper.EnumerableHelper,
+  JSONMapper.ListHelper,
   JSONMapper.DateFormatter,
   PublicFieldIterator,
   Nullable;
@@ -66,9 +66,10 @@ type
     /// <summary> Maps a TJSONObject into a record. </summary>
     class function jsonToRecord(const rec: Pointer; const typInfo: PTypeInfo; const jsonObject: TJSONObject): TValue; static;
 
-    /// <summary> Maps a TJSONArray into a generic TList. </summary>
+    /// <summary> Maps a TJSONArray into a generic TList. <c>list</c> must have an Add() method. </summary>
     class procedure jsonToList(const jsonArray: TJSONArray; const list: TObject); overload;
-    class function jsonToList<T: class, constructor>(const jsonArray: TJSONArray): T; overload;
+    class function jsonToList<T>(const jsonArray: TJSONArray): TList<T>; overload;
+    class function jsonToObjectList<T: class, constructor>(const jsonArray: TJSONArray): TObjectList<T>;
   end;
 
   IgnoreFieldAttribute = JSONMapper.Attributes.IgnoreFieldAttribute;
@@ -588,6 +589,13 @@ begin
 end;
 
 class procedure TJSONMapper.jsonToList(const jsonArray: TJSONArray; const list: TObject);
+var
+  rttiContext: TRttiContext;
+  listType: TRttiInstanceType;
+  addMethod: TRttiMethod;
+  elementType: TRttiType;
+
+  jsonElement: TJSONValue;
 begin
   if jsonArray = nil then begin
     raise EJSONMapperException.Create('TJSONMapper.jsonToList(): "jsonArray" is nil.');
@@ -595,9 +603,30 @@ begin
   if list = nil then begin
     raise EJSONMapperException.Create('TJSONMapper.jsonToList(): "list" is nil.');
   end;
+
+  rttiContext := TRttiContext.Create();
+  try
+    listType := rttiContext.GetType(list) as TRttiInstanceType;
+    getAddMethod(
+      listType,
+      addMethod,
+      elementType
+    );
+
+    for jsonElement in jsonArray do begin
+
+    end;
+  finally
+    rttiContext.Free();
+  end;
 end;
 
-class function TJSONMapper.jsonToList<T>(const jsonArray: TJSONArray): T;
+class function TJSONMapper.jsonToList<T>(const jsonArray: TJSONArray): TList<T>;
+begin
+
+end;
+
+class function TJSONMapper.jsonToObjectList<T>(const jsonArray: TJSONArray): TObjectList<T>;
 begin
 
 end;

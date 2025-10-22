@@ -96,7 +96,7 @@
         <DCCReference Include="..\src\JSONMapper\JSONMapper.Exceptions.pas"/>
         <DCCReference Include="..\src\JSONMapper\JSONMapper.Attributes.pas"/>
         <DCCReference Include="..\src\JSONMapper\JSONMapper.ClassFieldHelper.pas"/>
-        <DCCReference Include="..\src\JSONMapper\JSONMapper.EnumerableHelper.pas"/>
+        <DCCReference Include="..\src\JSONMapper\JSONMapper.ListHelper.pas"/>
         <DCCReference Include="..\src\JSONMapper\JSONMapper.DateFormatter.pas"/>
         <DCCReference Include="..\src\JSONMapper\JSONMapper.CustomMapping.pas"/>
         <DCCReference Include="..\src\JSONMapper\JSONMapper.Settings.pas"/>
