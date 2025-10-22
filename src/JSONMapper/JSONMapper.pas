@@ -283,7 +283,7 @@ begin
 
     tkClass: begin
       value_Object := value.AsObject;
-      if isGenericTEnumerable(value_Object) then begin
+      if hasGetEnumerator(value_Object) then begin
         exit(TJSONMapper.listToJSON(value_Object));
       end;
       exit(TJSONMapper.objectToJSON(value_Object));
