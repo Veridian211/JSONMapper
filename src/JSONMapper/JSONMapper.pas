@@ -121,10 +121,10 @@ var
   jsonPair: TJSONPair;
 begin
   if obj = nil then begin
-    raise EJSONMapperException.Create('"obj" is nil.');
+    raise EJSONMapperException.Create('TJSONMapper.objectToJSON(): "obj" is nil.');
   end;
   if jsonObject = nil then begin
-    raise EJSONMapperException.Create('"jsonObject" is nil.');
+    raise EJSONMapperException.Create('TJSONMapper.objectToJSON(): "jsonObject" is nil.');
   end;
 
   rttiContext := TRttiContext.Create();
@@ -154,10 +154,10 @@ var
   jsonValue: TJSONValue;
 begin
   if list = nil then begin
-    raise EJSONMapperException.Create('"list" is nil.');
+    raise EJSONMapperException.Create('TJSONMapper.listToJSON(): "list" is nil.');
   end;
   if jsonArray = nil then begin
-    raise EJSONMapperException.Create('"jsonArray" is nil.');
+    raise EJSONMapperException.Create('TJSONMapper.listToJSON(): "jsonArray" is nil.');
   end;
 
   rttiContext := TRttiContext.Create();
@@ -412,10 +412,10 @@ var
   newFieldValue: TValue;
 begin
   if jsonObject = nil then begin
-    raise EJSONMapperException.Create('"jsonObject" is nil.');
+    raise EJSONMapperException.Create('TJSONMapper.jsonToObject(): "jsonObject" is nil.');
   end;
   if obj = nil then begin
-    raise EJSONMapperException.Create('"obj" is nil.');
+    raise EJSONMapperException.Create('TJSONMapper.jsonToObject(): "obj" is nil.');
   end;
 
   rttiContext := TRttiContext.Create();
@@ -590,10 +590,10 @@ end;
 class procedure TJSONMapper.jsonToList(const jsonArray: TJSONArray; const list: TObject);
 begin
   if jsonArray = nil then begin
-    raise EJSONMapperException.Create('"jsonArray" is nil.');
+    raise EJSONMapperException.Create('TJSONMapper.jsonToList(): "jsonArray" is nil.');
   end;
   if list = nil then begin
-    raise EJSONMapperException.Create('"list" is nil.');
+    raise EJSONMapperException.Create('TJSONMapper.jsonToList(): "list" is nil.');
   end;
 end;
 
