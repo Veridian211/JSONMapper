@@ -52,11 +52,13 @@ uses
   Nullable in '..\src\Nullable\Nullable.pas',
   Nullable.Test in 'Nullable\Nullable.Test.pas';
 
+{$IFNDEF TESTINSIGHT}
 var
   runner: ITestRunner;
   results: IRunResults;
   logger: ITestLogger;
   nunitLogger : ITestLogger;
+{$ENDIF}
 begin
   ReportMemoryLeaksOnShutdown := true;
 {$IFDEF TESTINSIGHT}
