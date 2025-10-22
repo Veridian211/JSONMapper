@@ -10,7 +10,6 @@ program Tests;
 {$DEFINE USE_ATTRIBUTE_HELPER}
 {$ENDIF}
 
-
 uses
   System.SysUtils,
   DUnitX.TestFramework,
@@ -31,17 +30,18 @@ uses
   JSONMapper.CustomMapping in '..\src\JSONMapper\JSONMapper.CustomMapping.pas',
   JSONMapper.Settings in '..\src\JSONMapper\JSONMapper.Settings.pas',
   PublicFieldIterator in '..\src\JSONMapper\PublicFieldIterator.pas',
-  ObjectToJSON._Object in 'ObjectToJSON\ObjectToJSON._Object.pas',
-  ObjectToJSON.DateTime in 'ObjectToJSON\ObjectToJSON.DateTime.pas',
-  ObjectToJSON.IgnoreAttribute in 'ObjectToJSON\ObjectToJSON.IgnoreAttribute.pas',
-  ObjectToJSON.GenericList in 'ObjectToJSON\ObjectToJSON.GenericList.pas',
-  ObjectToJSON._Record in 'ObjectToJSON\ObjectToJSON._Record.pas',
-  ObjectToJSON.Arrays in 'ObjectToJSON\ObjectToJSON.Arrays.pas',
-  ObjectToJSON.Variant in 'ObjectToJSON\ObjectToJSON.Variant.pas',
-  JSONToObject._Object in 'JSONToObject\JSONToObject._Object.pas',
-  JSONToObject._Record in 'JSONToObject\JSONToObject._Record.pas',
-  JSONToObject.DateTime in 'JSONToObject\JSONToObject.DateTime.pas',
-  JSONToObject.Variant in 'JSONToObject\JSONToObject.Variant.pas',
+  ObjectToJSON._Object in 'JSONMapper\ObjectToJSON\ObjectToJSON._Object.pas',
+  ObjectToJSON.DateTime in 'JSONMapper\ObjectToJSON\ObjectToJSON.DateTime.pas',
+  ObjectToJSON.IgnoreAttribute in 'JSONMapper\ObjectToJSON\ObjectToJSON.IgnoreAttribute.pas',
+  ObjectToJSON.List in 'JSONMapper\ObjectToJSON\ObjectToJSON.List.pas',
+  ObjectToJSON._Record in 'JSONMapper\ObjectToJSON\ObjectToJSON._Record.pas',
+  ObjectToJSON.Arrays in 'JSONMapper\ObjectToJSON\ObjectToJSON.Arrays.pas',
+  ObjectToJSON.Variant in 'JSONMapper\ObjectToJSON\ObjectToJSON.Variant.pas',
+  JSONToObject._Object in 'JSONMapper\JSONToObject\JSONToObject._Object.pas',
+  JSONToObject._Record in 'JSONMapper\JSONToObject\JSONToObject._Record.pas',
+  JSONToObject.DateTime in 'JSONMapper\JSONToObject\JSONToObject.DateTime.pas',
+  JSONToObject.Variant in 'JSONMapper\JSONToObject\JSONToObject.Variant.pas',
+  JSONToObject.List in 'JSONMapper\JSONToObject\JSONToObject.List.pas',
   ObjectMapper in '..\src\ObjectMapper\ObjectMapper.pas',
   QueryMapper in '..\src\QueryMapper\QueryMapper.pas',
   QueryMapper.Attributes in '..\src\QueryMapper\QueryMapper.Attributes.pas',
@@ -52,6 +52,7 @@ uses
   Nullable in '..\src\Nullable\Nullable.pas',
   Nullable.Test in 'Nullable\Nullable.Test.pas';
 
+//
 {$IFNDEF TESTINSIGHT}
 var
   runner: ITestRunner;

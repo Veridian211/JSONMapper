@@ -64,7 +64,7 @@ type
     class function jsonToObject<T: class, constructor>(const jsonObject: TJSONObject): T; overload;
 
     /// <summary> Maps a TJSONObject into a record. </summary>
-    class function jsonToRecord(const rec: Pointer; const typeInfo: PTypeInfo; const jsonObject: TJSONObject): TValue; static;
+    class function jsonToRecord(const rec: Pointer; const typInfo: PTypeInfo; const jsonObject: TJSONObject): TValue; static;
 
     /// <summary> Maps a TJSONArray into a generic TList. </summary>
     class procedure jsonToList(const jsonArray: TJSONArray; const list: TObject); overload;
@@ -544,7 +544,11 @@ begin
   end;
 end;
 
-class function TJSONMapper.jsonToRecord(const rec: Pointer; const typeInfo: PTypeInfo; const jsonObject: TJSONObject): TValue;
+class function TJSONMapper.jsonToRecord(
+  const rec: Pointer;
+  const typInfo: PTypeInfo;
+  const jsonObject: TJSONObject
+): TValue;
 var
   rttiContext: TRttiContext;
   recordType: TRttiRecordType;
@@ -557,7 +561,7 @@ var
 begin
   rttiContext := TRttiContext.Create();
   try
-    recordType := rttiContext.GetType(typeInfo) as TRttiRecordType;
+    recordType := rttiContext.GetType(typInfo) as TRttiRecordType;
 
     for rttiField in recordType.GetFields() do begin
       jsonKey := getJSONKey(rttiField);
@@ -574,7 +578,7 @@ begin
   finally
     rttiContext.Free();
   end;
-  TValue.Make(rec, typeInfo, Result);
+  TValue.Make(rec, typInfo, Result);
 end;
 
 class function TJSONMapper.jsonToList<T>(const jsonArray: TJSONArray): T;
