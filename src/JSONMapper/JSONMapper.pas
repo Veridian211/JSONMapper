@@ -81,7 +81,6 @@ type
 
   EJSONMapperException = JSONMapper.Exceptions.EJSONMapperException;
   EJSONMapperObjectIsNil = JSONMapper.Exceptions.EJSONMapperObjectIsNil;
-  EJSONMapperJSONIsNil = JSONMapper.Exceptions.EJSONMapperJSONIsNil;
   EJSONMapperCastingException = JSONMapper.Exceptions.EJSONMapperCastingException;
   EJSONMapperInvalidDateTime = JSONMapper.Exceptions.EJSONMapperInvalidDateTime;
   EJSONMapperInvalidDate = JSONMapper.Exceptions.EJSONMapperInvalidDate;
@@ -122,10 +121,10 @@ var
   jsonPair: TJSONPair;
 begin
   if obj = nil then begin
-    raise EJSONMapperObjectIsNil.Create();
+    raise EJSONMapperException.Create('"obj" is nil.');
   end;
   if jsonObject = nil then begin
-    raise EJSONMapperJSONIsNil.Create();
+    raise EJSONMapperException.Create('"jsonObject" is nil.');
   end;
 
   rttiContext := TRttiContext.Create();
@@ -154,6 +153,13 @@ var
   currentValue: TValue;
   jsonValue: TJSONValue;
 begin
+  if list = nil then begin
+    raise EJSONMapperException.Create('"list" is nil.');
+  end;
+  if jsonArray = nil then begin
+    raise EJSONMapperException.Create('"jsonArray" is nil.');
+  end;
+
   rttiContext := TRttiContext.Create();
   try
     getEnumerableMethods(
@@ -406,10 +412,10 @@ var
   newFieldValue: TValue;
 begin
   if jsonObject = nil then begin
-    raise EJSONMapperJSONIsNil.Create();
+    raise EJSONMapperException.Create('"jsonObject" is nil.');
   end;
   if obj = nil then begin
-    raise EJSONMapperObjectIsNil.Create();
+    raise EJSONMapperException.Create('"obj" is nil.');
   end;
 
   rttiContext := TRttiContext.Create();
@@ -581,12 +587,17 @@ begin
   TValue.Make(rec, typInfo, Result);
 end;
 
-class function TJSONMapper.jsonToList<T>(const jsonArray: TJSONArray): T;
+class procedure TJSONMapper.jsonToList(const jsonArray: TJSONArray; const list: TObject);
 begin
-
+  if jsonArray = nil then begin
+    raise EJSONMapperException.Create('"jsonArray" is nil.');
+  end;
+  if list = nil then begin
+    raise EJSONMapperException.Create('"list" is nil.');
+  end;
 end;
 
-class procedure TJSONMapper.jsonToList(const jsonArray: TJSONArray; const list: TObject);
+class function TJSONMapper.jsonToList<T>(const jsonArray: TJSONArray): T;
 begin
 
 end;

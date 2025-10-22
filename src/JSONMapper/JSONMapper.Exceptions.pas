@@ -34,12 +34,6 @@ type
   EJSONMapperObjectIsNil = class(EJSONMapperException)
   public
     constructor Create(rttiField: TRttiField); reintroduce; overload;
-    constructor Create(); reintroduce; overload;
-  end;
-
-  EJSONMapperJSONIsNil = class(EJSONMapperException)
-  public
-    constructor Create(); reintroduce;
   end;
 
   EJSONMapperInvalidDate = class(EJSONMapperException)
@@ -106,11 +100,6 @@ end;
 
 { EJSONMapperObjectIsNil }
 
-constructor EJSONMapperObjectIsNil.Create();
-begin
-  inherited Create('Object is nil.');
-end;
-
 constructor EJSONMapperObjectIsNil.Create(rttiField: TRttiField);
 var
  fieldName: string;
@@ -125,13 +114,6 @@ begin
     '%s.%s is nil (should be instance of %s).',
     [fieldParentName, fieldName, fieldType]
   );
-end;
-
-{ EJSONMapperJSONIsNil }
-
-constructor EJSONMapperJSONIsNil.Create();
-begin
-  inherited Create('TJSONObject is nil.');
 end;
 
 { EJSONMapperInvalidDate }
