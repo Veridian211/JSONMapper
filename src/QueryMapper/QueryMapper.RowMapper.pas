@@ -1,5 +1,9 @@
 unit QueryMapper.RowMapper;
 
+{$IF CompilerVersion <= 34.0}
+{$DEFINE USE_ATTRIBUTE_HELPER}
+{$ENDIF}
+
 interface
 
 uses
@@ -42,7 +46,7 @@ type
 
   TDatasetRowMapperFactory = class
   private
-    // global rttiContext, not thread safe
+    // global rttiContext, not thread safe ?
     class var rttiContext: TRttiContext;
 
     class function getConstructorMethod<T: class>(): TConstructorMethod;

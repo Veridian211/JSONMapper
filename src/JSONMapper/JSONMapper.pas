@@ -1,5 +1,9 @@
 ﻿unit JSONMapper;
 
+{$IF CompilerVersion <= 34.0}
+{$DEFINE USE_ATTRIBUTE_HELPER}
+{$ENDIF}
+
 interface
 
 uses
