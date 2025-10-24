@@ -7,7 +7,7 @@ unit QueryMapper.RowMapper;
 interface
 
 uses
-  {$IF USE_ATTRIBUTE_HELPER}
+  {$IFDEF USE_ATTRIBUTE_HELPER}
   AttributeHelper,
   {$ENDIF}
   System.SysUtils,
