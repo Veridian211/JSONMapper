@@ -39,18 +39,18 @@ type
   protected
     class function getJSONKey(rttiField: TRttiField): string;
 
-    class function createJSONValue(obj: TObject; rttiField: TRttiField): TJSONValue; overload; static;
-    class function createJSONValue(rec: TValue; rttiField: TRttiField): TJSONValue; overload; static;
-    class function createJSONValue(value: TValue): TJSONValue; overload; static;
+    class function tryCreateJSONValue(obj: TObject; rttiField: TRttiField): TJSONValue; overload; static;
+    class function tryCreateJSONValue(rec: TValue; rttiField: TRttiField): TJSONValue; overload; static;
+    class function tryCreateJSONValue(value: TValue): TJSONValue; overload; static;
+    class function createJSONValue(value: TValue): TJSONValue; static;
 
     class function recordToJSON(const rec: TValue): TJSONObject; static;
     class function arrayToJSON(const arr: TValue): TJSONArray; static;
 
-    class function createValue(
-      const jsonValue: TJSONValue;
-      const rttiField: TRttiField;
-      const fieldValue: TValue
-    ): TValue;
+    class function tryCreateValue(jsonValue: TJSONValue; obj: TObject; rttiField: TRttiField): TValue; overload; static;
+    class function tryCreateValue(jsonValue: TJSONValue; rec: Pointer; rttiField: TRttiField): TValue; overload; static;
+    class function tryCreateValue(jsonValue: TJSONValue; rttiType: TRttiType): TValue; overload; static;
+    class function createValue(jsonValue: TJSONValue; rttiType: TRttiType; fieldValue: TValue): TValue;
 
   public
     class var dateFormatterClass: TDateFormatterClass;
@@ -86,12 +86,12 @@ type
 
   EJSONMapperException = JSONMapper.Exceptions.EJSONMapperException;
   EJSONMapperObjectIsNil = JSONMapper.Exceptions.EJSONMapperObjectIsNil;
-  EJSONMapperCastingException = JSONMapper.Exceptions.EJSONMapperCastingException;
+  EJSONMapperCastingToJSON = JSONMapper.Exceptions.EJSONMapperCastingToJSON;
+  EJSONMapperCastingFromJSON = JSONMapper.Exceptions.EJSONMapperCastingFromJSON;
   EJSONMapperInvalidDateTime = JSONMapper.Exceptions.EJSONMapperInvalidDateTime;
   EJSONMapperInvalidDate = JSONMapper.Exceptions.EJSONMapperInvalidDate;
   EJSONMapperNotATListException = JSONMapper.Exceptions.EJSONMapperNotATListException;
   EJSONMapperFaultyEnumerator = JSONMapper.Exceptions.EJSONMapperFaultyEnumerator;
-  EJSONMapperNotImplementedException = JSONMapper.Exceptions.EJSONMapperNotImplementedException;
 
   TNullString = Nullable.TNullString;
   TNullInteger = Nullable.TNullInteger;
@@ -138,7 +138,7 @@ begin
 
     for rttiField in rttiInstanceType.GetPublicFields() do begin
       jsonKey := getJSONKey(rttiField);
-      jsonValue := createJSONValue(obj, rttiField);
+      jsonValue := tryCreateJSONValue(obj, rttiField);
 
       jsonPair := TJSONPair.Create(jsonKey, jsonValue);
       jsonObject.AddPair(jsonPair);
@@ -177,7 +177,8 @@ begin
     try
       while moveNext.Invoke(enumerator, []).AsBoolean do begin
         currentValue := current.GetValue(enumerator.AsObject);
-        jsonValue := createJSONValue(currentValue);
+        jsonValue := tryCreateJSONValue(currentValue);
+
         jsonArray.AddElement(jsonValue);
       end;
     finally
@@ -202,7 +203,7 @@ begin
   exit(jsonArray);
 end;
 
-class function TJSONMapper.createJSONValue(obj: TObject; rttiField: TRttiField): TJSONValue;
+class function TJSONMapper.tryCreateJSONValue(obj: TObject; rttiField: TRttiField): TJSONValue;
 var
   value: TValue;
 begin
@@ -210,12 +211,12 @@ begin
   try
     exit(createJSONValue(value));
   except
-    on E: EJSONMapperCastingException do raise EJSONMapperCastingException.Create(rttiField)
+    on E: EValueToJSON do raise EJSONMapperCastingToJSON.Create(rttiField)
     else raise;
   end;
 end;
 
-class function TJSONMapper.createJSONValue(rec: TValue; rttiField: TRttiField): TJSONValue;
+class function TJSONMapper.tryCreateJSONValue(rec: TValue; rttiField: TRttiField): TJSONValue;
 var
   value: TValue;
 begin
@@ -223,7 +224,17 @@ begin
   try
     exit(createJSONValue(value));
   except
-    on E: EJSONMapperCastingException do raise EJSONMapperCastingException.Create(rttiField)
+    on E: EValueToJSON do raise EJSONMapperCastingToJSON.Create(rttiField)
+    else raise;
+  end;
+end;
+
+class function TJSONMapper.tryCreateJSONValue(value: TValue): TJSONValue;
+begin
+  try
+    exit(createJSONValue(value));
+  except
+    on E: EValueToJSON do raise EJSONMapperCastingToJSON.Create(value.TypeInfo)
     else raise;
   end;
 end;
@@ -265,7 +276,7 @@ begin
 
     tkEnumeration: begin
       if not (value.TypeInfo = TypeInfo(Boolean)) then begin
-        raise EJSONMapperCastingException.Create(value.TypeInfo);
+        raise EValueToJSON.Create();
       end;
       exit(TJSONBool.Create(value.AsBoolean));
     end;
@@ -317,7 +328,7 @@ begin
 //    tkClassRef: ;
 //    tkPointer: ;
 //    tkProcedure: ;
-      raise EJSONMapperCastingException.Create(value.TypeInfo);
+      raise EValueToJSON.Create();
     end;
   end;
 end;
@@ -342,7 +353,7 @@ begin
 
       for rttiField in recordType.GetPublicFields() do begin
         jsonKey := rttiField.Name;
-        jsonValue := createJSONValue(rec, rttiField);
+        jsonValue := tryCreateJSONValue(rec, rttiField);
 
         jsonPair := TJSONPair.Create(jsonKey, jsonValue);
         jsonObject.AddPair(jsonPair);
@@ -377,7 +388,7 @@ begin
       for i := 0 to arrayLength - 1 do begin
         element := arr.GetArrayElement(i);
 
-        jsonValue := createJSONValue(element);
+        jsonValue := tryCreateJSONValue(element);
         jsonArray.AddElement(jsonValue);
       end;
     finally
@@ -413,7 +424,6 @@ var
 
   jsonKey: string;
   jsonValue: TJSONValue;
-  fieldValue: TValue;
   newFieldValue: TValue;
 begin
   if jsonObject = nil then begin
@@ -435,8 +445,7 @@ begin
         continue;
       end;
 
-      fieldValue := rttiField.GetValue(obj);
-      newFieldValue := TJSONMapper.createValue(jsonValue, rttiField, fieldValue);
+      newFieldValue := tryCreateValue(jsonValue, obj, rttiField);
       rttiField.SetValue(obj, newFieldValue);
     end;
   finally
@@ -444,18 +453,61 @@ begin
   end;
 end;
 
+class function TJSONMapper.tryCreateValue(
+  jsonValue: TJSONValue;
+  obj: TObject;
+  rttiField: TRttiField
+): TValue;
+var
+  fieldValue: TValue;
+begin
+  fieldValue := rttiField.GetValue(obj);
+  try
+    exit(TJSONMapper.createValue(jsonValue, rttiField.FieldType, fieldValue));
+  except
+    on e: EJSONToValue do raise EJSONMapperCastingFromJSON.Create(jsonValue, rttiField);
+    else raise;
+  end;
+end;   
+
+class function TJSONMapper.tryCreateValue(
+  jsonValue: TJSONValue; 
+  rec: Pointer;
+  rttiField: TRttiField
+): TValue;
+var
+  fieldValue: TValue;
+begin
+  fieldValue := rttiField.GetValue(rec);
+  try
+    exit(TJSONMapper.createValue(jsonValue, rttiField.FieldType, fieldValue));
+  except
+    on e: EJSONToValue do raise EJSONMapperCastingFromJSON.Create(jsonValue, rttiField);
+    else raise;
+  end;
+end;
+
+class function TJSONMapper.tryCreateValue(
+  jsonValue: TJSONValue;
+  rttiType: TRttiType
+): TValue;
+begin
+  // TODO: create value
+end;
+
 class function TJSONMapper.createValue(
-  const jsonValue: TJSONValue;
-  const rttiField: TRttiField;
-  const fieldValue: TValue
+  jsonValue: TJSONValue;
+  rttiType: TRttiType;
+  fieldValue: TValue
 ): TValue;
 var
   obj: TObject;
+  rec: TValue;
   dateString: string;
   value_Integer: Int64;
   value_Double: double;
 begin
-  case rttiField.FieldType.TypeKind of
+  case rttiType.TypeKind of
     tkString,
     tkChar,
     tkWChar,
@@ -473,11 +525,11 @@ begin
     end;
 
     tkFloat: begin
-      if rttiField.FieldType.Handle = TypeInfo(TDateTime) then begin
+      if rttiType.Handle = TypeInfo(TDateTime) then begin
         dateString := TJSONString(jsonValue).Value;
         exit(dateFormatterClass.tryStringToDateTime(dateString));
       end;
-      if rttiField.FieldType.Handle = TypeInfo(TDate) then begin
+      if rttiType.Handle = TypeInfo(TDate) then begin
         dateString := TJSONString(jsonValue).Value;
         exit(dateFormatterClass.tryStringToDate(dateString));
       end;
@@ -485,8 +537,8 @@ begin
     end;
 
     tkEnumeration: begin
-      if not (rttiField.FieldType.Handle = TypeInfo(Boolean)) then begin
-        raise EJSONMapperCastingException.Create(rttiField);
+      if not (rttiType.Handle = TypeInfo(Boolean)) then begin
+        raise EJSONToValue.Create();
       end;
       exit(TJSONBool(jsonValue).AsBoolean);
     end;
@@ -525,17 +577,17 @@ begin
 //      if isGenericTEnumerable(obj) then begin
 //        exit(TJSONMapper.listToJSON(obj));
 //      end;
-      try
-        jsonToObject(TJSONObject(jsonValue), obj);
-      except
-        on e: EJSONMapperObjectIsNil do raise EJSONMapperObjectIsNil.Create(rttiField);
-        else raise;
-      end;
+      jsonToObject(TJSONObject(jsonValue), obj);
       exit(obj);
     end;
 
     tkRecord: begin
-      exit(jsonToRecord(fieldValue.GetReferenceToRawData, rttiField.FieldType.Handle, TJSONObject(jsonValue)));
+      rec := jsonToRecord(
+        fieldValue.GetReferenceToRawData,
+        rttiType.Handle,
+        TJSONObject(jsonValue)
+      );
+      exit(rec);
     end;
 
 //    tkArray,
@@ -550,7 +602,7 @@ begin
 //    tkClassRef: ;
 //    tkPointer: ;
 //    tkProcedure: ;
-      raise EJSONMapperCastingException.Create(rttiField);
+      raise EJSONToValue.Create();
     end;
   end;
 end;
@@ -582,8 +634,7 @@ begin
         continue;
       end;
 
-      fieldValue := rttiField.GetValue(rec);
-      newFieldValue := TJSONMapper.createValue(jsonValue, rttiField, fieldValue);
+      fieldValue := tryCreateValue(jsonValue, rec, rttiField);
       rttiField.SetValue(rec, newFieldValue);
     end;
   finally
@@ -599,7 +650,8 @@ var
   addMethod: TRttiMethod;
   elementType: TRttiType;
 
-  jsonElement: TJSONValue;
+  elementJSON: TJSONValue;
+  elementValue: TValue;
 begin
   if jsonArray = nil then begin
     raise EJSONMapperException.Create('TJSONMapper.jsonToList(): "jsonArray" is nil.');
@@ -617,8 +669,9 @@ begin
       elementType
     );
 
-    for jsonElement in jsonArray do begin
-
+    for elementJSON in jsonArray do begin
+      // todo check if element is simple type or an object or a list type
+      elementValue := tryCreateValue(elementJSON, elementType);
     end;
   finally
     rttiContext.Free();
