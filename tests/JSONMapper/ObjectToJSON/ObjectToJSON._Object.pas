@@ -26,7 +26,7 @@ type
   end;
 
   [TestFixture]
-  TBasicObjektToJSON = class
+  TBasicObjectToJSON = class
   private
     user: TUser;
     nestedUser: TNestedUser;
@@ -46,19 +46,19 @@ implementation
 
 { TBasicObjektToJSON }
 
-procedure TBasicObjektToJSON.Setup();
+procedure TBasicObjectToJSON.Setup();
 begin
   user := TUser.Create();
   nestedUser := TNestedUser.Create();
 end;
 
-procedure TBasicObjektToJSON.TearDown();
+procedure TBasicObjectToJSON.TearDown();
 begin
   user.Free();
   nestedUser.Free();
 end;
 
-procedure TBasicObjektToJSON.TestBasicObject();
+procedure TBasicObjectToJSON.TestBasicObject();
 const
   EXPECTED_JSON = '{"name":"John Doe","age":32,"dateOfBirth":"2006-10-23","rating":12.4,"isAdmin":true}';
 var
@@ -78,7 +78,7 @@ begin
   end;
 end;
 
-procedure TBasicObjektToJSON.TestNestedObject();
+procedure TBasicObjectToJSON.TestNestedObject();
 const
   EXPECTED_AGE = 23;
 var
@@ -114,6 +114,6 @@ begin
 end;
 
 initialization
-  TDUnitX.RegisterTestFixture(TBasicObjektToJSON);
+  TDUnitX.RegisterTestFixture(TBasicObjectToJSON);
 
 end.
