@@ -10,10 +10,12 @@ uses
 
 type
   TUser = class
+  private
+    fIsAdmin: boolean;
   public
     name: string;
     age: integer;
-    isAdmin: boolean;
+    property isAdmin: Boolean read fIsAdmin write fIsAdmin;
   end;
 
   TNestedUser = class
@@ -72,9 +74,9 @@ begin
     nestedUser := TJSONMapper.JSONToObject<TNestedUser>(nestedUserJSON);
 
     user := nestedUser.user;
-    Assert.AreEqual(user.age, 23);
-    Assert.AreEqual(user.name, 'John Doe');
-    Assert.AreEqual(user.isAdmin, true);
+    Assert.AreEqual(23, user.age);
+    Assert.AreEqual('John Doe', user.name);
+    Assert.AreEqual(true, user.isAdmin);
   finally
     if Assigned(nestedUser) then begin
       FreeAndNil(nestedUser);

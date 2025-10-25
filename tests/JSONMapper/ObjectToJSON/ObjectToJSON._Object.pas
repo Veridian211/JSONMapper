@@ -10,12 +10,14 @@ uses
 
 type
   TUser = class
+  private
+    fIsAdmin: boolean;
   public
     name: string;
     age: integer;
     dateOfBirth: TDate;
     rating: double;
-    isAdmin: boolean;
+    property isAdmin: boolean read fIsAdmin write fIsAdmin;
   end;
 
   TNestedUser = class

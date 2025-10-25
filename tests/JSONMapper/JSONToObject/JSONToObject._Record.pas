@@ -18,18 +18,12 @@ type
 
   TNestedUser = class
     user: TUser;
+    constructor Create();
   end;
 
   [TestFixture]
   TJSONToObject_Record = class
-  private
-    user: TUser;
   public
-    [Setup]
-    procedure Setup();
-    [TearDown]
-    procedure TearDown();
-
     [Test]
     procedure Test();
     [Test]
@@ -37,17 +31,6 @@ type
   end;
 
 implementation
-
-procedure TJSONToObject_Record.Setup();
-begin
-  user.name := 'John Doe';
-  user.age := 23;
-  user.isAdmin := true;
-end;
-
-procedure TJSONToObject_Record.TearDown();
-begin
-end;
 
 procedure TJSONToObject_Record.Test();
 const
@@ -57,6 +40,7 @@ var
   userValue: TValue;
   user: TUser;
 begin
+  user := Default(TUser);
   jsonObject := TJSONObject.ParseJSONValue(JSON_STRING) as TJSONObject;
   try
     userValue := TJSONMapper.jsonToRecord(@user, TypeInfo(TUser), jsonObject);
@@ -94,6 +78,13 @@ begin
     end;
     nestedUserJSON.Free();
   end;
+end;
+
+{ TNestedUser }
+
+constructor TNestedUser.Create;
+begin
+  self.user := Default(TUser);
 end;
 
 initialization
