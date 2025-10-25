@@ -23,7 +23,8 @@ type
   private
     function truncateJSON(json: string): string;
   public
-    constructor Create(jsonValue: TJSONValue; rttiField: TRttiField);
+    constructor Create(jsonValue: TJSONValue; rttiField: TRttiField); overload;
+    constructor Create(jsonValue: TJSONValue; rttiType: TRttiType); overload;
   end;
 
   EValueToJSON = class(EJSONMapperException)
@@ -98,8 +99,24 @@ constructor EJSONMapperCastingFromJSON.Create(
 );
 begin
   inherited CreateFmt(
+    'Failed to cast json "%s" into type "%s" at "%s.%s"',
+    [
+      truncateJSON(jsonValue.ToJSON),
+      rttiField.FieldType.Name,
+      rttiField.Parent.Name,
+      rttiField.Name
+    ]
+  );
+end;
+
+constructor EJSONMapperCastingFromJSON.Create(
+  jsonValue: TJSONValue;
+  rttiType: TRttiType
+);
+begin
+  inherited CreateFmt(
     'Failed to cast json "%s" into type "%s"',
-    [truncateJSON(jsonValue.ToJSON), rttiField.FieldType.Name]
+    [truncateJSON(jsonValue.ToJSON), rttiType.Name]
   );
 end;
 

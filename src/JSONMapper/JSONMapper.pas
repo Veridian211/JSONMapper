@@ -49,7 +49,7 @@ type
 
     class function tryCreateValue(jsonValue: TJSONValue; obj: TObject; rttiField: TRttiField): TValue; overload; static;
     class function tryCreateValue(jsonValue: TJSONValue; rec: Pointer; rttiField: TRttiField): TValue; overload; static;
-    class function tryCreateValue(jsonValue: TJSONValue; rttiType: TRttiType): TValue; overload; static;
+    class function tryCreateValue(elementJSON: TJSONValue; elementType: TRttiType): TValue; overload; static;
     class function createValue(jsonValue: TJSONValue; rttiType: TRttiType; fieldValue: TValue): TValue;
 
   public
@@ -197,7 +197,7 @@ begin
   try
     listToJSON(list, jsonArray);
   except
-    jsonArray.Free();
+    FreeAndNil(jsonArray);
     raise;
   end;
   exit(jsonArray);
@@ -232,7 +232,8 @@ begin
       rttiContext.Free();
     end;
   except
-    jsonObject.Free();
+    FreeAndNil(jsonObject);
+    raise;
   end;
 
   exit(jsonObject);
@@ -265,7 +266,7 @@ begin
       rttiContext.Free();
     end;
   except
-    jsonArray.Free();
+    FreeAndNil(jsonArray);
     raise;
   end;
 
@@ -447,7 +448,7 @@ begin
   try
     jsonToObject(jsonObject, obj);
   except
-    obj.Free();
+    FreeAndNil(obj);
     raise;
   end;
   exit(obj);
@@ -491,7 +492,7 @@ end;
 class procedure TJSONMapper.jsonToList(const jsonArray: TJSONArray; const list: TObject);
 var
   rttiContext: TRttiContext;
-  listType: TRttiInstanceType;
+  listType: TRttiType;
   addMethod: TRttiMethod;
   elementType: TRttiType;
 
@@ -507,16 +508,16 @@ begin
 
   rttiContext := TRttiContext.Create();
   try
-    listType := rttiContext.GetType(list) as TRttiInstanceType;
+    listType := rttiContext.GetType(list.ClassType);
     getAddMethod(
-      listType,
+      TRttiInstanceType(listType),
       addMethod,
       elementType
     );
 
     for elementJSON in jsonArray do begin
-      // todo check if element is simple type or an object or a list type
       elementValue := tryCreateValue(elementJSON, elementType);
+      addMethod.Invoke(list, [elementValue]);
     end;
   finally
     rttiContext.Free();
@@ -524,13 +525,34 @@ begin
 end;
 
 class function TJSONMapper.jsonToList<T>(const jsonArray: TJSONArray): TList<T>;
+var
+  list: TList<T>;
 begin
+  list := TList<T>.Create();
+  try
+    jsonToList(jsonArray, list);
+  except
+    // TODO: if T is TRttiInstanceType then free objects in List
+    FreeAndNil(list);
+    raise;
+  end;
 
+  exit(list);
 end;
 
 class function TJSONMapper.jsonToObjectList<T>(const jsonArray: TJSONArray): TObjectList<T>;
+var
+  list: TObjectList<T>;
 begin
+  list := TObjectList<T>.Create();
+  try
+    jsonToList(jsonArray, list);
+  except
+    FreeAndNil(list);
+    raise;
+  end;
 
+  exit(list);
 end;
 
 class function TJSONMapper.tryCreateValue(
@@ -568,11 +590,35 @@ begin
 end;
 
 class function TJSONMapper.tryCreateValue(
-  jsonValue: TJSONValue;
-  rttiType: TRttiType
+  elementJSON: TJSONValue;
+  elementType: TRttiType
 ): TValue;
+var
+  constructorMethod: TConstructorMethod;
+  elementValue: TValue;
+  elementObject: TObject;
 begin
-  // TODO: create value
+  try
+    elementValue := TValue.Empty;
+
+    if elementType is TRttiInstanceType then begin
+      constructorMethod := getConstructorMethod(TRttiInstanceType(elementType));
+      elementValue := TValue.From<TObject>(constructorMethod());
+    end;
+
+    try
+      exit(TJSONMapper.createValue(elementJSON, elementType, elementValue));
+    except
+      on e: EJSONToValue do raise EJSONMapperCastingFromJSON.Create(elementJSON, elementType);
+      else raise;
+    end;
+  except
+    if not elementValue.IsEmpty then begin
+      elementObject := elementValue.AsObject;
+      elementObject.Free;
+    end;
+    raise;
+  end;
 end;
 
 class function TJSONMapper.createValue(

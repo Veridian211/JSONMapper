@@ -8,6 +8,9 @@ uses
   System.SysUtils,
   JSONMapper.Exceptions;
 
+type
+  TConstructorMethod = reference to function: TObject;
+
   function hasGetEnumerator(const obj: TObject): Boolean;
   procedure getEnumerableMethods(
     const enumerable: TObject;
@@ -15,6 +18,8 @@ uses
     out current: TRttiProperty;
     out moveNext: TRttiMethod
   );
+  function isObjectType(typInfo: PTypeInfo): boolean;
+  function getConstructorMethod(rttiType: TRttiInstanceType): TConstructorMethod;
   procedure getAddMethod(
     const listType: TRttiInstanceType;
     out addMethod: TRttiMethod;
@@ -81,6 +86,48 @@ begin
   finally
     rttiContext.Free();
   end;
+end;
+
+function isObjectType(typInfo: PTypeInfo): boolean;
+var
+  rttiContext: TRttiContext;
+  rttiType: TRttiType;
+begin
+  rttiContext := TRttiContext.Create();
+  try
+    rttiType := rttiContext.GetType(typInfo);
+    exit(rttiType is TRttiInstanceType);
+  finally
+    rttiContext.Free;
+  end;
+end;
+
+function getConstructorMethod(rttiType: TRttiInstanceType): TConstructorMethod;
+var
+  rttiMethod: TRttiMethod;
+  constructorMethod: TConstructorMethod;
+begin
+  constructorMethod := nil;
+
+  for rttiMethod in rttiType.GetMethods() do begin
+    if rttiMethod.IsConstructor then begin
+      constructorMethod :=
+        function(): TObject
+        begin
+          Result := rttiMethod.Invoke(rttiType.MetaclassType, []).AsObject();
+        end;
+      break;
+    end;
+  end;
+
+  if not Assigned(constructorMethod) then begin
+    raise Exception.CreateFmt(
+      'No default constructor found on "%s"',
+      [rttiType.MetaclassType]
+    );
+  end;
+
+  Result := constructorMethod;
 end;
 
 procedure getAddMethod(
