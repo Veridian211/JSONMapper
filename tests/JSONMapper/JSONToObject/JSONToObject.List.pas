@@ -17,6 +17,13 @@ type
     isVerified: boolean;
   end;
 
+  TListWrapper = class
+  public
+    list: TObjectList<TPerson>;
+    constructor Create();
+    destructor Destroy(); override;
+  end;
+
   [TestFixture]
   TJSONToList = class
   public
@@ -96,8 +103,53 @@ begin
 end;
 
 procedure TJSONToList.TestObjectWithList();
+const
+  JSON_STRING = '{"list":[{"name":"0","age":0,"isVerified":true},' +
+    '{"name":"1","age":1,"isVerified":false},' +
+    '{"name":"2","age":2,"isVerified":true}]}';
+var
+  json: TJSONObject;
+  listWrapper: TListWrapper;
+  person: TPerson;
 begin
+  listWrapper := nil;
+  json := TJSONObject.ParseJSONValue(JSON_STRING) as TJSONObject;
+  try
+    listWrapper := TJSONMapper.jsonToObject<TListWrapper>(json);
 
+    person := listWrapper.list[0];
+    Assert.AreEqual('0' , person.name);
+    Assert.AreEqual(0   , person.age);
+    Assert.AreEqual(true, person.isVerified);
+
+    person := listWrapper.list[1];
+    Assert.AreEqual('1'  , person.name);
+    Assert.AreEqual(1    , person.age);
+    Assert.AreEqual(false, person.isVerified);
+
+    person := listWrapper.list[2];
+    Assert.AreEqual('2' , person.name);
+    Assert.AreEqual(2   , person.age);
+    Assert.AreEqual(true, person.isVerified);
+  finally
+    if Assigned(listWrapper) then begin
+      listWrapper.Free;
+    end;
+    json.Free;
+  end;
+end;
+
+{ TListWrapper }
+
+constructor TListWrapper.Create();
+begin
+  list := TObjectList<TPerson>.Create();
+end;
+
+destructor TListWrapper.Destroy();
+begin
+  list.Free;
+  inherited;
 end;
 
 initialization
