@@ -35,7 +35,7 @@ begin
   SetLength(rttiFields, 0);
   for rttiField in self.GetFields() do begin
     if not isPublicOrPublished(rttiField)
-    or rttiField.HasAttribute(IgnoreFieldAttribute) then begin
+    or rttiField.HasAttribute(IgnoreAttribute) then begin
       continue;
     end;
 
@@ -55,7 +55,7 @@ begin
   SetLength(rttiFields, 0);
   for rttiField in self.GetFields() do begin
     if not isPublicOrPublished(rttiField)
-    or rttiField.HasAttribute(IgnoreFieldAttribute) then begin
+    or rttiField.HasAttribute(IgnoreAttribute) then begin
       continue;
     end;
 

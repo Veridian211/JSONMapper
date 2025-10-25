@@ -3,7 +3,7 @@ unit JSONMapper.Attributes;
 interface
 
 type
-  IgnoreFieldAttribute = class(TCustomAttribute)
+  IgnoreAttribute = class(TCustomAttribute)
   end;
 
   JSONKeyAttribute = class(TCustomAttribute)

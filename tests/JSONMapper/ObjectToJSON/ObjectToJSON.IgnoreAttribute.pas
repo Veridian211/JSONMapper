@@ -11,7 +11,7 @@ type
   TUser = class
   public
     name: string;
-    [IgnoreField]
+    [Ignore]
     age: integer;
     isAdmin: boolean;
   end;

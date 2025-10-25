@@ -76,7 +76,7 @@ type
     class function jsonToObjectList<T: class, constructor>(const jsonArray: TJSONArray): TObjectList<T>;
   end;
 
-  IgnoreFieldAttribute = JSONMapper.Attributes.IgnoreFieldAttribute;
+  IgnoreAttribute = JSONMapper.Attributes.IgnoreAttribute;
   JSONKeyAttribute = JSONMapper.Attributes.JSONKeyAttribute;
 
   /// <summary> ISO 8601 conform date conversion </summary>
@@ -85,13 +85,13 @@ type
   TDateFormatter_Local = JSONMapper.DateFormatter.TDateFormatter_Local;
 
   EJSONMapperException = JSONMapper.Exceptions.EJSONMapperException;
-  EJSONMapperObjectIsNil = JSONMapper.Exceptions.EJSONMapperObjectIsNil;
   EJSONMapperCastingToJSON = JSONMapper.Exceptions.EJSONMapperCastingToJSON;
   EJSONMapperCastingFromJSON = JSONMapper.Exceptions.EJSONMapperCastingFromJSON;
-  EJSONMapperInvalidDateTime = JSONMapper.Exceptions.EJSONMapperInvalidDateTime;
   EJSONMapperInvalidDate = JSONMapper.Exceptions.EJSONMapperInvalidDate;
+  EJSONMapperInvalidDateTime = JSONMapper.Exceptions.EJSONMapperInvalidDateTime;
   EJSONMapperNotATListException = JSONMapper.Exceptions.EJSONMapperNotATListException;
   EJSONMapperFaultyEnumerator = JSONMapper.Exceptions.EJSONMapperFaultyEnumerator;
+  EJSONMapperObjectIsNil = JSONMapper.Exceptions.EJSONMapperObjectIsNil;
 
   TNullString = Nullable.TNullString;
   TNullInteger = Nullable.TNullInteger;
