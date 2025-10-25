@@ -39,13 +39,13 @@ type
   protected
     class function getJSONKey(rttiField: TRttiField): string;
 
+    class function recordToJSON(const rec: TValue): TJSONObject; static;
+    class function arrayToJSON(const arr: TValue): TJSONArray; static;
+
     class function tryCreateJSONValue(obj: TObject; rttiField: TRttiField): TJSONValue; overload; static;
     class function tryCreateJSONValue(rec: TValue; rttiField: TRttiField): TJSONValue; overload; static;
     class function tryCreateJSONValue(value: TValue): TJSONValue; overload; static;
     class function createJSONValue(value: TValue): TJSONValue; static;
-
-    class function recordToJSON(const rec: TValue): TJSONObject; static;
-    class function arrayToJSON(const arr: TValue): TJSONArray; static;
 
     class function tryCreateValue(jsonValue: TJSONValue; obj: TObject; rttiField: TRttiField): TValue; overload; static;
     class function tryCreateValue(jsonValue: TJSONValue; rec: Pointer; rttiField: TRttiField): TValue; overload; static;
@@ -101,20 +101,6 @@ type
 
 implementation
 
-class function TJSONMapper.objectToJSON(const obj: TObject): TJSONObject;
-var
-  jsonObject: TJSONObject;
-begin
-  jsonObject := TJSONObject.Create();
-  try
-    objectToJSON(obj, jsonObject);
-  except
-    jsonObject.Free();
-    raise;
-  end;
-  exit(jsonObject);
-end;
-
 class procedure TJSONMapper.objectToJSON(const obj: TObject; var jsonObject: TJSONObject);
 var
   rttiContext: TRttiContext;
@@ -146,6 +132,20 @@ begin
   finally
     rttiContext.Free();
   end;
+end;
+
+class function TJSONMapper.objectToJSON(const obj: TObject): TJSONObject;
+var
+  jsonObject: TJSONObject;
+begin
+  jsonObject := TJSONObject.Create();
+  try
+    objectToJSON(obj, jsonObject);
+  except
+    jsonObject.Free();
+    raise;
+  end;
+  exit(jsonObject);
 end;
 
 class procedure TJSONMapper.listToJSON(const list: TObject; var jsonArray: TJSONArray);
@@ -200,6 +200,75 @@ begin
     jsonArray.Free();
     raise;
   end;
+  exit(jsonArray);
+end;
+
+class function TJSONMapper.recordToJSON(const rec: TValue): TJSONObject;
+var
+  jsonObject: TJSONObject;
+
+  rttiContext: TRttiContext;
+  recordType: TRttiRecordType;
+  rttiField: TRttiField;
+
+  jsonKey: string;
+  jsonValue: TJSONValue;
+  jsonPair: TJSONPair;
+begin
+  jsonObject := TJSONObject.Create();
+  try
+    rttiContext := TRttiContext.Create();
+    try
+      recordType := rttiContext.GetType(rec.TypeInfo) as TRttiRecordType;
+
+      for rttiField in recordType.GetPublicFields() do begin
+        jsonKey := rttiField.Name;
+        jsonValue := tryCreateJSONValue(rec, rttiField);
+
+        jsonPair := TJSONPair.Create(jsonKey, jsonValue);
+        jsonObject.AddPair(jsonPair);
+      end;
+    finally
+      rttiContext.Free();
+    end;
+  except
+    jsonObject.Free();
+  end;
+
+  exit(jsonObject);
+end;
+
+class function TJSONMapper.arrayToJSON(const arr: TValue): TJSONArray;
+var
+  jsonArray: TJSONArray;
+
+  rttiContext: TRttiContext;
+  arrayLength: integer;
+
+  i: Integer;
+  element: TValue;
+  jsonValue: TJSONValue;
+begin
+  jsonArray := TJSONArray.Create();
+  try
+    rttiContext := TRttiContext.Create();
+    try
+      arrayLength := arr.GetArrayLength();
+
+      for i := 0 to arrayLength - 1 do begin
+        element := arr.GetArrayElement(i);
+
+        jsonValue := tryCreateJSONValue(element);
+        jsonArray.AddElement(jsonValue);
+      end;
+    finally
+      rttiContext.Free();
+    end;
+  except
+    jsonArray.Free();
+    raise;
+  end;
+
   exit(jsonArray);
 end;
 
@@ -333,89 +402,6 @@ begin
   end;
 end;
 
-class function TJSONMapper.recordToJSON(const rec: TValue): TJSONObject;
-var
-  jsonObject: TJSONObject;
-
-  rttiContext: TRttiContext;
-  recordType: TRttiRecordType;
-  rttiField: TRttiField;
-
-  jsonKey: string;
-  jsonValue: TJSONValue;
-  jsonPair: TJSONPair;
-begin
-  jsonObject := TJSONObject.Create();
-  try
-    rttiContext := TRttiContext.Create();
-    try
-      recordType := rttiContext.GetType(rec.TypeInfo) as TRttiRecordType;
-
-      for rttiField in recordType.GetPublicFields() do begin
-        jsonKey := rttiField.Name;
-        jsonValue := tryCreateJSONValue(rec, rttiField);
-
-        jsonPair := TJSONPair.Create(jsonKey, jsonValue);
-        jsonObject.AddPair(jsonPair);
-      end;
-    finally
-      rttiContext.Free();
-    end;
-  except
-    jsonObject.Free();
-  end;
-
-  exit(jsonObject);
-end;
-
-class function TJSONMapper.arrayToJSON(const arr: TValue): TJSONArray;
-var
-  jsonArray: TJSONArray;
-
-  rttiContext: TRttiContext;
-  arrayLength: integer;
-
-  i: Integer;
-  element: TValue;
-  jsonValue: TJSONValue;
-begin
-  jsonArray := TJSONArray.Create();
-  try
-    rttiContext := TRttiContext.Create();
-    try
-      arrayLength := arr.GetArrayLength();
-
-      for i := 0 to arrayLength - 1 do begin
-        element := arr.GetArrayElement(i);
-
-        jsonValue := tryCreateJSONValue(element);
-        jsonArray.AddElement(jsonValue);
-      end;
-    finally
-      rttiContext.Free();
-    end;
-  except
-    jsonArray.Free();
-    raise;
-  end;
-
-  exit(jsonArray);
-end;
-
-class function TJSONMapper.jsonToObject<T>(const jsonObject: TJSONObject): T;
-var
-  obj: T;
-begin
-  obj := T.Create();
-  try
-    jsonToObject(jsonObject, obj);
-  except
-    obj.Free();
-    raise;
-  end;
-  exit(obj);
-end;
-
 class procedure TJSONMapper.jsonToObject(const jsonObject: TJSONObject; const obj: TObject);
 var
   rttiContext: TRttiContext;
@@ -451,6 +437,100 @@ begin
   finally
     rttiContext.Free();
   end;
+end;
+
+class function TJSONMapper.jsonToObject<T>(const jsonObject: TJSONObject): T;
+var
+  obj: T;
+begin
+  obj := T.Create();
+  try
+    jsonToObject(jsonObject, obj);
+  except
+    obj.Free();
+    raise;
+  end;
+  exit(obj);
+end;
+
+class function TJSONMapper.jsonToRecord(
+  const rec: Pointer;
+  const typInfo: PTypeInfo;
+  const jsonObject: TJSONObject
+): TValue;
+var
+  rttiContext: TRttiContext;
+  recordType: TRttiRecordType;
+  rttiField: TRttiField;
+
+  jsonKey: string;
+  jsonValue: TJSONValue;
+  newFieldValue: TValue;
+begin
+  rttiContext := TRttiContext.Create();
+  try
+    recordType := rttiContext.GetType(typInfo) as TRttiRecordType;
+
+    for rttiField in recordType.GetFields() do begin
+      jsonKey := getJSONKey(rttiField);
+      jsonValue := jsonObject.GetValue(jsonKey);
+
+      if jsonValue = nil then begin
+        continue;
+      end;
+
+      newFieldValue := tryCreateValue(jsonValue, rec, rttiField);
+      rttiField.SetValue(rec, newFieldValue);
+    end;
+  finally
+    rttiContext.Free();
+  end;
+  TValue.Make(rec, typInfo, Result);
+end;
+
+class procedure TJSONMapper.jsonToList(const jsonArray: TJSONArray; const list: TObject);
+var
+  rttiContext: TRttiContext;
+  listType: TRttiInstanceType;
+  addMethod: TRttiMethod;
+  elementType: TRttiType;
+
+  elementJSON: TJSONValue;
+  elementValue: TValue;
+begin
+  if jsonArray = nil then begin
+    raise EJSONMapperException.Create('TJSONMapper.jsonToList(): "jsonArray" is nil.');
+  end;
+  if list = nil then begin
+    raise EJSONMapperException.Create('TJSONMapper.jsonToList(): "list" is nil.');
+  end;
+
+  rttiContext := TRttiContext.Create();
+  try
+    listType := rttiContext.GetType(list) as TRttiInstanceType;
+    getAddMethod(
+      listType,
+      addMethod,
+      elementType
+    );
+
+    for elementJSON in jsonArray do begin
+      // todo check if element is simple type or an object or a list type
+      elementValue := tryCreateValue(elementJSON, elementType);
+    end;
+  finally
+    rttiContext.Free();
+  end;
+end;
+
+class function TJSONMapper.jsonToList<T>(const jsonArray: TJSONArray): TList<T>;
+begin
+
+end;
+
+class function TJSONMapper.jsonToObjectList<T>(const jsonArray: TJSONArray): TObjectList<T>;
+begin
+
 end;
 
 class function TJSONMapper.tryCreateValue(
@@ -605,86 +685,6 @@ begin
       raise EJSONToValue.Create();
     end;
   end;
-end;
-
-class function TJSONMapper.jsonToRecord(
-  const rec: Pointer;
-  const typInfo: PTypeInfo;
-  const jsonObject: TJSONObject
-): TValue;
-var
-  rttiContext: TRttiContext;
-  recordType: TRttiRecordType;
-  rttiField: TRttiField;
-
-  jsonKey: string;
-  jsonValue: TJSONValue;
-  newFieldValue: TValue;
-begin
-  rttiContext := TRttiContext.Create();
-  try
-    recordType := rttiContext.GetType(typInfo) as TRttiRecordType;
-
-    for rttiField in recordType.GetFields() do begin
-      jsonKey := getJSONKey(rttiField);
-      jsonValue := jsonObject.GetValue(jsonKey);
-
-      if jsonValue = nil then begin
-        continue;
-      end;
-
-      newFieldValue := tryCreateValue(jsonValue, rec, rttiField);
-      rttiField.SetValue(rec, newFieldValue);
-    end;
-  finally
-    rttiContext.Free();
-  end;
-  TValue.Make(rec, typInfo, Result);
-end;
-
-class procedure TJSONMapper.jsonToList(const jsonArray: TJSONArray; const list: TObject);
-var
-  rttiContext: TRttiContext;
-  listType: TRttiInstanceType;
-  addMethod: TRttiMethod;
-  elementType: TRttiType;
-
-  elementJSON: TJSONValue;
-  elementValue: TValue;
-begin
-  if jsonArray = nil then begin
-    raise EJSONMapperException.Create('TJSONMapper.jsonToList(): "jsonArray" is nil.');
-  end;
-  if list = nil then begin
-    raise EJSONMapperException.Create('TJSONMapper.jsonToList(): "list" is nil.');
-  end;
-
-  rttiContext := TRttiContext.Create();
-  try
-    listType := rttiContext.GetType(list) as TRttiInstanceType;
-    getAddMethod(
-      listType,
-      addMethod,
-      elementType
-    );
-
-    for elementJSON in jsonArray do begin
-      // todo check if element is simple type or an object or a list type
-      elementValue := tryCreateValue(elementJSON, elementType);
-    end;
-  finally
-    rttiContext.Free();
-  end;
-end;
-
-class function TJSONMapper.jsonToList<T>(const jsonArray: TJSONArray): TList<T>;
-begin
-
-end;
-
-class function TJSONMapper.jsonToObjectList<T>(const jsonArray: TJSONArray): TObjectList<T>;
-begin
-
 end;
 
 class function TJSONMapper.getJSONKey(rttiField: TRttiField): string;
