@@ -34,7 +34,7 @@ type
   ///  <para> <c>TJSONArray</c> - Array, Dynamic Array, TList, TEnumerable in general </para>
   /// </summary>
   /// <remarks>
-  /// A Field can be ignored by adding the <c>IgnoreAttribute</c> to it.
+  /// A Field/Property can be ignored by adding the <c>IgnoreAttribute</c> to it.
   /// </remarks>
   TJSONMapper = class
   protected
@@ -439,7 +439,7 @@ begin
   try
     rttiInstanceType := rttiContext.GetType(obj.ClassType) as TRttiInstanceType;
 
-    for rttiDataMember in rttiInstanceType.GetFields() do begin
+    for rttiDataMember in rttiInstanceType.GetPublicDataMembers() do begin
       jsonKey := getJSONKey(rttiDataMember);
       jsonValue := jsonObject.GetValue(jsonKey);
 

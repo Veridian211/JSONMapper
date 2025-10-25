@@ -79,6 +79,7 @@ begin
       rttiDataMembers.Add(rttiDataMember);
     end;
 
+    // somehow doesn't work for records
     for rttiDataMember in self.GetProperties() do begin
       if not isPublicOrPublished(rttiDataMember) then
         continue;
