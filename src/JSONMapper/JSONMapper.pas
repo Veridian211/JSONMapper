@@ -619,7 +619,6 @@ var
 
   jsonKey: string;
   jsonValue: TJSONValue;
-  fieldValue: TValue;
   newFieldValue: TValue;
 begin
   rttiContext := TRttiContext.Create();
@@ -634,7 +633,7 @@ begin
         continue;
       end;
 
-      fieldValue := tryCreateValue(jsonValue, rec, rttiField);
+      newFieldValue := tryCreateValue(jsonValue, rec, rttiField);
       rttiField.SetValue(rec, newFieldValue);
     end;
   finally
