@@ -9,20 +9,20 @@ uses
   JSONMapper;
 
 type
-  TUser = class
+  TPerson = class
   private
-    fIsAdmin: boolean;
+    fIsVerified: boolean;
   public
     name: string;
     age: integer;
     dateOfBirth: TDate;
-    rating: double;
-    property isAdmin: boolean read fIsAdmin write fIsAdmin;
+    reputationScore: double;
+    property isVerified: boolean read fIsVerified write fIsVerified;
   end;
 
-  TNestedUser = class
+  TPersonWrapper = class
   public
-    user: TUser;
+    person: TPerson;
     constructor Create();
     destructor Destroy(); override;
   end;
@@ -30,8 +30,8 @@ type
   [TestFixture]
   TBasicObjectToJSON = class
   private
-    user: TUser;
-    nestedUser: TNestedUser;
+    person: TPerson;
+    personWrapper: TPersonWrapper;
   public
     [Setup]
     procedure Setup();
@@ -50,29 +50,30 @@ implementation
 
 procedure TBasicObjectToJSON.Setup();
 begin
-  user := TUser.Create();
-  nestedUser := TNestedUser.Create();
+  person := TPerson.Create();
+  personWrapper := TPersonWrapper.Create();
 end;
 
 procedure TBasicObjectToJSON.TearDown();
 begin
-  user.Free();
-  nestedUser.Free();
+  person.Free();
+  personWrapper.Free();
 end;
 
 procedure TBasicObjectToJSON.TestBasicObject();
 const
-  EXPECTED_JSON = '{"name":"John Doe","age":32,"dateOfBirth":"2006-10-23","rating":12.4,"isAdmin":true}';
+  EXPECTED_JSON = '{"name":"John Doe","age":32,"dateOfBirth":"2006-10-23",' +
+    '"reputationScore":12.4,"isVerified":true}';
 var
   jsonObject: TJSONObject;
 begin
-  user.name := 'John Doe';
-  user.age := 32;
-  user.isAdmin := true;
-  user.dateOfBirth := ISO8601ToDate('2006-10-23');
-  user.rating := 12.4;
+  person.name := 'John Doe';
+  person.age := 32;
+  person.isVerified := true;
+  person.dateOfBirth := ISO8601ToDate('2006-10-23');
+  person.reputationScore := 12.4;
 
-  jsonObject := TJSONMapper.objectToJSON(user);
+  jsonObject := TJSONMapper.objectToJSON(person);
   try
     Assert.AreEqual(EXPECTED_JSON, jsonObject.ToJSON());
   finally
@@ -81,37 +82,36 @@ begin
 end;
 
 procedure TBasicObjectToJSON.TestNestedObject();
-const
-  EXPECTED_AGE = 23;
 var
-  jsonObject: TJSONObject;
-  userObj: TJSONObject;
-  userAge: integer;
+  json: TJSONObject;
+  personJSON: TJSONObject;
 begin
-  nestedUser.user.age := EXPECTED_AGE;
+  personWrapper.person.age := 23;
 
-  jsonObject := TJSONMapper.objectToJSON(nestedUser);
+  json := TJSONMapper.objectToJSON(personWrapper);
   try
-    jsonObject.TryGetValue<TJSONObject>('user', userObj);
-    userObj.TryGetValue<integer>('age', userAge);
+    personJSON := json.GetValue('person') as TJSONObject;
 
-    Assert.AreEqual(EXPECTED_AGE, userAge);
+    Assert.AreEqual(
+      personWrapper.person.age,
+      personJSON.GetValue('age').AsType<Integer>
+    );
   finally
-    jsonObject.Free();
+    json.Free();
   end;
 end;
 
-{ TNestedUser }
+{ TPersonWrapper }
 
-constructor TNestedUser.Create();
+constructor TPersonWrapper.Create();
 begin
   inherited;
-  user := TUser.Create();
+  person := TPerson.Create();
 end;
 
-destructor TNestedUser.Destroy();
+destructor TPersonWrapper.Destroy();
 begin
-  user.Free();
+  person.Free();
   inherited;
 end;
 

@@ -10,16 +10,16 @@ uses
   JSONMapper;
 
 type
-  TUser = class
+  TPerson = class
   public
     name: string;
     age: integer;
-    isAdmin: boolean;
+    isVerified: boolean;
   end;
 
-  TObjectWithUserList = class
+  TObjectWithPersonList = class
   public
-    users: TObjectList<TUser>;
+    personList: TObjectList<TPerson>;
     constructor Create(); reintroduce;
     destructor Destroy(); override;
   end;
@@ -30,9 +30,9 @@ type
     integerList: TList<integer>;
     stringList: TList<string>;
     booleanList: TList<boolean>;
-    userList: TList<TUser>;
-    userObjectList: TObjectList<TUser>;
-    objectWithUserList: TObjectWithUserList;
+    personList: TList<TPerson>;
+    personObjectList: TObjectList<TPerson>;
+    objectWithPersonList: TObjectWithPersonList;
   public
     [Setup]
     procedure Setup();
@@ -61,24 +61,24 @@ begin
   integerList := TList<integer>.Create();
   stringList := TList<string>.Create();
   booleanList := TList<boolean>.Create();
-  userList := TList<TUser>.Create();
-  userObjectList := TObjectList<TUser>.Create();
-  objectWithUserList := TObjectWithUserList.Create();
+  personList := TList<TPerson>.Create();
+  personObjectList := TObjectList<TPerson>.Create();
+  objectWithPersonList := TObjectWithPersonList.Create();
 end;
 
 procedure TList_BasicDatatypes.TearDown();
 var
-  user: TUser;
+  person: TPerson;
 begin
   integerList.Free;
   stringList.Free;
   booleanList.Free;
-  for user in userList do begin
-    user.Free;
+  for person in personList do begin
+    person.Free;
   end;
-  userList.Free();
-  userObjectList.Free();
-  objectWithUserList.Free();
+  personList.Free();
+  personObjectList.Free();
+  objectWithPersonList.Free();
 end;
 
 procedure TList_BasicDatatypes.TestIntegerList();
@@ -86,17 +86,17 @@ const
   EXPECTED_VALUE = '[0,1,2,3]';
 var
   i: integer;
-  jsonArray: TJSONArray;
+  json: TJSONArray;
 begin
   for i := 0 to 3 do begin
     integerList.Add(i);
   end;
 
-  jsonArray := TJSONMapper.listToJSON(integerList);
+  json := TJSONMapper.listToJSON(integerList);
   try
-    Assert.AreEqual(EXPECTED_VALUE, jsonArray.ToJSON());
+    Assert.AreEqual(EXPECTED_VALUE, json.ToJSON());
   finally
-    jsonArray.Free();
+    json.Free();
   end;
 end;
 
@@ -105,17 +105,17 @@ const
   EXPECTED_VALUE = '["0","1","2","3"]';
 var
   i: integer;
-  jsonArray: TJSONArray;
+  json: TJSONArray;
 begin
   for i := 0 to 3 do begin
     stringList.Add(IntToStr(i));
   end;
 
-  jsonArray := TJSONMapper.listToJSON(stringList);
+  json := TJSONMapper.listToJSON(stringList);
   try
-    Assert.AreEqual(EXPECTED_VALUE, jsonArray.ToJSON());
+    Assert.AreEqual(EXPECTED_VALUE, json.ToJSON());
   finally
-    jsonArray.Free();
+    json.Free();
   end;
 end;
 
@@ -125,107 +125,113 @@ const
 var
   i: integer;
   isBiggerThanZero: Boolean;
-  jsonArray: TJSONArray;
+  json: TJSONArray;
 begin
   for i := 0 to 3 do begin
     isBiggerThanZero := i > 0;
     booleanList.Add(isBiggerThanZero);
   end;
 
-  jsonArray := TJSONMapper.listToJSON(booleanList);
+  json := TJSONMapper.listToJSON(booleanList);
   try
-    Assert.AreEqual(EXPECTED_VALUE, jsonArray.ToJSON());
+    Assert.AreEqual(EXPECTED_VALUE, json.ToJSON());
   finally
-    jsonArray.Free();
+    json.Free();
   end;
 end;
 
 procedure TList_BasicDatatypes.TestTListOfObjects();
 const
-  EXPECTED_VALUE = '[{"name":"0","age":0,"isAdmin":true},{"name":"1","age":1,"isAdmin":false},{"name":"2","age":2,"isAdmin":true}]';
+  EXPECTED_VALUE = '[{"name":"0","age":0,"isVerified":true},' +
+    '{"name":"1","age":1,"isVerified":false},' +
+    '{"name":"2","age":2,"isVerified":true}]';
 var
   i: integer;
-  user: TUser;
-  jsonArray: TJSONArray;
+  person: TPerson;
+  json: TJSONArray;
 begin
   for i := 0 to 2 do begin
-    user := TUser.Create();
-    userList.Add(user);
+    person := TPerson.Create();
+    personList.Add(person);
 
-    user.name := IntToStr(i);
-    user.age := i;
-    user.isAdmin := (i mod 2) = 0;
+    person.name := IntToStr(i);
+    person.age := i;
+    person.isVerified := (i mod 2) = 0;
   end;
 
-  jsonArray := TJSONMapper.listToJSON(userList);
+  json := TJSONMapper.listToJSON(personList);
   try
-    Assert.AreEqual(EXPECTED_VALUE, jsonArray.ToJSON());
+    Assert.AreEqual(EXPECTED_VALUE, json.ToJSON());
   finally
-    jsonArray.Free();
+    json.Free();
   end;
 end;
 
 procedure TList_BasicDatatypes.TestTObjectList;
 const
-  EXPECTED_VALUE = '[{"name":"0","age":0,"isAdmin":true},{"name":"1","age":1,"isAdmin":false},{"name":"2","age":2,"isAdmin":true}]';
+  EXPECTED_VALUE = '[{"name":"0","age":0,"isVerified":true},' +
+    '{"name":"1","age":1,"isVerified":false},' +
+    '{"name":"2","age":2,"isVerified":true}]';
 var
   i: integer;
-  user: TUser;
-  jsonArray: TJSONArray;
+  person: TPerson;
+  json: TJSONArray;
 begin
   for i := 0 to 2 do begin
-    user := TUser.Create();
-    userObjectList.Add(user);
+    person := TPerson.Create();
+    personObjectList.Add(person);
 
-    user.name := IntToStr(i);
-    user.age := i;
-    user.isAdmin := (i mod 2) = 0;
+    person.name := IntToStr(i);
+    person.age := i;
+    person.isVerified := (i mod 2) = 0;
   end;
 
-  jsonArray := TJSONMapper.listToJSON(userObjectList);
+  json := TJSONMapper.listToJSON(personObjectList);
   try
-    Assert.AreEqual(EXPECTED_VALUE, jsonArray.ToJSON());
+    Assert.AreEqual(EXPECTED_VALUE, json.ToJSON());
   finally
-    jsonArray.Free();
+    json.Free();
   end;
 end;
 
 procedure TList_BasicDatatypes.TestObjectWithTObjectList();
 const
-  EXPECTED_VALUE = '{"users":[{"name":"0","age":0,"isAdmin":true},{"name":"1","age":1,"isAdmin":false},{"name":"2","age":2,"isAdmin":true}]}';
+  EXPECTED_VALUE = '{"personList":[{"name":"0","age":0,"isVerified":true},' +
+    '{"name":"1","age":1,"isVerified":false},' +
+    '{"name":"2","age":2,"isVerified":true}]}';
 var
   i: integer;
-  user: TUser;
-  jsonObject: TJSONObject;
+  person: TPerson;
+  json: TJSONObject;
 begin
   for i := 0 to 2 do begin
-    user := TUser.Create();
-    objectWithUserList.users.Add(user);
+    person := TPerson.Create();
+    objectWithPersonList.personList.Add(person);
 
-    user.name := IntToStr(i);
-    user.age := i;
-    user.isAdmin := (i mod 2) = 0;
+    person.name := IntToStr(i);
+    person.age := i;
+    person.isVerified := (i mod 2) = 0;
   end;
 
-  jsonObject := TJSONMapper.objectToJSON(objectWithUserList);
+  json := TJSONMapper.objectToJSON(objectWithPersonList);
   try
-    Assert.AreEqual(EXPECTED_VALUE, jsonObject.ToJSON());
+    Assert.AreEqual(EXPECTED_VALUE, json.ToJSON());
   finally
-    jsonObject.Free();
+    json.Free();
   end;
 end;
 
-{ TObjectWithUserList }
+{ TObjectWithPersonList }
 
-constructor TObjectWithUserList.Create();
+constructor TObjectWithPersonList.Create();
 begin
   inherited;
-  users := TObjectList<TUser>.Create();
+  personList := TObjectList<TPerson>.Create();
 end;
 
-destructor TObjectWithUserList.Destroy();
+destructor TObjectWithPersonList.Destroy();
 begin
-  users.Free();
+  personList.Free();
   inherited;
 end;
 

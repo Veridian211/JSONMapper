@@ -10,14 +10,14 @@ uses
   JSONMapper;
 
 type
-  TUser = record
+  TPerson = record
     name: string;
     age: integer;
-    isAdmin: boolean;
+    isVerified: boolean;
   end;
 
-  TNestedUser = class
-    user: TUser;
+  TPersonWrapper = class
+    person: TPerson;
     constructor Create();
   end;
 
@@ -34,57 +34,60 @@ implementation
 
 procedure TJSONToObject_Record.Test();
 const
-  JSON_STRING = '{"name":"John Doe","age":23,"isAdmin":true}';
+  JSON_STRING = '{"name":"John Doe","age":23,"isVerified":true}';
 var
-  jsonObject: TJSONObject;
-  userValue: TValue;
-  user: TUser;
+  json: TJSONObject;
+  personValue: TValue;
+  person: TPerson;
 begin
-  user := Default(TUser);
-  jsonObject := TJSONObject.ParseJSONValue(JSON_STRING) as TJSONObject;
+  person := Default(TPerson);
+  json := TJSONObject.ParseJSONValue(JSON_STRING) as TJSONObject;
   try
-    userValue := TJSONMapper.jsonToRecord(@user, TypeInfo(TUser), jsonObject);
-    user := userValue.AsType<TUser>;
+    personValue := TJSONMapper.jsonToRecord(@person, TypeInfo(TPerson), json);
+    person := personValue.AsType<TPerson>;
 
-    Assert.AreEqual(23, user.age);
-    Assert.AreEqual('John Doe', user.name);
-    Assert.AreEqual(true, user.isAdmin);
+    Assert.AreEqual(json.GetValue('age').AsType<Integer>, person.age);
+    Assert.AreEqual(json.GetValue('name').AsType<string>, person.name);
+    Assert.AreEqual(json.GetValue('isVerified').AsType<Boolean>, person.isVerified);
   finally
-    jsonObject.Free();
+    json.Free();
   end;
 end;
 
 procedure TJSONToObject_Record.TestNestedObject();
 const
-  JSON_STRING = '{"user":{"name":"John Doe","age":23,"isAdmin":true}}';
+  JSON_STRING = '{"person":{"name":"John Doe","age":23,"isVerified":true}}';
 var
-  nestedUserJSON: TJSONObject;
-  nestedUser: TNestedUser;
-  user: TUser;
+  json: TJSONObject;
+  personJSON: TJSONObject;
+  personWrapper: TPersonWrapper;
+  person: TPerson;
 begin
-  nestedUser := nil;
+  personWrapper := nil;
 
-  nestedUserJSON := TJSONObject.ParseJSONValue(JSON_STRING) as TJSONObject;
+  json := TJSONObject.ParseJSONValue(JSON_STRING) as TJSONObject;
   try
-    nestedUser := TJSONMapper.JSONToObject<TNestedUser>(nestedUserJSON);
+    personWrapper := TJSONMapper.JSONToObject<TPersonWrapper>(json);
 
-    user := nestedUser.user;
-    Assert.AreEqual(23, user.age);
-    Assert.AreEqual('John Doe', user.name);
-    Assert.AreEqual(true, user.isAdmin);
+    personJSON := json.GetValue('person') as TJSONObject;
+    person := personWrapper.person;
+
+    Assert.AreEqual(personJSON.GetValue('age').AsType<Integer>, person.age);
+    Assert.AreEqual(personJSON.GetValue('name').AsType<string>, person.name);
+    Assert.AreEqual(personJSON.GetValue('isVerified').AsType<Boolean>, person.isVerified);
   finally
-    if Assigned(nestedUser) then begin
-      FreeAndNil(nestedUser);
+    if Assigned(personWrapper) then begin
+      FreeAndNil(personWrapper);
     end;
-    nestedUserJSON.Free();
+    json.Free();
   end;
 end;
 
-{ TNestedUser }
+{ TPersonWrapper }
 
-constructor TNestedUser.Create;
+constructor TPersonWrapper.Create();
 begin
-  self.user := Default(TUser);
+  self.person := Default(TPerson);
 end;
 
 initialization

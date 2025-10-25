@@ -10,7 +10,7 @@ uses
   JSONMapper;
 
 type
-  TUser = class
+  TPerson = class
   public
     dateOfBirth: TDate;
     lastActive: TDateTime;
@@ -47,21 +47,21 @@ const
   EXPECTED_DATE_OF_BIRTH = '2006-01-21';
   EXPECTED_LAST_ACTIVE = '2025-06-29T23:28:59.000Z';
 var
-  jsonObject: TJSONObject;
-  user: TUser;
+  json: TJSONObject;
+  person: TPerson;
 begin
-  user := nil;
+  person := nil;
 
-  jsonObject := TJSONObject.ParseJSONValue(JSON_STRING) as TJSONObject;
+  json := TJSONObject.ParseJSONValue(JSON_STRING) as TJSONObject;
   try
-    user := TJSONMapper.jsonToObject<TUser>(jsonObject);
-    Assert.AreEqual(user.dateOfBirth, ISO8601ToDate(EXPECTED_DATE_OF_BIRTH));
-    Assert.AreEqual(user.lastActive, ISO8601ToDate(EXPECTED_LAST_ACTIVE));
+    person := TJSONMapper.jsonToObject<TPerson>(json);
+    Assert.AreEqual(ISO8601ToDate(EXPECTED_DATE_OF_BIRTH), person.dateOfBirth);
+    Assert.AreEqual(ISO8601ToDate(EXPECTED_LAST_ACTIVE), person.lastActive);
   finally
-    if Assigned(user) then begin
-      FreeAndNil(user);
+    if Assigned(person) then begin
+      FreeAndNil(person);
     end;
-    jsonObject.Free();
+    json.Free();
   end;
 end;
 
@@ -76,10 +76,10 @@ var
   expectedLastActive: TDateTime;
 
   jsonString: string;
-  jsonObject: TJSONObject;
-  user: TUser;
+  json: TJSONObject;
+  person: TPerson;
 begin
-  user := nil;
+  person := nil;
 
   TJSONMapper.dateFormatterClass := TDateFormatter_Local;
 
@@ -91,16 +91,16 @@ begin
     [DateToStr(expectedDateOfBirth), DateTimeToStr(expectedLastActive)]
   );
 
-  jsonObject := TJSONObject.ParseJSONValue(jsonString) as TJSONObject;
+  json := TJSONObject.ParseJSONValue(jsonString) as TJSONObject;
   try
-    user := TJSONMapper.jsonToObject<TUser>(jsonObject);
-    Assert.AreEqual(user.dateOfBirth, expectedDateOfBirth);
-    Assert.AreEqual(user.lastActive, expectedLastActive);
+    person := TJSONMapper.jsonToObject<TPerson>(json);
+    Assert.AreEqual(expectedDateOfBirth, person.dateOfBirth);
+    Assert.AreEqual(expectedLastActive, person.lastActive);
   finally
-    if Assigned(user) then begin
-      FreeAndNil(user);
+    if Assigned(person) then begin
+      FreeAndNil(person);
     end;
-    jsonObject.Free();
+    json.Free();
   end;
 end;
 
@@ -108,22 +108,22 @@ procedure TJSONToDateTime.TestInvalidDateTime();
 const
   JSON_STRING = '{"dateOfBirth":"malformed date","lastActive":"2025-06-29T23:28:59.000Z"}';
 var
-  jsonObject: TJSONObject;
-  user: TUser;
+  json: TJSONObject;
+  person: TPerson;
 begin
-  user := nil;
-  jsonObject := TJSONObject.ParseJSONValue(JSON_STRING) as TJSONObject;
+  person := nil;
+  json := TJSONObject.ParseJSONValue(JSON_STRING) as TJSONObject;
   try
     try
-      user := TJSONMapper.jsonToObject<TUser>(jsonObject);
+      person := TJSONMapper.jsonToObject<TPerson>(json);
     except
       on e: Exception do begin
         Assert.AreEqual(e.ClassType, EJSONMapperInvalidDate);
       end;
     end;
   finally
-    FreeAndNil(user);
-    jsonObject.Free();
+    FreeAndNil(person);
+    json.Free();
   end;
 end;
 
@@ -131,22 +131,22 @@ procedure TJSONToDateTime.TestInvalidDate();
 const
   JSON_STRING = '{"dateOfBirth":"2006-01-21","lastActive":"malformed datetime"}';
 var
-  jsonObject: TJSONObject;
-  user: TUser;
+  json: TJSONObject;
+  person: TPerson;
 begin
-  user := nil;
-  jsonObject := TJSONObject.ParseJSONValue(JSON_STRING) as TJSONObject;
+  person := nil;
+  json := TJSONObject.ParseJSONValue(JSON_STRING) as TJSONObject;
   try
     try
-      user := TJSONMapper.jsonToObject<TUser>(jsonObject);
+      person := TJSONMapper.jsonToObject<TPerson>(json);
     except
       on e: Exception do begin
         Assert.AreEqual(e.ClassType, EJSONMapperInvalidDateTime);
       end;
     end;
   finally
-    FreeAndNil(user);
-    jsonObject.Free();
+    FreeAndNil(person);
+    json.Free();
   end;
 end;
 

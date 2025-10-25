@@ -8,18 +8,18 @@ uses
   JSONMapper;
 
 type
-  TUser = class
+  TPerson = class
   public
     name: string;
     [Ignore]
     age: integer;
-    isAdmin: boolean;
+    isVerified: boolean;
   end;
 
   [TestFixture]
   TIgnoreAttribute = class
   private
-    user: TUser;
+    person: TPerson;
   public
     [Setup]
     procedure Setup();
@@ -34,24 +34,24 @@ implementation
 
 procedure TIgnoreAttribute.Setup();
 begin
-  user := TUser.Create();
+  person := TPerson.Create();
 end;
 
 procedure TIgnoreAttribute.TearDown();
 begin
-  user.Free();
+  person.Free();
 end;
 
 procedure TIgnoreAttribute.TestIgnoreAttribute();
 var
-  jsonObject: TJSONObject;
+  json: TJSONObject;
   _: TJSONValue;
 begin
-  jsonObject := TJSONMapper.objectToJSON(user);
+  json := TJSONMapper.objectToJSON(person);
   try
-    Assert.IsFalse(jsonObject.TryGetValue('age', _));
+    Assert.IsFalse(json.TryGetValue('age', _));
   finally
-    jsonObject.Free();
+    json.Free();
   end;
 end;
 

@@ -66,21 +66,21 @@ const
   EXPECTED_STRING_ARRAY = '["0","1","2"]';
   EXPECTED_BOOLEAN_ARRAY = '[false,true,true]';
 var
-  jsonObject: TJSONObject;
-  jsonArray: TJSONArray;
+  json: TJSONObject;
+  jsonArray: TJSONValue;
 begin
-  jsonObject := TJSONMapper.objectToJSON(arrayWrapper);
+  json := TJSONMapper.objectToJSON(arrayWrapper);
   try
-    jsonObject.TryGetValue<TJSONArray>('integerArray', jsonArray);
+    jsonArray := json.GetValue('integerArray');
     Assert.AreEqual(EXPECTED_INTEGER_ARRAY, jsonArray.ToJSON());
 
-    jsonObject.TryGetValue<TJSONArray>('stringArray', jsonArray);
+    jsonArray := json.GetValue('stringArray');
     Assert.AreEqual(EXPECTED_STRING_ARRAY, jsonArray.ToJSON());
 
-    jsonObject.TryGetValue<TJSONArray>('booleanArray', jsonArray);
+    jsonArray := json.GetValue('booleanArray');
     Assert.AreEqual(EXPECTED_BOOLEAN_ARRAY, jsonArray.ToJSON());
   finally
-    jsonObject.Free();
+    json.Free();
   end;
 end;
 

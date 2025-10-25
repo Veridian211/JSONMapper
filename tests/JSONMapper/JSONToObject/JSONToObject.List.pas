@@ -10,48 +10,37 @@ uses
   JSONMapper;
 
 type
-  TUser = class
+  TPerson = class
   public
     name: string;
     age: integer;
-    isAdmin: boolean;
+    isVerified: boolean;
   end;
 
   [TestFixture]
   TJSONToList = class
   public
-    [Setup]
-    procedure Setup();
-    [TearDown]
-    procedure TearDown();
-
     [Test]
     procedure TestListOfInteger();
     [Test]
     procedure TestListOfObjects();
+    [Test]
+    procedure TestObjectWithList();
   end;
 
 implementation
-
-procedure TJSONToList.Setup();
-begin
-end;
-
-procedure TJSONToList.TearDown();
-begin
-end;
 
 procedure TJSONToList.TestListOfInteger();
 const
   JSON_STRING = '[1,2,3]';
 var
-  jsonArray: TJSONArray;
+  json: TJSONArray;
   list: TList<integer>;
 begin
   list := nil;
-  jsonArray := TJSONArray.ParseJSONValue(JSON_STRING) as TJSONArray;
+  json := TJSONArray.ParseJSONValue(JSON_STRING) as TJSONArray;
   try
-    list := TJSONMapper.jsonToList<integer>(jsonArray);
+    list := TJSONMapper.jsonToList<integer>(json);
 
     Assert.AreEqual(1, list[0]);
     Assert.AreEqual(2, list[1]);
@@ -60,48 +49,55 @@ begin
     if Assigned(list) then begin
       FreeAndNil(list);
     end;
-    jsonArray.Free();
+    json.Free();
   end;
 end;
 
 procedure TJSONToList.TestListOfObjects();
 const
-  JSON_STRING = '[{"name":"0","age":0,"isAdmin":true},{"name":"1","age":1,"isAdmin":false},{"name":"2","age":2,"isAdmin":true}]';
+  JSON_STRING = '[{"name":"0","age":0,"isVerified":true},' +
+    '{"name":"1","age":1,"isVerified":false},' +
+    '{"name":"2","age":2,"isVerified":true}]';
 var
-  jsonArray: TJSONArray;
-  list: TList<TUser>;
-  user: TUser;
+  json: TJSONArray;
+  list: TList<TPerson>;
+  person: TPerson;
 begin
   list := nil;
-  jsonArray := TJSONArray.ParseJSONValue(JSON_STRING) as TJSONArray;
+  json := TJSONArray.ParseJSONValue(JSON_STRING) as TJSONArray;
   try
-    list := TJSONMapper.jsonToList<TUser>(jsonArray);
+    list := TJSONMapper.jsonToList<TPerson>(json);
 
-    user := list[0];
-    Assert.AreEqual('0' , user.name);
-    Assert.AreEqual(0   , user.age);
-    Assert.AreEqual(true, user.isAdmin);
+    person := list[0];
+    Assert.AreEqual('0' , person.name);
+    Assert.AreEqual(0   , person.age);
+    Assert.AreEqual(true, person.isVerified);
 
-    user := list[1];
-    Assert.AreEqual('1'  , user.name);
-    Assert.AreEqual(1    , user.age);
-    Assert.AreEqual(false, user.isAdmin);
+    person := list[1];
+    Assert.AreEqual('1'  , person.name);
+    Assert.AreEqual(1    , person.age);
+    Assert.AreEqual(false, person.isVerified);
 
-    user := list[2];
-    Assert.AreEqual('2' , user.name);
-    Assert.AreEqual(2   , user.age);
-    Assert.AreEqual(true, user.isAdmin);
+    person := list[2];
+    Assert.AreEqual('2' , person.name);
+    Assert.AreEqual(2   , person.age);
+    Assert.AreEqual(true, person.isVerified);
   finally
     if Assigned(list) then begin
-      for user in list do begin
-        if Assigned(user) then begin
-          FreeAndNil(user);
+      for person in list do begin
+        if Assigned(person) then begin
+          FreeAndNil(person);
         end;
       end;
       FreeAndNil(list);
     end;
-    jsonArray.Free();
+    json.Free();
   end;
+end;
+
+procedure TJSONToList.TestObjectWithList();
+begin
+
 end;
 
 initialization

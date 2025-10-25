@@ -8,20 +8,20 @@ uses
   JSONMapper;
 
 type
-  TUser = record
+  TPerson = record
     id: integer;
     name: string;
-    isAdmin: boolean;
+    isVerified: boolean;
   end;
 
-  TUserWrapper = class
-    user: TUser;
+  TPersonWrapper = class
+    person: TPerson;
   end;
 
   [TestFixture]
   TRecordToJSON = class
   private
-    userWrapper: TUserWrapper;
+    personWrapper: TPersonWrapper;
   public
     [Setup]
     procedure Setup();
@@ -36,29 +36,29 @@ implementation
 
 procedure TRecordToJSON.Setup();
 begin
-  userWrapper := TUserWrapper.Create();
+  personWrapper := TPersonWrapper.Create();
 
-  userWrapper.user.id := 1;
-  userWrapper.user.name := 'John Doe';
-  userWrapper.user.isAdmin := true;
+  personWrapper.person.id := 1;
+  personWrapper.person.name := 'John Doe';
+  personWrapper.person.isVerified := true;
 end;
 
 procedure TRecordToJSON.TearDown();
 begin
-  userWrapper.Free();
+  personWrapper.Free();
 end;
 
 procedure TRecordToJSON.TestBasicRecord();
 const
-  EXPECTED_VALUE = '{"user":{"id":1,"name":"John Doe","isAdmin":true}}';
+  EXPECTED_VALUE = '{"person":{"id":1,"name":"John Doe","isVerified":true}}';
 var
-  jsonObject: TJSONObject;
+  json: TJSONObject;
 begin
-  jsonObject := TJSONMapper.objectToJSON(userWrapper);
+  json := TJSONMapper.objectToJSON(personWrapper);
   try
-    Assert.AreEqual(EXPECTED_VALUE, jsonObject.ToJSON());
+    Assert.AreEqual(EXPECTED_VALUE, json.ToJSON());
   finally
-    jsonObject.Free();
+    json.Free();
   end;
 end;
 

@@ -10,7 +10,7 @@ uses
   JSONMapper;
 
 type
-  TUser = class
+  TPerson = class
   public
     dateOfBirth: TDate;
     lastActive: TDateTime;
@@ -19,7 +19,7 @@ type
   [TestFixture]
   TDateTimeToJSON = class
   private
-    user: TUser;
+    person: TPerson;
   public
     [Setup]
     procedure Setup();
@@ -39,15 +39,15 @@ const
   DATE_OF_BIRTH = '2006-01-21';
   LAST_ACTIVE = '2025-06-29T23:28:59.000Z';
 begin
-  user := TUser.Create();
+  person := TPerson.Create();
 
-  user.dateOfBirth := ISO8601ToDate(DATE_OF_BIRTH);
-  user.lastActive := ISO8601ToDate(LAST_ACTIVE);
+  person.dateOfBirth := ISO8601ToDate(DATE_OF_BIRTH);
+  person.lastActive := ISO8601ToDate(LAST_ACTIVE);
 end;
 
 procedure TDateTimeToJSON.TearDown();
 begin
-  user.Free();
+  person.Free();
   TJSONMapper.dateFormatterClass := TDateFormatter_ISO8601;
 end;
 
@@ -57,7 +57,7 @@ const
 var
   json: TJSONObject;
 begin
-  json := TJSONMapper.objectToJSON(user);
+  json := TJSONMapper.objectToJSON(person);
   try
     Assert.AreEqual(EXPECTED_VALUE, json.ToJSON());
   finally
@@ -76,10 +76,10 @@ begin
 
   expectedJSON := Format(
     EXPECTED_JSON,
-    [DateToStr(user.dateOfBirth), DateTimeToStr(user.lastActive)]
+    [DateToStr(person.dateOfBirth), DateTimeToStr(person.lastActive)]
   );
 
-  json := TJSONMapper.objectToJSON(user);
+  json := TJSONMapper.objectToJSON(person);
   try
     Assert.AreEqual(expectedJSON, json.ToJSON());
   finally

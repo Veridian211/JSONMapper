@@ -11,13 +11,13 @@ uses
   QueryMapper;
 
 type
-  TUser = class
+  TPerson = class
   private
-    _age: integer;
+    fAge: integer;
   public
     [FieldName('Name')]
     fullName: string;
-    property age: integer read _age write _age;
+    property age: integer read fAge write fAge;
   end;
 
   [TestFixture]
@@ -68,18 +68,18 @@ end;
 
 procedure TQueryMapperTest.TestEnumeration();
 var
-  user: TUser;
+  person: TPerson;
   index: integer;
 begin
   index := 0;
-  for user in dataset.Rows<TUser> do begin
+  for person in dataset.Rows<TPerson> do begin
     if index = 0 then begin
-      Assert.AreEqual('Max', user.fullName);
-      Assert.AreEqual(32, user.age);
+      Assert.AreEqual('Max', person.fullName);
+      Assert.AreEqual(32, person.age);
     end;
     if index = 1 then begin
-      Assert.AreEqual('Anna', user.fullName);
-      Assert.AreEqual(23, user.age);
+      Assert.AreEqual('Anna', person.fullName);
+      Assert.AreEqual(23, person.age);
     end;
     inc(index);
   end;
@@ -87,35 +87,35 @@ end;
 
 procedure TQueryMapperTest.TestAsList();
 var
-  userList: TList<TUser>;
-  user: TUser;
+  personList: TList<TPerson>;
+  person: TPerson;
 begin
-  userList := dataset.Rows<TUser>.asList();
+  personList := dataset.Rows<TPerson>.asList();
   try
-    Assert.AreEqual('Max', userList[0].fullName);
-    Assert.AreEqual(32, userList[0].age);
-    Assert.AreEqual('Anna', userList[1].fullName);
-    Assert.AreEqual(23, userList[1].age);
+    Assert.AreEqual('Max', personList[0].fullName);
+    Assert.AreEqual(32, personList[0].age);
+    Assert.AreEqual('Anna', personList[1].fullName);
+    Assert.AreEqual(23, personList[1].age);
   finally
-    for user in userList do begin
-      user.Free();
+    for person in personList do begin
+      person.Free();
     end;
-    userList.Free();
+    personList.Free();
   end;
 end;
 
 procedure TQueryMapperTest.TestAsObjectList();
 var
-  userList: TObjectList<TUser>;
+  personList: TObjectList<TPerson>;
 begin
-  userList := dataset.Rows<TUser>.asObjectList();
+  personList := dataset.Rows<TPerson>.asObjectList();
   try
-    Assert.AreEqual('Max', userList[0].fullName);
-    Assert.AreEqual(32, userList[0].age);
-    Assert.AreEqual('Anna', userList[1].fullName);
-    Assert.AreEqual(23, userList[1].age);
+    Assert.AreEqual('Max', personList[0].fullName);
+    Assert.AreEqual(32, personList[0].age);
+    Assert.AreEqual('Anna', personList[1].fullName);
+    Assert.AreEqual(23, personList[1].age);
   finally
-    userList.Free();
+    personList.Free();
   end;
 end;
 

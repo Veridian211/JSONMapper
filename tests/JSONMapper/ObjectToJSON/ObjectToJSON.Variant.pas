@@ -11,19 +11,19 @@ uses
   System.DateUtils;
 
 type
-  TUser = class
+  TPerson = class
   public
     name: Variant;
     age: Variant;
     dateOfBirth: Variant;
     rating: Variant;
-    isAdmin: Variant;
+    isVerified: Variant;
   end;
 
   [TestFixture]
   TVariantToJSON = class
   private
-    user: TUser;
+    person: TPerson;
   public
     [Setup]
     procedure Setup();
@@ -40,27 +40,27 @@ implementation
 
 procedure TVariantToJSON.Setup();
 begin
-  user := TUser.Create();
+  person := TPerson.Create();
 end;
 
 procedure TVariantToJSON.Teardown();
 begin
-  user.Free();
+  person.Free();
 end;
 
 procedure TVariantToJSON.TestNull();
 const
-  EXPECTED_JSON = '{"name":null,"age":null,"dateOfBirth":null,"rating":null,"isAdmin":null}';
+  EXPECTED_JSON = '{"name":null,"age":null,"dateOfBirth":null,"rating":null,"isVerified":null}';
 var
   json: TJSONObject;
 begin
-  user.name := null;
-  user.age := null;
-  user.dateOfBirth := null;
-  user.rating := null;
-  user.isAdmin := null;
+  person.name := null;
+  person.age := null;
+  person.dateOfBirth := null;
+  person.rating := null;
+  person.isVerified := null;
 
-  json := TJSONMapper.objectToJSON(user);
+  json := TJSONMapper.objectToJSON(person);
   try
     Assert.AreEqual(EXPECTED_JSON, json.ToJSON());
   finally
@@ -70,21 +70,22 @@ end;
 
 procedure TVariantToJSON.TestVariant();
 const
-  EXPECTED_JSON = '{"name":"John Doe","age":32,"dateOfBirth":"2006-10-23T00:00:00.000Z","rating":12.4,"isAdmin":true}';
+  EXPECTED_JSON = '{"name":"John Doe","age":32,' +
+    '"dateOfBirth":"2006-10-23T00:00:00.000Z","rating":12.4,"isVerified":true}';
 var
-  jsonObject: TJSONObject;
+  json: TJSONObject;
 begin
-  user.name := 'John Doe';
-  user.age := 32;
-  user.isAdmin := true;
-  user.dateOfBirth := ISO8601ToDate('2006-10-23');
-  user.rating := 12.4;
+  person.name := 'John Doe';
+  person.age := 32;
+  person.isVerified := true;
+  person.dateOfBirth := ISO8601ToDate('2006-10-23');
+  person.rating := 12.4;
 
-  jsonObject := TJSONMapper.objectToJSON(user);
+  json := TJSONMapper.objectToJSON(person);
   try
-    Assert.AreEqual(EXPECTED_JSON, jsonObject.ToJSON());
+    Assert.AreEqual(EXPECTED_JSON, json.ToJSON());
   finally
-    jsonObject.Free();
+    json.Free();
   end;
 end;
 

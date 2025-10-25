@@ -10,12 +10,12 @@ uses
   JSONMapper;
 
 type
-  TUser = class
+  TPerson = class
   public
     name: Variant;
     age: Variant;
     rating: Variant;
-    isAdmin: Variant;
+    isVerified: Variant;
   end;
 
   [TestFixture]
@@ -31,55 +31,55 @@ implementation
 
 procedure TJSONToVariant.TestVariant();
 const
-  JSON_STRING = '{"name":"John Doe","age":23,"rating":12.4,"isAdmin":true}';
+  JSON_STRING = '{"name":"John Doe","age":23,"rating":12.4,"isVerified":true}';
 
   EXPECTED_NAME = 'John Doe';
   EXPECTED_AGE = 23;
   EXPECTED_RATING = 12.4;
   EXPECTED_IS_ADMIN = true;
 var
-  jsonObject: TJSONObject;
-  user: TUser;
+  json: TJSONObject;
+  person: TPerson;
 begin
-  user := nil;
+  person := nil;
 
-  jsonObject := TJSONObject.ParseJSONValue(JSON_STRING) as TJSONObject;
+  json := TJSONObject.ParseJSONValue(JSON_STRING) as TJSONObject;
   try
-    user := TJSONMapper.jsonToObject<TUser>(jsonObject);
+    person := TJSONMapper.jsonToObject<TPerson>(json);
 
-    Assert.AreEqual(EXPECTED_NAME, VarToStr(user.name));
-    Assert.AreEqual(EXPECTED_AGE, Integer(user.age));
-    Assert.IsTrue(Round(EXPECTED_RATING) = Round(Double(user.rating)));
-    Assert.AreEqual(EXPECTED_IS_ADMIN, Boolean(user.isAdmin));
+    Assert.AreEqual(EXPECTED_NAME, VarToStr(person.name));
+    Assert.AreEqual(EXPECTED_AGE, Integer(person.age));
+    Assert.IsTrue(Round(EXPECTED_RATING) = Round(Double(person.rating)));
+    Assert.AreEqual(EXPECTED_IS_ADMIN, Boolean(person.isVerified));
   finally
-    if Assigned(user) then begin
-      FreeAndNil(user);
+    if Assigned(person) then begin
+      FreeAndNil(person);
     end;
-    jsonObject.Free();
+    json.Free();
   end;
 end;
 
 procedure TJSONToVariant.TestNull();
 const
-  JSON_STRING = '{"name":null,"age":null,"isAdmin":null}';
+  JSON_STRING = '{"name":null,"age":null,"isVerified":null}';
 var
-  jsonObject: TJSONObject;
-  user: TUser;
+  json: TJSONObject;
+  person: TPerson;
 begin
-  user := nil;
+  person := nil;
 
-  jsonObject := TJSONObject.ParseJSONValue(JSON_STRING) as TJSONObject;
+  json := TJSONObject.ParseJSONValue(JSON_STRING) as TJSONObject;
   try
-    user := TJSONMapper.jsonToObject<TUser>(jsonObject);
+    person := TJSONMapper.jsonToObject<TPerson>(json);
 
-    Assert.AreEqual(Null, user.name);
-    Assert.AreEqual(Null, user.age);
-    Assert.AreEqual(Null, user.name);
+    Assert.AreEqual(Null, person.name);
+    Assert.AreEqual(Null, person.age);
+    Assert.AreEqual(Null, person.name);
   finally
-    if Assigned(user) then begin
-      FreeAndNil(user);
+    if Assigned(person) then begin
+      FreeAndNil(person);
     end;
-    jsonObject.Free();
+    json.Free();
   end;
 end;
 
