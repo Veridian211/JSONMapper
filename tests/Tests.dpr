@@ -37,6 +37,7 @@ uses
   ObjectToJSON._Record in 'JSONMapper\ObjectToJSON\ObjectToJSON._Record.pas',
   ObjectToJSON.Arrays in 'JSONMapper\ObjectToJSON\ObjectToJSON.Arrays.pas',
   ObjectToJSON.Variant in 'JSONMapper\ObjectToJSON\ObjectToJSON.Variant.pas',
+  Test.CustomMapping in 'JSONMapper\Test.CustomMapping.pas',
   JSONToObject._Object in 'JSONMapper\JSONToObject\JSONToObject._Object.pas',
   JSONToObject._Record in 'JSONMapper\JSONToObject\JSONToObject._Record.pas',
   JSONToObject.DateTime in 'JSONMapper\JSONToObject\JSONToObject.DateTime.pas',

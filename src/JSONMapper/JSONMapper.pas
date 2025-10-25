@@ -21,6 +21,8 @@ uses
   JSONMapper.ClassFieldHelper,
   JSONMapper.ListHelper,
   JSONMapper.DateFormatter,
+  JSONMapper.Settings,
+  JSONMapper.CustomMapping,
   PublicFieldIterator,
   Nullable;
 
@@ -54,6 +56,7 @@ type
 
   public
     class var dateFormatterClass: TDateFormatterClass;
+    class var customMappings: TCustomMappings;
 
     /// <summary> Maps the public fields of a generic object into a TJSONObject. </summary>
     class procedure objectToJSON(const obj: TObject; var jsonObject: TJSONObject); overload;
@@ -74,6 +77,8 @@ type
     class procedure jsonToList(const jsonArray: TJSONArray; const list: TObject); overload;
     class function jsonToList<T>(const jsonArray: TJSONArray): TList<T>; overload;
     class function jsonToObjectList<T: class, constructor>(const jsonArray: TJSONArray): TObjectList<T>;
+
+    class procedure registerCustomMapping<T>(mapper: TCustomMappingClass);
   end;
 
   IgnoreAttribute = JSONMapper.Attributes.IgnoreAttribute;
@@ -314,6 +319,7 @@ var
   value_Object: TObject;
   value_Variant: Variant;
   dateString: string;
+  customMapper: TCustomMappingClass;
 begin
   case value.Kind of
     tkString,
@@ -345,10 +351,13 @@ begin
     end;
 
     tkEnumeration: begin
-      if not (value.TypeInfo = TypeInfo(Boolean)) then begin
-        raise EValueToJSON.Create();
+      if value.TypeInfo = TypeInfo(Boolean) then begin
+        exit(TJSONBool.Create(value.AsBoolean));
       end;
-      exit(TJSONBool.Create(value.AsBoolean));
+      if customMappings.TryGetValue(value.TypeInfo, customMapper) then begin
+        exit(customMapper.valueToJSON(value));
+      end;
+      raise EValueToJSON.Create();
     end;
 
     tkVariant: begin
@@ -632,6 +641,7 @@ var
   dateString: string;
   value_Integer: Int64;
   value_Double: double;
+  customMapper: TCustomMappingClass;
 begin
   case rttiType.TypeKind of
     tkString,
@@ -663,10 +673,13 @@ begin
     end;
 
     tkEnumeration: begin
-      if not (rttiType.Handle = TypeInfo(Boolean)) then begin
-        raise EJSONToValue.Create();
+      if rttiType.Handle = TypeInfo(Boolean) then begin
+        exit(TJSONBool(jsonValue).AsBoolean);
       end;
-      exit(TJSONBool(jsonValue).AsBoolean);
+      if customMappings.TryGetValue(rttiType.Handle, customMapper) then begin
+        exit(customMapper.JSONToValue(jsonValue));
+      end;
+      raise EJSONToValue.Create();
     end;
 
     tkVariant: begin
@@ -744,7 +757,16 @@ begin
   exit(jsonKeyAttrib.getKey);
 end;
 
+class procedure TJSONMapper.registerCustomMapping<T>(mapper: TCustomMappingClass);
+begin
+  TJSONMapper.customMappings.add<T>(mapper);
+end;
+
 initialization
+  TJSONMapper.customMappings := TCustomMappings.Create();
   TJSONMapper.dateFormatterClass := TDateFormatter_ISO8601;
+
+finalization
+  FreeAndNil(TJSONMapper.customMappings);
 
 end.

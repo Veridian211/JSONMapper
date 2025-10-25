@@ -4,56 +4,70 @@ interface
 
 uses
   System.SysUtils,
+  System.Rtti,
   System.Generics.Collections,
   System.JSON,
-  System.TypInfo;
+  System.TypInfo,
+  JSONMapper.Exceptions;
 
 type
-  TCustomMappingBase = class
+  TCustomMapping = class
   public
-    class procedure toJSONUntyped(value: Pointer; out jsonValue: TJSONValue); virtual; abstract;
-    class procedure fromJSONUntyped(jsonValue: TJSONValue; out value: Pointer); virtual; abstract;
+    class function valueToJSON(value: TValue): TJSONValue; virtual; abstract;
+    class function JSONToValue(jsonValue: TJSONValue): TValue; virtual; abstract;
   end;
 
-  TCustomMapping<T> = class(TCustomMappingBase)
+  TCustomMapping<T> = class(TCustomMapping)
   public
-    class procedure toJSONUntyped(value: Pointer; out jsonValue: TJSONValue); override;
-    class procedure fromJSONUntyped(jsonValue: TJSONValue; out value: Pointer); override;
+    class function valueToJSON(value: TValue): TJSONValue; override;
+    class function JSONToValue(jsonValue: TJSONValue): TValue; override;
 
-    class procedure toJSON(value: T; out jsonValue: TJSONValue); virtual; abstract;
-    class procedure fromJSON(jsonValue: TJSONValue; out value: T); virtual; abstract;
+    class function toJSON(value: T): TJSONValue; virtual; abstract;
+    class function fromJSON(jsonValue: TJSONValue): T; virtual; abstract;
   end;
 
-  TCustomMappingBaseClass = class of TCustomMappingBase;
+  TCustomMappingClass = class of TCustomMapping;
 
-  TCustomMappings = class(TDictionary<PTypeInfo, TCustomMappingBaseClass>)
+  TCustomMappings = class(TDictionary<PTypeInfo, TCustomMappingClass>)
   public
-    procedure Add<T>(customMappingClass: TCustomMappingBaseClass); reintroduce;
+    procedure Add<T>(customMappingClass: TCustomMappingClass); reintroduce;
   end;
 
 implementation
 
 { TCustomMapping<T> }
 
-class procedure TCustomMapping<T>.fromJSONUntyped(
-  jsonValue: TJSONValue;
-  out value: Pointer
-);
+class function TCustomMapping<T>.valueToJSON(value: TValue): TJSONValue;
 begin
-  fromJSON(jsonValue, T(value^));
+  try
+    Result := toJSON(value.AsType<T>);
+  except
+    on e: Exception do begin
+      raise EJSONMapperCastingToJSON.CreateFmt(
+        'TCustomMapping<%s>.toJSON(): Failed to convert to JSON. Error: %s',
+        [GetTypeName(TypeInfo(T)), e.Message]
+      );
+    end;
+  end;
 end;
 
-class procedure TCustomMapping<T>.toJSONUntyped(
-  value: Pointer;
-  out jsonValue: TJSONValue
-);
+class function TCustomMapping<T>.JSONToValue(jsonValue: TJSONValue): TValue;
 begin
-  toJSON(T(value^), jsonValue);
+  try
+    Result := TValue.From<T>(fromJSON(jsonValue));
+  except
+    on e: Exception do begin
+      raise EJSONMapperCastingFromJSON.CreateFmt(
+        'TCustomMapping<%s>.fromJSON(): Failed to convert from JSON. Error: %s',
+        [GetTypeName(TypeInfo(T)), e.Message]
+      );
+    end;
+  end;
 end;
 
 { TCustomMappings }
 
-procedure TCustomMappings.Add<T>(customMappingClass: TCustomMappingBaseClass);
+procedure TCustomMappings.Add<T>(customMappingClass: TCustomMappingClass);
 begin
   inherited Add(TypeInfo(T), customMappingClass);
 end;

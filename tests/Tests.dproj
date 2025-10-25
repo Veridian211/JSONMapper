@@ -108,6 +108,7 @@
         <DCCReference Include="JSONMapper\ObjectToJSON\ObjectToJSON._Record.pas"/>
         <DCCReference Include="JSONMapper\ObjectToJSON\ObjectToJSON.Arrays.pas"/>
         <DCCReference Include="JSONMapper\ObjectToJSON\ObjectToJSON.Variant.pas"/>
+        <DCCReference Include="JSONMapper\Test.CustomMapping.pas"/>
         <DCCReference Include="JSONMapper\JSONToObject\JSONToObject._Object.pas"/>
         <DCCReference Include="JSONMapper\JSONToObject\JSONToObject._Record.pas"/>
         <DCCReference Include="JSONMapper\JSONToObject\JSONToObject.DateTime.pas"/>
