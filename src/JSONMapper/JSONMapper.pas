@@ -38,18 +38,18 @@ type
   /// </remarks>
   TJSONMapper = class
   protected
-    class function getJSONKey(rttiField: TRttiField): string;
+    class function getJSONKey(rttiDataMember: TRttiDataMember): string;
 
     class function recordToJSON(const rec: TValue): TJSONObject; static;
     class function arrayToJSON(const arr: TValue): TJSONArray; static;
 
-    class function tryCreateJSONValue(obj: TObject; rttiField: TRttiField): TJSONValue; overload; static;
-    class function tryCreateJSONValue(rec: TValue; rttiField: TRttiField): TJSONValue; overload; static;
+    class function tryCreateJSONValue(obj: TObject; rttiDataMember: TRttiDataMember): TJSONValue; overload; static;
+    class function tryCreateJSONValue(rec: TValue; rttiDataMember: TRttiDataMember): TJSONValue; overload; static;
     class function tryCreateJSONValue(value: TValue): TJSONValue; overload; static;
     class function createJSONValue(value: TValue): TJSONValue; static;
 
-    class function tryCreateValue(jsonValue: TJSONValue; obj: TObject; rttiField: TRttiField): TValue; overload; static;
-    class function tryCreateValue(jsonValue: TJSONValue; rec: Pointer; rttiField: TRttiField): TValue; overload; static;
+    class function tryCreateValue(jsonValue: TJSONValue; obj: TObject; rttiDataMember: TRttiDataMember): TValue; overload; static;
+    class function tryCreateValue(jsonValue: TJSONValue; rec: Pointer; rttiDataMember: TRttiDataMember): TValue; overload; static;
     class function tryCreateValue(elementJSON: TJSONValue; elementType: TRttiType): TValue; overload; static;
     class function createValue(jsonValue: TJSONValue; rttiType: TRttiType; fieldValue: TValue): TValue;
 
@@ -103,7 +103,6 @@ type
   EJSONMapperInvalidDateTime = JSONMapper.Exceptions.EJSONMapperInvalidDateTime;
   EJSONMapperNotATListException = JSONMapper.Exceptions.EJSONMapperNotATListException;
   EJSONMapperFaultyEnumerator = JSONMapper.Exceptions.EJSONMapperFaultyEnumerator;
-  EJSONMapperObjectIsNil = JSONMapper.Exceptions.EJSONMapperObjectIsNil;
 
   TNullString = Nullable.TNullString;
   TNullInteger = Nullable.TNullInteger;
@@ -117,7 +116,7 @@ class procedure TJSONMapper.objectToJSON(const obj: TObject; var jsonObject: TJS
 var
   rttiContext: TRttiContext;
   rttiInstanceType: TRttiInstanceType;
-  rttiField: TRttiField;
+  rttiDataMember: TRttiDataMember;
 
   jsonKey: string;
   jsonValue: TJSONValue;
@@ -134,9 +133,9 @@ begin
   try
     rttiInstanceType := rttiContext.GetType(obj.ClassType) as TRttiInstanceType;
 
-    for rttiField in rttiInstanceType.GetPublicFields() do begin
-      jsonKey := getJSONKey(rttiField);
-      jsonValue := tryCreateJSONValue(obj, rttiField);
+    for rttiDataMember in rttiInstanceType.GetPublicDataMembers() do begin
+      jsonKey := getJSONKey(rttiDataMember);
+      jsonValue := tryCreateJSONValue(obj, rttiDataMember);
 
       jsonPair := TJSONPair.Create(jsonKey, jsonValue);
       jsonObject.AddPair(jsonPair);
@@ -221,7 +220,7 @@ var
 
   rttiContext: TRttiContext;
   recordType: TRttiRecordType;
-  rttiField: TRttiField;
+  rttiDataMember: TRttiDataMember;
 
   jsonKey: string;
   jsonValue: TJSONValue;
@@ -233,9 +232,9 @@ begin
     try
       recordType := rttiContext.GetType(rec.TypeInfo) as TRttiRecordType;
 
-      for rttiField in recordType.GetPublicFields() do begin
-        jsonKey := rttiField.Name;
-        jsonValue := tryCreateJSONValue(rec, rttiField);
+      for rttiDataMember in recordType.GetPublicDataMembers() do begin
+        jsonKey := rttiDataMember.Name;
+        jsonValue := tryCreateJSONValue(rec, rttiDataMember);
 
         jsonPair := TJSONPair.Create(jsonKey, jsonValue);
         jsonObject.AddPair(jsonPair);
@@ -285,28 +284,28 @@ begin
   exit(jsonArray);
 end;
 
-class function TJSONMapper.tryCreateJSONValue(obj: TObject; rttiField: TRttiField): TJSONValue;
+class function TJSONMapper.tryCreateJSONValue(obj: TObject; rttiDataMember: TRttiDataMember): TJSONValue;
 var
   value: TValue;
 begin
-  value := rttiField.GetValue(obj);
+  value := rttiDataMember.GetValue(obj);
   try
     exit(createJSONValue(value));
   except
-    on E: EValueToJSON do raise EJSONMapperCastingToJSON.Create(rttiField)
+    on E: EValueToJSON do raise EJSONMapperCastingToJSON.Create(rttiDataMember)
     else raise;
   end;
 end;
 
-class function TJSONMapper.tryCreateJSONValue(rec: TValue; rttiField: TRttiField): TJSONValue;
+class function TJSONMapper.tryCreateJSONValue(rec: TValue; rttiDataMember: TRttiDataMember): TJSONValue;
 var
   value: TValue;
 begin
-  value := rttiField.GetValue(rec.GetReferenceToRawData);
+  value := rttiDataMember.GetValue(rec.GetReferenceToRawData);
   try
     exit(createJSONValue(value));
   except
-    on E: EValueToJSON do raise EJSONMapperCastingToJSON.Create(rttiField)
+    on E: EValueToJSON do raise EJSONMapperCastingToJSON.Create(rttiDataMember)
     else raise;
   end;
 end;
@@ -423,7 +422,7 @@ class procedure TJSONMapper.jsonToObject(const jsonObject: TJSONObject; const ob
 var
   rttiContext: TRttiContext;
   rttiInstanceType: TRttiInstanceType;
-  rttiField: TRttiField;
+  rttiDataMember: TRttiDataMember;
 
   jsonKey: string;
   jsonValue: TJSONValue;
@@ -440,16 +439,16 @@ begin
   try
     rttiInstanceType := rttiContext.GetType(obj.ClassType) as TRttiInstanceType;
 
-    for rttiField in rttiInstanceType.GetFields() do begin
-      jsonKey := getJSONKey(rttiField);
+    for rttiDataMember in rttiInstanceType.GetFields() do begin
+      jsonKey := getJSONKey(rttiDataMember);
       jsonValue := jsonObject.GetValue(jsonKey);
 
       if jsonValue = nil then begin
         continue;
       end;
 
-      newFieldValue := tryCreateValue(jsonValue, obj, rttiField);
-      rttiField.SetValue(obj, newFieldValue);
+      newFieldValue := tryCreateValue(jsonValue, obj, rttiDataMember);
+      rttiDataMember.SetValue(obj, newFieldValue);
     end;
   finally
     rttiContext.Free();
@@ -478,7 +477,7 @@ class function TJSONMapper.jsonToRecord(
 var
   rttiContext: TRttiContext;
   recordType: TRttiRecordType;
-  rttiField: TRttiField;
+  rttiDataMember: TRttiDataMember;
 
   jsonKey: string;
   jsonValue: TJSONValue;
@@ -488,16 +487,16 @@ begin
   try
     recordType := rttiContext.GetType(typInfo) as TRttiRecordType;
 
-    for rttiField in recordType.GetFields() do begin
-      jsonKey := getJSONKey(rttiField);
+    for rttiDataMember in recordType.GetPublicDataMembers() do begin
+      jsonKey := getJSONKey(rttiDataMember);
       jsonValue := jsonObject.GetValue(jsonKey);
 
       if jsonValue = nil then begin
         continue;
       end;
 
-      newFieldValue := tryCreateValue(jsonValue, rec, rttiField);
-      rttiField.SetValue(rec, newFieldValue);
+      newFieldValue := tryCreateValue(jsonValue, rec, rttiDataMember);
+      rttiDataMember.SetValue(rec, newFieldValue);
     end;
   finally
     rttiContext.Free();
@@ -574,16 +573,16 @@ end;
 class function TJSONMapper.tryCreateValue(
   jsonValue: TJSONValue;
   obj: TObject;
-  rttiField: TRttiField
+  rttiDataMember: TRttiDataMember
 ): TValue;
 var
   fieldValue: TValue;
 begin
-  fieldValue := rttiField.GetValue(obj);
+  fieldValue := rttiDataMember.GetValue(obj);
   try
-    exit(TJSONMapper.createValue(jsonValue, rttiField.FieldType, fieldValue));
+    exit(TJSONMapper.createValue(jsonValue, rttiDataMember.DataType, fieldValue));
   except
-    on e: EJSONToValue do raise EJSONMapperCastingFromJSON.Create(jsonValue, rttiField);
+    on e: EJSONToValue do raise EJSONMapperCastingFromJSON.Create(jsonValue, rttiDataMember);
     else raise;
   end;
 end;   
@@ -591,16 +590,16 @@ end;
 class function TJSONMapper.tryCreateValue(
   jsonValue: TJSONValue; 
   rec: Pointer;
-  rttiField: TRttiField
+  rttiDataMember: TRttiDataMember
 ): TValue;
 var
   fieldValue: TValue;
 begin
-  fieldValue := rttiField.GetValue(rec);
+  fieldValue := rttiDataMember.GetValue(rec);
   try
-    exit(TJSONMapper.createValue(jsonValue, rttiField.FieldType, fieldValue));
+    exit(TJSONMapper.createValue(jsonValue, rttiDataMember.DataType, fieldValue));
   except
-    on e: EJSONToValue do raise EJSONMapperCastingFromJSON.Create(jsonValue, rttiField);
+    on e: EJSONToValue do raise EJSONMapperCastingFromJSON.Create(jsonValue, rttiDataMember);
     else raise;
   end;
 end;
@@ -753,15 +752,15 @@ begin
   end;
 end;
 
-class function TJSONMapper.getJSONKey(rttiField: TRttiField): string;
+class function TJSONMapper.getJSONKey(rttiDataMember: TRttiDataMember): string;
 var
-  jsonKeyAttrib: JSONKeyAttribute;
+  jsonKeyAttr: JSONKeyAttribute;
 begin
-  jsonKeyAttrib := rttiField.GetAttribute<JSONKeyAttribute>();
-  if jsonKeyAttrib = nil then begin
-    exit(rttiField.Name);
+  jsonKeyAttr := rttiDataMember.GetAttribute<JSONKeyAttribute>();
+  if jsonKeyAttr = nil then begin
+    exit(rttiDataMember.Name);
   end;
-  exit(jsonKeyAttrib.getKey);
+  exit(jsonKeyAttr.getKey);
 end;
 
 class procedure TJSONMapper.registerCustomMapper<T>(mapper: TCustomMapperClass);

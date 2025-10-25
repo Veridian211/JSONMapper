@@ -15,7 +15,7 @@ type
 
   EJSONMapperCastingToJSON = class(EJSONMapperException)
   public
-    constructor Create(rttiField: TRttiField); reintroduce; overload;
+    constructor Create(rttiDataMember: TRttiDataMember); reintroduce; overload;
     constructor Create(typeInfo: PTypeInfo); reintroduce; overload;
   end;
 
@@ -23,7 +23,7 @@ type
   private
     function truncateJSON(json: string): string;
   public
-    constructor Create(jsonValue: TJSONValue; rttiField: TRttiField); overload;
+    constructor Create(jsonValue: TJSONValue; rttiDataMember: TRttiDataMember); overload;
     constructor Create(jsonValue: TJSONValue; rttiType: TRttiType); overload;
   end;
 
@@ -59,30 +59,23 @@ type
     constructor Create(rttiType: TRttiType); reintroduce;
   end;
 
-  // ###  Rest  ###
-
-  EJSONMapperObjectIsNil = class(EJSONMapperException)
-  public
-    constructor Create(rttiField: TRttiField); reintroduce; overload;
-  end;
-
 implementation
 
 { EJSONMapperCastingToJSON }
 
-constructor EJSONMapperCastingToJSON.Create(rttiField: TRttiField);
+constructor EJSONMapperCastingToJSON.Create(rttiDataMember: TRttiDataMember);
 var
-  fieldParentName: string;
-  fieldName: string;
-  fieldType: string;
+  className: string;
+  datamemberName: string;
+  datamemberType: string;
 begin
-  fieldParentName := rttiField.Parent.Name;
-  fieldName := rttiField.Name;
-  fieldType := rttiField.FieldType.Name;
+  className := rttiDataMember.Parent.Name;
+  datamemberName := rttiDataMember.Name;
+  datamemberType := rttiDataMember.DataType.Name;
 
   inherited CreateFmt(
     'Failed to cast "%s.%s" of type "%s" into JSON. Consider adding the Ignore-Attribute.',
-    [fieldParentName, fieldName, fieldType]
+    [className, datamemberName, datamemberType]
   );
 end;
 
@@ -95,16 +88,24 @@ end;
 
 constructor EJSONMapperCastingFromJSON.Create(
   jsonValue: TJSONValue;
-  rttiField: TRttiField
+  rttiDataMember: TRttiDataMember
 );
+var
+  datamemberType: string;
+  className: string;
+  datamemberName: string;
 begin
+  datamemberType := rttiDataMember.DataType.Name;
+  className := rttiDataMember.Parent.Name;
+  datamemberName := rttiDataMember.Name;
+
   inherited CreateFmt(
     'Failed to cast json "%s" into type "%s" at "%s.%s"',
     [
       truncateJSON(jsonValue.ToJSON),
-      rttiField.FieldType.Name,
-      rttiField.Parent.Name,
-      rttiField.Name
+      datamemberType,
+      className,
+      datamemberName
     ]
   );
 end;
@@ -172,24 +173,6 @@ begin
   inherited CreateFmt(
     'Method GetEnumrator() not found on type "%s" or MoveNext() and GetCurrent() methods not found on enumerator.',
     [rttiType.ClassType.QualifiedClassName]
-  );
-end;
-
-{ EJSONMapperObjectIsNil }
-
-constructor EJSONMapperObjectIsNil.Create(rttiField: TRttiField);
-var
- fieldParentName: string;
- fieldName: string;
- fieldType: string;
-begin
-  fieldParentName := rttiField.Parent.Name;
-  fieldName := rttiField.Name;
-  fieldType := rttiField.FieldType.Name;
-
-  inherited CreateFmt(
-    '%s.%s is nil (should be instance of %s).',
-    [fieldParentName, fieldName, fieldType]
   );
 end;
 

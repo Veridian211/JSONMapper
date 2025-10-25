@@ -12,62 +12,85 @@ uses
   {$ENDIF}
   System.Rtti,
   System.TypInfo,
+  System.Generics.Collections,
   JSONMapper.Attributes;
 
 type
   TRttiInstanceTypeHelper = class helper for TRttiInstanceType
-    function GetPublicFields(): TArray<TRttiField>;
+    function GetPublicDataMembers(): TArray<TRttiDataMember>;
   end;
 
   TRttiRecordTypeHelper = class helper for TRttiRecordType
-    function GetPublicFields(): TArray<TRttiField>;
+    function GetPublicDataMembers(): TArray<TRttiDataMember>;
   end;
 
 implementation
 
-function isPublicOrPublished(rttiField: TRttiField): boolean;
+function isPublicOrPublished(rttiDataMember: TRttiDataMember): boolean;
 begin
-  exit(rttiField.Visibility in [mvPublic, mvPublished]);
+  exit(rttiDataMember.Visibility in [mvPublic, mvPublished]);
 end;
 
 { TRttiInstanceTypeHelper }
 
-function TRttiInstanceTypeHelper.GetPublicFields(): TArray<TRttiField>;
+function TRttiInstanceTypeHelper.GetPublicDataMembers(): TArray<TRttiDataMember>;
 var
-  rttiFields: TArray<TRttiField>;
-  rttiField: TRttiField;
+  rttiDataMembers: TList<TRttiDataMember>;
+  rttiDataMember: TRttiDataMember;
 begin
-  SetLength(rttiFields, 0);
-  for rttiField in self.GetFields() do begin
-    if not isPublicOrPublished(rttiField)
-    or rttiField.HasAttribute(IgnoreAttribute) then begin
-      continue;
+  rttiDataMembers := TList<TRttiDataMember>.Create;
+  try
+    for rttiDataMember in self.GetFields() do begin
+      if not isPublicOrPublished(rttiDataMember) then
+        continue;
+      if rttiDataMember.HasAttribute(IgnoreAttribute) then
+        continue;
+      rttiDataMembers.Add(rttiDataMember);
     end;
 
-    SetLength(rttiFields, Length(rttiFields) + 1);
-    rttiFields[High(rttiFields)] := rttiField;
+    for rttiDataMember in self.GetProperties() do begin
+      if not isPublicOrPublished(rttiDataMember) then
+        continue;
+      if rttiDataMember.HasAttribute(IgnoreAttribute) then
+        continue;
+      rttiDataMembers.Add(rttiDataMember);
+    end;
+
+    exit(rttiDataMembers.ToArray);
+  finally
+    rttiDataMembers.Free;
   end;
-  exit(rttiFields);
 end;
 
 { TRttiRecordTypeHelper }
 
-function TRttiRecordTypeHelper.GetPublicFields(): TArray<TRttiField>;
+function TRttiRecordTypeHelper.GetPublicDataMembers(): TArray<TRttiDataMember>;
 var
-  rttiFields: TArray<TRttiField>;
-  rttiField: TRttiField;
+  rttiDataMembers: TList<TRttiDataMember>;
+  rttiDataMember: TRttiDataMember;
 begin
-  SetLength(rttiFields, 0);
-  for rttiField in self.GetFields() do begin
-    if not isPublicOrPublished(rttiField)
-    or rttiField.HasAttribute(IgnoreAttribute) then begin
-      continue;
+  rttiDataMembers := TList<TRttiDataMember>.Create;
+  try
+    for rttiDataMember in self.GetFields() do begin
+      if not isPublicOrPublished(rttiDataMember) then
+        continue;
+      if rttiDataMember.HasAttribute(IgnoreAttribute) then
+        continue;
+      rttiDataMembers.Add(rttiDataMember);
     end;
 
-    SetLength(rttiFields, Length(rttiFields) + 1);
-    rttiFields[High(rttiFields)] := rttiField;
+    for rttiDataMember in self.GetProperties() do begin
+      if not isPublicOrPublished(rttiDataMember) then
+        continue;
+      if rttiDataMember.HasAttribute(IgnoreAttribute) then
+        continue;
+      rttiDataMembers.Add(rttiDataMember);
+    end;
+
+    exit(rttiDataMembers.ToArray);
+  finally
+    rttiDataMembers.Free;
   end;
-  exit(rttiFields);
 end;
 
 end.
