@@ -11,13 +11,13 @@ uses
   JSONMapper.Exceptions;
 
 type
-  TCustomMapping = class
+  TCustomMapper = class
   public
     class function valueToJSON(value: TValue): TJSONValue; virtual; abstract;
     class function JSONToValue(jsonValue: TJSONValue): TValue; virtual; abstract;
   end;
 
-  TCustomMapping<T> = class(TCustomMapping)
+  TCustomMapper<T> = class(TCustomMapper)
   public
     class function valueToJSON(value: TValue): TJSONValue; override;
     class function JSONToValue(jsonValue: TJSONValue): TValue; override;
@@ -26,18 +26,18 @@ type
     class function fromJSON(jsonValue: TJSONValue): T; virtual; abstract;
   end;
 
-  TCustomMappingClass = class of TCustomMapping;
+  TCustomMapperClass = class of TCustomMapper;
 
-  TCustomMappings = class(TDictionary<PTypeInfo, TCustomMappingClass>)
+  TCustomMappers = class(TDictionary<PTypeInfo, TCustomMapperClass>)
   public
-    procedure Add<T>(customMappingClass: TCustomMappingClass); reintroduce;
+    procedure Add<T>(customMappingClass: TCustomMapperClass); reintroduce;
   end;
 
 implementation
 
-{ TCustomMapping<T> }
+{ TCustomMapper<T> }
 
-class function TCustomMapping<T>.valueToJSON(value: TValue): TJSONValue;
+class function TCustomMapper<T>.valueToJSON(value: TValue): TJSONValue;
 begin
   try
     Result := toJSON(value.AsType<T>);
@@ -51,7 +51,7 @@ begin
   end;
 end;
 
-class function TCustomMapping<T>.JSONToValue(jsonValue: TJSONValue): TValue;
+class function TCustomMapper<T>.JSONToValue(jsonValue: TJSONValue): TValue;
 begin
   try
     Result := TValue.From<T>(fromJSON(jsonValue));
@@ -65,9 +65,9 @@ begin
   end;
 end;
 
-{ TCustomMappings }
+{ TCustomMappers }
 
-procedure TCustomMappings.Add<T>(customMappingClass: TCustomMappingClass);
+procedure TCustomMappers.Add<T>(customMappingClass: TCustomMapperClass);
 begin
   inherited Add(TypeInfo(T), customMappingClass);
 end;

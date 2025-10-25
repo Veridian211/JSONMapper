@@ -27,7 +27,7 @@ type
     function toString(): string;
   end;
 
-  TColorJSONMapper = class(TCustomMapping<TColor>)
+  TColorJSONMapper = class(TCustomMapper<TColor>)
     class function toJSON(value: TColor): TJSONValue; override;
     class function fromJSON(jsonValue: TJSONValue): TColor; override;
   end;
@@ -177,6 +177,11 @@ end;
 
 { TColorJSONMapper }
 
+class function TColorJSONMapper.toJSON(value: TColor): TJSONValue;
+begin
+  Result := TJSONString.Create(value.toString());
+end;
+
 class function TColorJSONMapper.fromJSON(jsonValue: TJSONValue): TColor;
 var
   colorString: string;
@@ -185,13 +190,8 @@ begin
   Result := TColor.fromString(colorString);
 end;
 
-class function TColorJSONMapper.toJSON(value: TColor): TJSONValue;
-begin
-  Result := TJSONString.Create(value.toString());
-end;
-
 initialization
   TDUnitX.RegisterTestFixture(TTestCustomMapping);
-  TJSONMapper.registerCustomMapping<TColor>(TColorJSONMapper);
+  TJSONMapper.registerCustomMapper<TColor>(TColorJSONMapper);
 
 end.

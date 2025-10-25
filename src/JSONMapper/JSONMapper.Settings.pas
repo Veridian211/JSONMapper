@@ -10,7 +10,7 @@ type
   TJSONMapperSettings = record
   public
     dateFormatter: TDateFormatterClass;
-    customMapping: TCustomMappings;
+    customMapping: TCustomMappers;
   end;
 
 implementation
