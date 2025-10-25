@@ -1,4 +1,4 @@
-unit JSONMapper.DateFormatter;
+unit JSONMapper.DateTimeFormatter;
 
 interface
 

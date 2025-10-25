@@ -8,7 +8,7 @@ interface
 
 uses
   {$IFDEF USE_ATTRIBUTE_HELPER}
-  AttributeHelper,
+  JSONMapper.AttributeHelper,
   {$ENDIF}
   System.SysUtils,
   System.Rtti,

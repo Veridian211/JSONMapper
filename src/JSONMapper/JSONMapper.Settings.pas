@@ -3,7 +3,7 @@ unit JSONMapper.Settings;
 interface
 
 uses
-  JSONMapper.DateFormatter,
+  JSONMapper.DateTimeFormatter,
   JSONMapper.CustomMapping;
 
 type

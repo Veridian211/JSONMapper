@@ -19,17 +19,16 @@ uses
   DUnitX.Loggers.Console,
   {$ENDIF }
   {$IFDEF USE_ATTRIBUTE_HELPER}
-  AttributeHelper in '..\src\JSONMapper\AttributeHelper.pas',
+  JSONMapper.AttributeHelper in '..\src\JSONMapper\JSONMapper.AttributeHelper.pas',
   {$ENDIF }
   JSONMapper in '..\src\JSONMapper\JSONMapper.pas',
   JSONMapper.Exceptions in '..\src\JSONMapper\JSONMapper.Exceptions.pas',
   JSONMapper.Attributes in '..\src\JSONMapper\JSONMapper.Attributes.pas',
-  JSONMapper.ClassFieldHelper in '..\src\JSONMapper\JSONMapper.ClassFieldHelper.pas',
   JSONMapper.ListHelper in '..\src\JSONMapper\JSONMapper.ListHelper.pas',
-  JSONMapper.DateFormatter in '..\src\JSONMapper\JSONMapper.DateFormatter.pas',
+  JSONMapper.DateTimeFormatter in '..\src\JSONMapper\JSONMapper.DateTimeFormatter.pas',
   JSONMapper.CustomMapping in '..\src\JSONMapper\JSONMapper.CustomMapping.pas',
   JSONMapper.Settings in '..\src\JSONMapper\JSONMapper.Settings.pas',
-  PublicFieldIterator in '..\src\JSONMapper\PublicFieldIterator.pas',
+  JSONMapper.PublicFieldIterator in '..\src\JSONMapper\JSONMapper.PublicFieldIterator.pas',
   ObjectToJSON._Object in 'JSONMapper\ObjectToJSON\ObjectToJSON._Object.pas',
   ObjectToJSON.DateTime in 'JSONMapper\ObjectToJSON\ObjectToJSON.DateTime.pas',
   ObjectToJSON.IgnoreAttribute in 'JSONMapper\ObjectToJSON\ObjectToJSON.IgnoreAttribute.pas',

@@ -8,7 +8,7 @@ interface
 
 uses
   {$IFDEF USE_ATTRIBUTE_HELPER}
-  AttributeHelper,
+  JSONMapper.AttributeHelper,
   {$ENDIF}
   System.JSON,
   System.Rtti,
@@ -18,12 +18,11 @@ uses
   System.Generics.Collections,
   JSONMapper.Exceptions,
   JSONMapper.Attributes,
-  JSONMapper.ClassFieldHelper,
   JSONMapper.ListHelper,
-  JSONMapper.DateFormatter,
+  JSONMapper.DateTimeFormatter,
   JSONMapper.Settings,
   JSONMapper.CustomMapping,
-  PublicFieldIterator,
+  JSONMapper.PublicFieldIterator,
   Nullable;
 
 type
@@ -85,9 +84,9 @@ type
   JSONKeyAttribute = JSONMapper.Attributes.JSONKeyAttribute;
 
   /// <summary> ISO 8601 conform date conversion </summary>
-  TDateFormatter_ISO8601 = JSONMapper.DateFormatter.TDateFormatter_ISO8601;
+  TDateFormatter_ISO8601 = JSONMapper.DateTimeFormatter.TDateFormatter_ISO8601;
   /// <summary> uses current FormatSettings for date conversion </summary>
-  TDateFormatter_Local = JSONMapper.DateFormatter.TDateFormatter_Local;
+  TDateFormatter_Local = JSONMapper.DateTimeFormatter.TDateFormatter_Local;
 
   EJSONMapperException = JSONMapper.Exceptions.EJSONMapperException;
   EJSONMapperCastingToJSON = JSONMapper.Exceptions.EJSONMapperCastingToJSON;

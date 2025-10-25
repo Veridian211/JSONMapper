@@ -91,16 +91,15 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="..\src\JSONMapper\AttributeHelper.pas"/>
+        <DCCReference Include="..\src\JSONMapper\JSONMapper.AttributeHelper.pas"/>
         <DCCReference Include="..\src\JSONMapper\JSONMapper.pas"/>
         <DCCReference Include="..\src\JSONMapper\JSONMapper.Exceptions.pas"/>
         <DCCReference Include="..\src\JSONMapper\JSONMapper.Attributes.pas"/>
-        <DCCReference Include="..\src\JSONMapper\JSONMapper.ClassFieldHelper.pas"/>
         <DCCReference Include="..\src\JSONMapper\JSONMapper.ListHelper.pas"/>
-        <DCCReference Include="..\src\JSONMapper\JSONMapper.DateFormatter.pas"/>
+        <DCCReference Include="..\src\JSONMapper\JSONMapper.DateTimeFormatter.pas"/>
         <DCCReference Include="..\src\JSONMapper\JSONMapper.CustomMapping.pas"/>
         <DCCReference Include="..\src\JSONMapper\JSONMapper.Settings.pas"/>
-        <DCCReference Include="..\src\JSONMapper\PublicFieldIterator.pas"/>
+        <DCCReference Include="..\src\JSONMapper\JSONMapper.PublicFieldIterator.pas"/>
         <DCCReference Include="JSONMapper\ObjectToJSON\ObjectToJSON._Object.pas"/>
         <DCCReference Include="JSONMapper\ObjectToJSON\ObjectToJSON.DateTime.pas"/>
         <DCCReference Include="JSONMapper\ObjectToJSON\ObjectToJSON.IgnoreAttribute.pas"/>

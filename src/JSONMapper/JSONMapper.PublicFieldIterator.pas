@@ -1,4 +1,4 @@
-unit PublicFieldIterator;
+unit JSONMapper.PublicFieldIterator;
 
 {$IF CompilerVersion <= 34.0}
 {$DEFINE USE_ATTRIBUTE_HELPER}
@@ -8,10 +8,10 @@ interface
 
 uses
   {$IFDEF USE_ATTRIBUTE_HELPER}
-  AttributeHelper,
+  JSONMapper.AttributeHelper,
   {$ENDIF}
   System.Rtti,
-  JSONMapper.ClassFieldHelper,
+  System.TypInfo,
   JSONMapper.Attributes;
 
 type
@@ -24,6 +24,11 @@ type
   end;
 
 implementation
+
+function isPublicOrPublished(rttiField: TRttiField): boolean;
+begin
+  exit(rttiField.Visibility in [mvPublic, mvPublished]);
+end;
 
 { TRttiInstanceTypeHelper }
 
