@@ -18,7 +18,6 @@ type
     out current: TRttiProperty;
     out moveNext: TRttiMethod
   );
-  function isObjectType(typInfo: PTypeInfo): boolean;
   function getConstructorMethod(rttiType: TRttiInstanceType): TConstructorMethod;
   procedure getAddMethod(
     const listType: TRttiInstanceType;
@@ -85,20 +84,6 @@ begin
     end;
   finally
     rttiContext.Free();
-  end;
-end;
-
-function isObjectType(typInfo: PTypeInfo): boolean;
-var
-  rttiContext: TRttiContext;
-  rttiType: TRttiType;
-begin
-  rttiContext := TRttiContext.Create();
-  try
-    rttiType := rttiContext.GetType(typInfo);
-    exit(rttiType is TRttiInstanceType);
-  finally
-    rttiContext.Free;
   end;
 end;
 
