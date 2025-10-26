@@ -45,7 +45,7 @@ var
   list: TList<integer>;
 begin
   list := nil;
-  json := TJSONArray.ParseJSONValue(JSON_STRING) as TJSONArray;
+  json := TJSONObject.ParseJSONValue(JSON_STRING) as TJSONArray;
   try
     list := TJSONMapper.jsonToList<integer>(json);
 
@@ -71,7 +71,7 @@ var
   person: TPerson;
 begin
   list := nil;
-  json := TJSONArray.ParseJSONValue(JSON_STRING) as TJSONArray;
+  json := TJSONObject.ParseJSONValue(JSON_STRING) as TJSONArray;
   try
     list := TJSONMapper.jsonToList<TPerson>(json);
 
@@ -93,7 +93,7 @@ begin
     if Assigned(list) then begin
       for person in list do begin
         if Assigned(person) then begin
-          FreeAndNil(person);
+          person.Free;
         end;
       end;
       FreeAndNil(list);
