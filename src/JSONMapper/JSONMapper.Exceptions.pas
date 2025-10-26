@@ -15,7 +15,8 @@ type
 
   EJSONMapperCastingToJSON = class(EJSONMapperException)
   public
-    constructor Create(rttiDataMember: TRttiDataMember); reintroduce; overload;
+    constructor Create(rttiField: TRttiField); reintroduce; overload;
+    constructor Create(rttiProperty: TRttiProperty); reintroduce; overload;
     constructor Create(typeInfo: PTypeInfo); reintroduce; overload;
   end;
 
@@ -23,7 +24,8 @@ type
   private
     function truncateJSON(json: string): string;
   public
-    constructor Create(jsonValue: TJSONValue; rttiDataMember: TRttiDataMember); overload;
+    constructor Create(jsonValue: TJSONValue; rttiField: TRttiField); overload;
+    constructor Create(jsonValue: TJSONValue; rttiProperty: TRttiProperty); overload;
     constructor Create(jsonValue: TJSONValue; rttiType: TRttiType); overload;
   end;
 
@@ -63,19 +65,35 @@ implementation
 
 { EJSONMapperCastingToJSON }
 
-constructor EJSONMapperCastingToJSON.Create(rttiDataMember: TRttiDataMember);
+constructor EJSONMapperCastingToJSON.Create(rttiField: TRttiField);
 var
   className: string;
-  datamemberName: string;
-  datamemberType: string;
+  fieldName: string;
+  fieldType: string;
 begin
-  className := rttiDataMember.Parent.Name;
-  datamemberName := rttiDataMember.Name;
-  datamemberType := rttiDataMember.DataType.Name;
+  className := rttiField.Parent.Name;
+  fieldName := rttiField.Name;
+  fieldType := rttiField.DataType.Name;
 
   inherited CreateFmt(
     'Failed to cast "%s.%s" of type "%s" into JSON. Consider adding the Ignore-Attribute.',
-    [className, datamemberName, datamemberType]
+    [className, fieldName, fieldType]
+  );
+end;
+
+constructor EJSONMapperCastingToJSON.Create(rttiProperty: TRttiProperty);
+var
+  className: string;
+  propertyName: string;
+  propertyType: string;
+begin
+  className := rttiProperty.Parent.Name;
+  propertyName := rttiProperty.Name;
+  propertyType := rttiProperty.DataType.Name;
+
+  inherited CreateFmt(
+    'Failed to cast "%s.%s" of type "%s" into JSON. Consider adding the Ignore-Attribute.',
+    [className, propertyName, propertyType]
   );
 end;
 
@@ -88,24 +106,48 @@ end;
 
 constructor EJSONMapperCastingFromJSON.Create(
   jsonValue: TJSONValue;
-  rttiDataMember: TRttiDataMember
+  rttiField: TRttiField
 );
 var
-  datamemberType: string;
+  fieldType: string;
   className: string;
-  datamemberName: string;
+  fieldName: string;
 begin
-  datamemberType := rttiDataMember.DataType.Name;
-  className := rttiDataMember.Parent.Name;
-  datamemberName := rttiDataMember.Name;
+  fieldType := rttiField.DataType.Name;
+  className := rttiField.Parent.Name;
+  fieldName := rttiField.Name;
 
   inherited CreateFmt(
     'Failed to cast json "%s" into type "%s" at "%s.%s"',
     [
       truncateJSON(jsonValue.ToJSON),
-      datamemberType,
+      fieldType,
       className,
-      datamemberName
+      fieldName
+    ]
+  );
+end;
+
+constructor EJSONMapperCastingFromJSON.Create(
+  jsonValue: TJSONValue;
+  rttiProperty: TRttiProperty
+);
+var
+  propertyType: string;
+  className: string;
+  propertyName: string;
+begin
+  propertyType := rttiProperty.DataType.Name;
+  className := rttiProperty.Parent.Name;
+  propertyName := rttiProperty.Name;
+
+  inherited CreateFmt(
+    'Failed to cast json "%s" into type "%s" at "%s.%s"',
+    [
+      truncateJSON(jsonValue.ToJSON),
+      propertyType,
+      className,
+      propertyName
     ]
   );
 end;

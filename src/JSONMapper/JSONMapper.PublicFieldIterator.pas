@@ -17,81 +17,91 @@ uses
 
 type
   TRttiInstanceTypeHelper = class helper for TRttiInstanceType
-    function GetPublicDataMembers(): TArray<TRttiDataMember>;
+  public
+    function GetPublicProperties(): TArray<TRttiProperty>;
+    function GetPublicFields(): TArray<TRttiField>;
   end;
 
   TRttiRecordTypeHelper = class helper for TRttiRecordType
-    function GetPublicDataMembers(): TArray<TRttiDataMember>;
+  public
+    function GetPublicFields: TArray<TRttiField>;
   end;
 
 implementation
 
-function isPublicOrPublished(rttiDataMember: TRttiDataMember): boolean;
+function isPublicOrPublished(rttiField: TRttiField): boolean; overload;
 begin
-  exit(rttiDataMember.Visibility in [mvPublic, mvPublished]);
+  exit(rttiField.Visibility in [mvPublic, mvPublished]);
+end;
+
+function isPublicOrPublished(rttiProperty: TRttiProperty): boolean; overload;
+begin
+  exit(rttiProperty.Visibility in [mvPublic, mvPublished]);
 end;
 
 { TRttiInstanceTypeHelper }
 
-function TRttiInstanceTypeHelper.GetPublicDataMembers(): TArray<TRttiDataMember>;
+function TRttiInstanceTypeHelper.GetPublicFields: TArray<TRttiField>;
 var
-  rttiDataMembers: TList<TRttiDataMember>;
-  rttiDataMember: TRttiDataMember;
+  rttiFields: TList<TRttiField>;
+  rttiField: TRttiField;
 begin
-  rttiDataMembers := TList<TRttiDataMember>.Create;
+  rttiFields := TList<TRttiField>.Create;
   try
-    for rttiDataMember in self.GetFields() do begin
-      if not isPublicOrPublished(rttiDataMember) then
+    for rttiField in self.GetFields() do begin
+      if not isPublicOrPublished(rttiField) then
         continue;
-      if rttiDataMember.HasAttribute(IgnoreAttribute) then
+      if rttiField.HasAttribute(IgnoreAttribute) then
         continue;
-      rttiDataMembers.Add(rttiDataMember);
+      rttiFields.Add(rttiField);
     end;
-
-    for rttiDataMember in self.GetProperties() do begin
-      if not isPublicOrPublished(rttiDataMember) then
-        continue;
-      if rttiDataMember.HasAttribute(IgnoreAttribute) then
-        continue;
-      rttiDataMembers.Add(rttiDataMember);
-    end;
-
-    exit(rttiDataMembers.ToArray);
+    exit(rttiFields.ToArray);
   finally
-    rttiDataMembers.Free;
+    rttiFields.Free;
+  end;
+end;
+
+function TRttiInstanceTypeHelper.GetPublicProperties: TArray<TRttiProperty>;
+var
+  rttiProperties: TList<TRttiProperty>;
+  rttiProperty: TRttiProperty;
+begin
+  rttiProperties := TList<TRttiProperty>.Create;
+  try
+    for rttiProperty in self.GetProperties() do begin
+      if not isPublicOrPublished(rttiProperty) then
+        continue;
+      if rttiProperty.HasAttribute(IgnoreAttribute) then
+        continue;
+      rttiProperties.Add(rttiProperty);
+    end;
+    exit(rttiProperties.ToArray);
+  finally
+    rttiProperties.Free;
   end;
 end;
 
 { TRttiRecordTypeHelper }
 
-function TRttiRecordTypeHelper.GetPublicDataMembers(): TArray<TRttiDataMember>;
+function TRttiRecordTypeHelper.GetPublicFields(): TArray<TRttiField>;
 var
-  rttiDataMembers: TList<TRttiDataMember>;
-  rttiDataMember: TRttiDataMember;
+  rttiFields: TList<TRttiField>;
+  rttiField: TRttiField;
 begin
-  rttiDataMembers := TList<TRttiDataMember>.Create;
+  rttiFields := TList<TRttiField>.Create;
   try
-    for rttiDataMember in self.GetFields() do begin
-      if not isPublicOrPublished(rttiDataMember) then
+    for rttiField in self.GetFields() do begin
+      if not isPublicOrPublished(rttiField) then
         continue;
-      if rttiDataMember.HasAttribute(IgnoreAttribute) then
+      if rttiField.HasAttribute(IgnoreAttribute) then
         continue;
-      rttiDataMembers.Add(rttiDataMember);
+      rttiFields.Add(rttiField);
     end;
-
-    // somehow doesn't work for records
-    for rttiDataMember in self.GetProperties() do begin
-      if not isPublicOrPublished(rttiDataMember) then
-        continue;
-      if rttiDataMember.HasAttribute(IgnoreAttribute) then
-        continue;
-      rttiDataMembers.Add(rttiDataMember);
-    end;
-
-    exit(rttiDataMembers.ToArray);
+    exit(rttiFields.ToArray);
   finally
-    rttiDataMembers.Free;
+    rttiFields.Free;
   end;
 end;
 
 end.
+
