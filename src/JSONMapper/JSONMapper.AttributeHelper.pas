@@ -1,5 +1,7 @@
 unit JSONMapper.AttributeHelper;
 
+// For compatibility with Delphi 10.2
+
 interface
 
 uses

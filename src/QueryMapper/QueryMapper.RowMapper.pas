@@ -18,96 +18,109 @@ uses
   QueryMapper.Exceptions;
 
 type
-  TFieldMappingType = (fmField, fmProperty);
-
-  TFieldMapping = record
-  public
-    fieldName: string;
-    constructor Create(fieldName: string; field: TRttiField); overload;
-    constructor Create(fieldName: string; prop: TRttiProperty); overload;  
-  case fieldType: TFieldMappingType of
-    fmField: (field: TRttiField);
-    fmProperty: (prop: TRttiProperty);
-  end;
-
-  TFieldMappings = TList<TFieldMapping>;
-
-  TConstructorMethod = reference to function: TObject;
+  TFieldMap = TDictionary<TRttiField, TField>;
+  TPropertyMap = TDictionary<TRttiProperty, TField>;
 
   TDatasetRowMapper<T: class> = class
   private
-    constructorMethod: TConstructorMethod;
-    fieldMappings: TFieldMappings;
+    rttiContext: TRttiContext;
+    rttiType: TRttiInstanceType;
+    constructorMethod: TRttiMethod;
+    fieldMap: TFieldMap;
+    propertyMap: TPropertyMap;
+    procedure getFieldMappings(datasetFields: TFields);
+    function getConstructor(): TRttiMethod;
+    class function getFieldName(rttiField: TRttiField): string; overload; static;
+    class function getFieldName(rttiProperty: TRttiProperty): string; overload; static;
   public
-    constructor Create(constructorMethod: TConstructorMethod); reintroduce;
+    constructor Create(datasetFields: TFields); reintroduce;
     function mapRow(dataset: TDataSet): T;
     destructor Destroy(); override;
   end;
 
-  TDatasetRowMapperFactory = class
-  private
-    // global rttiContext, not thread safe ?
-    class var rttiContext: TRttiContext;
-
-    class function getConstructorMethod<T: class>(): TConstructorMethod;
-    class function getFieldName(field: TRttiField): string; overload; static;
-    class function getFieldName(prop: TRttiProperty): string; overload; static;
-
-    class procedure Initialize();
-    class procedure Finalize();
-  public
-    class function createRowMapper<T: class>(): TDatasetRowMapper<T>;
-  end;
-
 implementation
-
-{ TFieldMapping }
-
-constructor TFieldMapping.Create(fieldName: string; field: TRttiField);
-begin
-  self.fieldName := fieldName;
-  self.field := field;
-end;     
-
-constructor TFieldMapping.Create(fieldName: string; prop: TRttiProperty);
-begin
-  self.fieldName := fieldName;
-  self.prop := prop;
-end;
 
 { TDatasetRowMapper<T> }
 
-constructor TDatasetRowMapper<T>.Create(constructorMethod: TConstructorMethod);
+constructor TDatasetRowMapper<T>.Create(datasetFields: TFields);
 begin
   inherited Create();
-  self.constructorMethod := constructorMethod;
+  rttiContext := TRttiContext.Create();
+  fieldMap := TFieldMap.Create();
+  propertyMap := TPropertyMap.Create();
 
-  self.fieldMappings := TFieldMappings.Create();
+  rttiType := rttiContext.GetType(TypeInfo(T)) as TRttiInstanceType;
+  constructorMethod := getConstructor();
+
+  getFieldMappings(datasetFields);
+end;
+
+procedure TDatasetRowMapper<T>.getFieldMappings(datasetFields: TFields);
+var
+  rttiField: TRttiField;
+  rttiProperty: TRttiProperty;
+  fieldName: string;
+  field: TField;
+begin
+  for rttiField in rttiType.GetFields() do begin
+    fieldName := getFieldName(rttiField);
+    field := datasetFields.FindField(fieldName);
+    if field = nil then begin
+      continue;
+    end;
+
+    fieldMap.Add(rttiField, field);
+  end;
+
+  for rttiProperty in rttiType.GetProperties() do begin
+    fieldName := getFieldName(rttiProperty);
+    field := datasetFields.FindField(fieldName);
+    if field = nil then begin
+      continue;
+    end;
+
+    propertyMap.Add(rttiProperty, field);
+  end;
+end;
+
+function TDatasetRowMapper<T>.getConstructor(): TRttiMethod;
+var
+  rttiMethod: TRttiMethod;
+begin
+  for rttiMethod in rttiType.GetMethods() do begin
+    if rttiMethod.IsConstructor then begin
+      exit(rttiMethod);
+    end;
+  end;
+
+  raise EQueryMapper_NoEmptyConstructorFound.Create(rttiType.MetaclassType);
 end;
 
 function TDatasetRowMapper<T>.mapRow(dataset: TDataSet): T;
 var
+  fieldMapPair: TPair<TRttiField, TField>;
+  propertyMapPair: TPair<TRttiProperty, TField>;
+  rttiField: TRttiField;
+  rttiProperty: TRttiProperty;
   field: TField;
   fieldValue: TValue;
-  fieldMapping: TFieldMapping;
-  rowFieldName: string;
 begin
-  Result := constructorMethod() as T;
+  Result := constructorMethod.Invoke(T, []).AsObject() as T;
   try
-    for fieldMapping in fieldMappings do begin
-      field := dataset.FindField(fieldMapping.fieldName);
-      if field = nil then begin
-        continue;
-      end;
+    for fieldMapPair in fieldMap do begin
+      rttiField := fieldMapPair.Key;
+      field := fieldMapPair.Value;
 
       fieldValue := TValue.FromVariant(field.Value);
+      rttiField.SetValue(TObject(Result), fieldValue);
+    end;
 
-      case fieldMapping.fieldType of
-        fmField:
-          fieldMapping.field.SetValue(TObject(Result), fieldValue);
-        fmProperty: 
-          fieldMapping.prop.SetValue(TObject(Result), fieldValue);
-      end;
+    for propertyMapPair in propertyMap do begin
+      rttiProperty := propertyMapPair.Key;
+      field := propertyMapPair.Value;
+
+      fieldValue := TValue.FromVariant(field.Value);
+      rttiProperty.SetValue(TObject(Result), fieldValue);
     end;
   except
     Result.Free();
@@ -115,109 +128,36 @@ begin
   end;
 end;
 
+class function TDatasetRowMapper<T>.getFieldName(rttiField: TRttiField): string;
+var
+  fieldNameAttr: FieldNameAttribute;
+begin
+  fieldNameAttr := rttiField.GetAttribute<FieldNameAttribute>();
+  if fieldNameAttr = nil then begin
+    exit(rttiField.Name);
+  end;
+
+  exit(fieldNameAttr.fieldName);
+end;
+
+class function TDatasetRowMapper<T>.getFieldName(rttiProperty: TRttiProperty): string;
+var
+  fieldNameAttr: FieldNameAttribute;
+begin
+  fieldNameAttr := rttiProperty.GetAttribute<FieldNameAttribute>();
+  if fieldNameAttr = nil then begin
+    exit(rttiProperty.Name);
+  end;
+
+  exit(fieldNameAttr.fieldName);
+end;
+
 destructor TDatasetRowMapper<T>.Destroy();
 begin
-  fieldMappings.Free();
+  propertyMap.Free();
+  fieldMap.Free();
+  rttiContext.Free();
   inherited;
 end;
-
-{ TDatasetRowMapperFactory }
-
-class function TDatasetRowMapperFactory.createRowMapper<T>(): TDatasetRowMapper<T>;
-var
-  rttiType: TRttiInstanceType;
-  constructorMethod: TConstructorMethod;
-
-  rowMapper: TDatasetRowMapper<T>;
-  field: TRttiField;
-  fieldName: string;
-  fieldMapping: TFieldMapping;
-
-  prop: TRttiProperty;
-begin
-  constructorMethod := getConstructorMethod<T>();
-
-  rowMapper := TDatasetRowMapper<T>.Create(constructorMethod);
-  try
-    rttiType := rttiContext.GetType(T) as TRttiInstanceType;
-    for field in rttiType.GetFields() do begin
-      fieldName := getFieldName(field);
-      fieldMapping := TFieldMapping.Create(fieldName, field);
-      rowMapper.fieldMappings.Add(fieldMapping);
-    end;
-
-    for prop in rttiType.GetProperties() do begin
-      fieldName := getFieldName(prop);
-      fieldMapping := TFieldMapping.Create(fieldName, prop);
-      rowMapper.fieldMappings.Add(fieldMapping);
-    end;
-  except
-    rowMapper.Free();
-    raise;
-  end;
-
-  Result := rowMapper;
-end;
-
-class function TDatasetRowMapperFactory.getConstructorMethod<T>(): TConstructorMethod;
-var
-  rttiType: TRttiInstanceType;
-  rttiMethod: TRttiMethod;
-  constructorMethod: TConstructorMethod;
-begin
-  constructorMethod := nil;
-
-  rttiType := rttiContext.GetType(T) as TRttiInstanceType;
-  for rttiMethod in rttiType.GetMethods() do begin
-    if rttiMethod.IsConstructor then begin
-      constructorMethod :=
-        function(): TObject
-        begin
-          Result := rttiMethod.Invoke(rttiType.MetaclassType, []).AsObject();
-        end;
-      break;
-    end;
-  end;
-
-  if not Assigned(constructorMethod) then begin
-    raise EQueryMapper_NoEmptyConstructorFound.Create(rttiType.MetaclassType);
-  end;
-
-  Result := constructorMethod;
-end;
-
-class function TDatasetRowMapperFactory.getFieldName(field: TRttiField): string;
-begin
-  if field.HasAttribute(FieldNameAttribute) then begin
-    exit(FieldNameAttribute(field.GetAttribute(FieldNameAttribute)).fieldName);
-  end;
-
-  exit(field.Name);
-end;
-
-class function TDatasetRowMapperFactory.getFieldName(prop: TRttiProperty): string;
-begin
-  if prop.HasAttribute(FieldNameAttribute) then begin
-    exit(FieldNameAttribute(prop.GetAttribute(FieldNameAttribute)).fieldName);
-  end;
-
-  exit(prop.Name);
-end;
-
-class procedure TDatasetRowMapperFactory.Initialize();
-begin
-  rttiContext := TRttiContext.Create();
-end;
-
-class procedure TDatasetRowMapperFactory.Finalize();
-begin
-  rttiContext.Free();
-end;
-
-initialization
-  TDatasetRowMapperFactory.Initialize();
-
-finalization
-  TDatasetRowMapperFactory.Finalize();
 
 end.

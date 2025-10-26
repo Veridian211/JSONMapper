@@ -39,7 +39,7 @@ type
   FieldNamePrefix = QueryMapper.Attributes.FieldNamePrefixAttribute;
 
   EQueryMapper = QueryMapper.Exceptions.EQueryMapper;
-  EQueryMapper_EmptyDataset = QueryMapper.Exceptions.EQueryMapper_EmptyDataset;
+  EQueryMapper_EmptyDataset = QueryMapper.Exceptions.EQueryMapper_NotExactlyOneRecord;
   EQueryMapper_NoEmptyConstructorFound = Querymapper.Exceptions.EQueryMapper_NoEmptyConstructorFound;
 
 implementation
@@ -57,7 +57,11 @@ begin
     self.Open();
     self.First();
 
-    rowMapper := TDatasetRowMapperFactory.createRowMapper<T>();
+    if (self.RecordCount <> 1) then begin
+      raise EQueryMapper_EmptyDataset.Create(self);
+    end;
+
+    rowMapper := TDatasetRowMapper<T>.Create(self.Fields);
     try
       Result := rowMapper.mapRow(self);
     finally
@@ -80,7 +84,7 @@ begin
       raise EQueryMapper_EmptyDataset.Create(self);
     end;
 
-    rowMapper := TDatasetRowMapperFactory.createRowMapper<T>();
+    rowMapper := TDatasetRowMapper<T>.Create(self.Fields);
     try
       Result := rowMapper.mapRow(self);
     finally

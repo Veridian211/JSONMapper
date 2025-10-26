@@ -134,7 +134,7 @@ constructor TEnumerableDataset<T>.Create(const dataset: TDataSet);
 begin
   inherited Create();
   self.dataset := dataset;
-  self.datasetRowMapper := TDatasetRowMapperFactory.createRowMapper<T>();
+  self.datasetRowMapper := TDatasetRowMapper<T>.Create(dataset.Fields);
 end;
 
 function TEnumerableDataset<T>.GetEnumerator(): IEnumerator;
@@ -164,8 +164,6 @@ begin
 end;
 
 function TEnumerableDataset<T>.asObjectList(): TObjectList<T>;
-var
-  item: T;
 begin
   Result := TObjectList<T>.Create();
   try
