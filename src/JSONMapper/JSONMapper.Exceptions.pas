@@ -73,7 +73,7 @@ var
 begin
   className := rttiField.Parent.Name;
   fieldName := rttiField.Name;
-  fieldType := rttiField.DataType.Name;
+  fieldType := rttiField.FieldType.Name;
 
   inherited CreateFmt(
     'Failed to cast "%s.%s" of type "%s" into JSON. Consider adding the Ignore-Attribute.',
@@ -89,7 +89,7 @@ var
 begin
   className := rttiProperty.Parent.Name;
   propertyName := rttiProperty.Name;
-  propertyType := rttiProperty.DataType.Name;
+  propertyType := rttiProperty.PropertyType.Name;
 
   inherited CreateFmt(
     'Failed to cast "%s.%s" of type "%s" into JSON. Consider adding the Ignore-Attribute.',
@@ -113,7 +113,7 @@ var
   className: string;
   fieldName: string;
 begin
-  fieldType := rttiField.DataType.Name;
+  fieldType := rttiField.FieldType.Name;
   className := rttiField.Parent.Name;
   fieldName := rttiField.Name;
 
@@ -137,7 +137,7 @@ var
   className: string;
   propertyName: string;
 begin
-  propertyType := rttiProperty.DataType.Name;
+  propertyType := rttiProperty.PropertyType.Name;
   className := rttiProperty.Parent.Name;
   propertyName := rttiProperty.Name;
 

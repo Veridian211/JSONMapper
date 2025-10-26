@@ -618,7 +618,7 @@ var
 begin
   fieldValue := rttiField.GetValue(obj);
   try
-    exit(TJSONMapper.createValue(jsonValue, rttiField.DataType, fieldValue));
+    exit(TJSONMapper.createValue(jsonValue, rttiField.FieldType, fieldValue));
   except
     on e: EJSONToValue do raise EJSONMapperCastingFromJSON.Create(jsonValue, rttiField);
     else raise;
@@ -635,7 +635,7 @@ var
 begin
   fieldValue := rttiProperty.GetValue(obj);
   try
-    exit(TJSONMapper.createValue(jsonValue, rttiProperty.DataType, fieldValue));
+    exit(TJSONMapper.createValue(jsonValue, rttiProperty.PropertyType, fieldValue));
   except
     on e: EJSONToValue do raise EJSONMapperCastingFromJSON.Create(jsonValue, rttiProperty);
     else raise;
@@ -652,7 +652,7 @@ var
 begin
   fieldValue := rttiField.GetValue(rec);
   try
-    exit(TJSONMapper.createValue(jsonValue, rttiField.DataType, fieldValue));
+    exit(TJSONMapper.createValue(jsonValue, rttiField.FieldType, fieldValue));
   except
     on e: EJSONToValue do raise EJSONMapperCastingFromJSON.Create(jsonValue, rttiField);
     else raise;
