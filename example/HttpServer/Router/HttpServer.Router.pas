@@ -43,7 +43,7 @@ type
     ): TRttiMethod;
   public
     constructor Create(logger: TLogger);
-    class procedure register(httpResource: TClass);
+    class procedure register(controller: TClass);
     procedure handleRequest(httpRequest: THttpRequest);
     destructor Destroy(); override;
   end;
@@ -71,8 +71,8 @@ var
 begin
   rttiContext := TRttiContext.Create();
   try
-    for i := 0 to httpRouterRegistry.Count - 1 do begin
-      httpResource := rttiContext.GetType(httpRouterRegistry[i]) as TRttiInstanceType;
+    for i := 0 to controllerRegistry.Count - 1 do begin
+      httpResource := rttiContext.GetType(controllerRegistry[i]) as TRttiInstanceType;
 
       if httpResource.HasAttribute(ControllerAttribute) then begin
         path := httpResource.GetAttribute<ControllerAttribute>().path;
@@ -174,7 +174,7 @@ begin
       rttiParameter := endpointMethodParameters[i];
 
       if not rttiParameter.HasAttribute(MethodParameterAttribute) then begin
-        raise Exception.Create('Kein Method Parameter gefunden!');
+        raise Exception.Create('No method parameter found!');
       end;
 
       parameterClass := rttiParameter.ParamType.Handle;
@@ -226,9 +226,9 @@ begin
   end;
 end;
 
-class procedure THttpRouter.register(httpResource: TClass);
+class procedure THttpRouter.register(controller: TClass);
 begin
-  httpRouterRegistry.registerResource(httpResource);
+  controllerRegistry.registerController(controller);
 end;
 
 destructor THttpRouter.Destroy();

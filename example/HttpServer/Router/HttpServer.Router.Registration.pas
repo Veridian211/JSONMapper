@@ -6,16 +6,16 @@ uses
   System.Generics.Collections;
 
 type
-  TRegisteredHttpResources = TList<TClass>;
+  TRegisteredControllers = TList<TClass>;
 
-  THttpRouterRegistration = class
+  TControllerRegistry = class
   private
-    registeredHttpResources: TRegisteredHttpResources;
+    registeredControllers: TRegisteredControllers;
     function getCount(): integer;
     function getItem(index: integer): TClass;
   public
     constructor Create();
-    procedure registerResource(cls: TClass);
+    procedure registerController(controllerClass: TClass);
     destructor Destroy(); override;
 
     property Count: integer read getCount;
@@ -24,41 +24,41 @@ type
 
 var
   // Singleton
-  httpRouterRegistry: THttpRouterRegistration;
+  controllerRegistry: TControllerRegistry;
 
 implementation
 
-constructor THttpRouterRegistration.Create;
+constructor TControllerRegistry.Create;
 begin
   inherited;
-  registeredHttpResources := TRegisteredHttpResources.Create();
+  registeredControllers := TRegisteredControllers.Create();
 end;
 
-procedure THttpRouterRegistration.registerResource(cls: TClass);
+procedure TControllerRegistry.registerController(controllerClass: TClass);
 begin
-  registeredHttpResources.Add(cls);
+  registeredControllers.Add(controllerClass);
 end;
 
-destructor THttpRouterRegistration.Destroy;
+destructor TControllerRegistry.Destroy;
 begin
-  registeredHttpResources.Free();
+  registeredControllers.Free();
   inherited;
 end;
 
-function THttpRouterRegistration.getCount: integer;
+function TControllerRegistry.getCount: integer;
 begin
-  exit(registeredHttpResources.Count);
+  exit(registeredControllers.Count);
 end;
 
-function THttpRouterRegistration.getItem(index: integer): TClass;
+function TControllerRegistry.getItem(index: integer): TClass;
 begin
-  exit(registeredHttpResources[index]);
+  exit(registeredControllers[index]);
 end;
 
 initialization
-  httpRouterRegistry := THttpRouterRegistration.Create();
+  controllerRegistry := TControllerRegistry.Create();
 
 finalization
-  httpRouterRegistry.Free;
+  controllerRegistry.Free;
 
 end.
