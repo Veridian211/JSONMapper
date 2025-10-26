@@ -769,17 +769,16 @@ begin
         exit(TValue.From<String>(TJSONString(jsonValue).Value));
       end;
 
-      // TODO: theoretisch fehlt TDate / TDateTime
+      // TODO: TDate / TDateTime
     end;
 
     tkClass: begin
       obj := fieldValue.AsObject;
-      // TODO: if isEnumerable and hasAddMethod
-
-//      if isGenericTEnumerable(obj) then begin
-//        exit(TJSONMapper.listToJSON(obj));
-//      end;
-      jsonToObject(TJSONObject(jsonValue), obj);
+      if hasGetEnumerator(obj) then begin
+        jsonToList(jsonValue as TJSONArray, obj);
+      end else begin
+        jsonToObject(TJSONObject(jsonValue), obj);
+      end;
       exit(obj);
     end;
 
