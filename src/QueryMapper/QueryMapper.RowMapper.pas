@@ -24,7 +24,6 @@ type
   TDatasetRowMapper<T: class> = class
   private
     rttiContext: TRttiContext;
-    rttiType: TRttiInstanceType;
     constructorMethod: TRttiMethod;
     fieldMap: TFieldMap;
     propertyMap: TPropertyMap;
@@ -49,7 +48,6 @@ begin
   fieldMap := TFieldMap.Create();
   propertyMap := TPropertyMap.Create();
 
-  rttiType := rttiContext.GetType(TypeInfo(T)) as TRttiInstanceType;
   constructorMethod := getConstructor();
 
   getFieldMappings(datasetFields);
@@ -57,11 +55,14 @@ end;
 
 procedure TDatasetRowMapper<T>.getFieldMappings(datasetFields: TFields);
 var
+  rttiType: TRttiInstanceType;
   rttiField: TRttiField;
   rttiProperty: TRttiProperty;
   fieldName: string;
   field: TField;
 begin
+  rttiType := rttiContext.GetType(TypeInfo(T)) as TRttiInstanceType;
+
   for rttiField in rttiType.GetFields() do begin
     fieldName := getFieldName(rttiField);
     field := datasetFields.FindField(fieldName);
@@ -85,8 +86,11 @@ end;
 
 function TDatasetRowMapper<T>.getConstructor(): TRttiMethod;
 var
+  rttiType: TRttiInstanceType;
   rttiMethod: TRttiMethod;
 begin
+  rttiType := rttiContext.GetType(TypeInfo(T)) as TRttiInstanceType;
+
   for rttiMethod in rttiType.GetMethods() do begin
     if rttiMethod.IsConstructor then begin
       exit(rttiMethod);
