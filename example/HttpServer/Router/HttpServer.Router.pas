@@ -189,7 +189,7 @@ begin
           try
             TJSONMapper.jsonToObject(request, requestObject);
           except
-            on e: EJSONMapperJSONIsNil do raise EBadRequest.Create()
+            on e: EJSONMapperException do raise EBadRequest.Create()
             else raise;
           end;
         end;
