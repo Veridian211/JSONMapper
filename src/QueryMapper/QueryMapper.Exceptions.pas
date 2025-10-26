@@ -8,10 +8,9 @@ uses
 
 type
   EQueryMapper = class(Exception)
-  public
   end;
 
-  EQueryMapper_EmptyDataset = class(EQueryMapper)
+  EQueryMapper_NotExactlyOneRecord = class(EQueryMapper)
   public
     constructor Create(dataset: TDataSet); reintroduce;
   end;
@@ -23,18 +22,18 @@ type
 
 implementation
 
-{ EQueryMapper_EmptyDataset }
+{ EQueryMapper_NotExactlyOneRecord }
 
-constructor EQueryMapper_EmptyDataset.Create(dataset: TDataSet);
+constructor EQueryMapper_NotExactlyOneRecord.Create(dataset: TDataSet);
 begin
-  inherited CreateFmt('Query did not return one record (%s).', [dataset.Name]);
+  inherited CreateFmt('QueryMapper: Query "%s" did not return exactly one record.', [dataset.Name]);
 end;
 
 { EQueryMapper_NoEmptyConstructorFound }
 
 constructor EQueryMapper_NoEmptyConstructorFound.Create(classType: TClass);
 begin
-  inherited CreateFmt('"%s" has no empty constructor.', [classType.QualifiedClassName]);
+  inherited CreateFmt('QueryMapper: "%s" has no empty constructor.', [classType.QualifiedClassName]);
 end;
 
 end.
