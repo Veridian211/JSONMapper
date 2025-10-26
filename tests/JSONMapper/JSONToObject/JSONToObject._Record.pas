@@ -46,9 +46,9 @@ begin
     personValue := TJSONMapper.jsonToRecord(@person, TypeInfo(TPerson), json);
     person := personValue.AsType<TPerson>;
 
-    Assert.AreEqual(json.GetValue('age').AsType<Integer>, person.age);
-    Assert.AreEqual(json.GetValue('name').AsType<string>, person.name);
-    Assert.AreEqual(json.GetValue('isVerified').AsType<Boolean>, person.isVerified);
+    Assert.AreEqual(json.GetValue<Integer>('age'), person.age);
+    Assert.AreEqual(json.GetValue<string>('name'), person.name);
+    Assert.AreEqual(json.GetValue<boolean>('isVerified'), person.isVerified);
   finally
     json.Free();
   end;
@@ -72,9 +72,9 @@ begin
     personJSON := json.GetValue('person') as TJSONObject;
     person := personWrapper.person;
 
-    Assert.AreEqual(personJSON.GetValue('age').AsType<Integer>, person.age);
-    Assert.AreEqual(personJSON.GetValue('name').AsType<string>, person.name);
-    Assert.AreEqual(personJSON.GetValue('isVerified').AsType<Boolean>, person.isVerified);
+    Assert.AreEqual(personJSON.GetValue<Integer>('age'), person.age);
+    Assert.AreEqual(personJSON.GetValue<string>('name'), person.name);
+    Assert.AreEqual(personJSON.GetValue<Boolean>('isVerified'), person.isVerified);
   finally
     if Assigned(personWrapper) then begin
       FreeAndNil(personWrapper);

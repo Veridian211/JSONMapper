@@ -49,8 +49,8 @@ begin
 
   json := TJSONMapper.objectToJSON(person);
   try
-    Assert.AreEqual(json.GetValue('personName').Value, person.name);
-    Assert.AreEqual(json.GetValue('age').AsType<integer>, person.age);
+    Assert.AreEqual(json.GetValue<string>('personName'), person.name);
+    Assert.AreEqual(json.GetValue<integer>('age'), person.age);
   finally
     json.Free;
   end;

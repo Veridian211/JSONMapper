@@ -94,7 +94,7 @@ begin
 
     Assert.AreEqual(
       personWrapper.person.age,
-      personJSON.GetValue('age').AsType<Integer>
+      personJSON.GetValue<Integer>('age')
     );
   finally
     json.Free();
