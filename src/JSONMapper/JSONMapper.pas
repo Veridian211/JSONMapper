@@ -745,7 +745,7 @@ begin
 
     tkVariant: begin
       if jsonValue is TJSONNull then begin
-        exit(TValue.FromVariant(Null));
+        exit(TValue.From<Variant>(Null));
       end;
 
       if jsonValue is TJSONNumber then begin
