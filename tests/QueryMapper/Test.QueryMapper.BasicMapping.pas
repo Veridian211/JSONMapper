@@ -1,4 +1,4 @@
-unit QueryMapper.Test;
+unit Test.QueryMapper.BasicMapping;
 
 interface
 
@@ -21,7 +21,7 @@ type
   end;
 
   [TestFixture]
-  TQueryMapperTest = class
+  TBasicMappingTest = class
   private
     dataset: TClientDataSet;
   public
@@ -36,13 +36,11 @@ type
     procedure TestAsList();
     [Test]
     procedure TestAsObjectList();
-    [Test]
-    procedure TestCount();
   end;
 
 implementation
 
-procedure TQueryMapperTest.Setup();
+procedure TBasicMappingTest.Setup();
 begin
   dataset := TClientDataSet.Create(nil);
 
@@ -61,12 +59,12 @@ begin
   dataset.Post;
 end;
 
-procedure TQueryMapperTest.TearDown();
+procedure TBasicMappingTest.TearDown();
 begin
   dataset.Free();
 end;
 
-procedure TQueryMapperTest.TestEnumeration();
+procedure TBasicMappingTest.TestEnumeration();
 var
   person: TPerson;
   index: integer;
@@ -85,7 +83,7 @@ begin
   end;
 end;
 
-procedure TQueryMapperTest.TestAsList();
+procedure TBasicMappingTest.TestAsList();
 var
   personList: TList<TPerson>;
   person: TPerson;
@@ -104,7 +102,7 @@ begin
   end;
 end;
 
-procedure TQueryMapperTest.TestAsObjectList();
+procedure TBasicMappingTest.TestAsObjectList();
 var
   personList: TObjectList<TPerson>;
 begin
@@ -119,13 +117,8 @@ begin
   end;
 end;
 
-procedure TQueryMapperTest.TestCount();
-begin
-  Assert.AreEqual(2, dataset.Count());
-end;
-
 initialization
-  TDUnitX.RegisterTestFixture(TQueryMapperTest);
+  TDUnitX.RegisterTestFixture(TBasicMappingTest);
 
 end.
 

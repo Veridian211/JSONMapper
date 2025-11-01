@@ -4,36 +4,59 @@ interface
 
 uses
   System.SysUtils,
+  System.TypInfo,
+  System.Rtti,
   Data.DB;
 
 type
   EQueryMapper = class(Exception)
   end;
 
-  EQueryMapper_NotExactlyOneRecord = class(EQueryMapper)
+  EQueryMapperNotExactlyOneRecord = class(EQueryMapper)
   public
     constructor Create(dataset: TDataSet); reintroduce;
   end;
 
-  EQueryMapper_NoEmptyConstructorFound = class(Exception)
+  EQueryMapperNoEmptyConstructorFound = class(EQueryMapper)
   public
     constructor Create(classType: TClass); reintroduce;
+  end;
+
+  EQueryMapperCastingFromField = class(EQueryMapper)
+  public
+    constructor Create(field: TField; rttiType: TRttiType); reintroduce;
   end;
 
 implementation
 
 { EQueryMapper_NotExactlyOneRecord }
 
-constructor EQueryMapper_NotExactlyOneRecord.Create(dataset: TDataSet);
+constructor EQueryMapperNotExactlyOneRecord.Create(dataset: TDataSet);
 begin
-  inherited CreateFmt('QueryMapper: Query "%s" did not return exactly one record.', [dataset.Name]);
+  inherited CreateFmt(
+    'QueryMapper: Query "%s" did not return exactly one record.',
+    [dataset.Name]
+  );
 end;
 
 { EQueryMapper_NoEmptyConstructorFound }
 
-constructor EQueryMapper_NoEmptyConstructorFound.Create(classType: TClass);
+constructor EQueryMapperNoEmptyConstructorFound.Create(classType: TClass);
 begin
-  inherited CreateFmt('QueryMapper: "%s" has no empty constructor.', [classType.QualifiedClassName]);
+  inherited CreateFmt(
+    'QueryMapper: "%s" has no empty constructor.',
+    [classType.QualifiedClassName]
+  );
+end;
+
+{ EQueryMapperCastingFromField }
+
+constructor EQueryMapperCastingFromField.Create(field: TField; rttiType: TRttiType);
+begin
+  inherited CreateFmt(
+    'QueryMapper: Failed to map field "%s" into type "%s".',
+    [field.Name, rttiType.Name]
+  );
 end;
 
 end.

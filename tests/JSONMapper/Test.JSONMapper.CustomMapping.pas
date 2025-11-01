@@ -1,4 +1,4 @@
-unit Test.CustomMapping;
+unit Test.JSONMapper.CustomMapping;
 
 interface
 

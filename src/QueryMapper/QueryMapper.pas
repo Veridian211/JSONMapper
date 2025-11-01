@@ -19,9 +19,19 @@ uses
   QueryMapper.DatasetEnumerator,
   QueryMapper.RowMapper,
   QueryMapper.Attributes,
-  QueryMapper.Exceptions;
+  QueryMapper.Exceptions,
+  QueryMapper.CustomMapping;
 
 type
+  FieldName = QueryMapper.Attributes.FieldNameAttribute;
+  FieldNamePrefix = QueryMapper.Attributes.FieldNamePrefixAttribute;
+
+  EQueryMapper = QueryMapper.Exceptions.EQueryMapper;
+  EQueryMapperNotExactlyOneRecord = QueryMapper.Exceptions.EQueryMapperNotExactlyOneRecord;
+  EQueryMapperNoEmptyConstructorFound = Querymapper.Exceptions.EQueryMapperNoEmptyConstructorFound;
+  EQueryMapperUnknownType = QueryMapper.Exceptions.EQueryMapperCastingFromField;
+
+
   TDatasetHelper = class helper for TDataset
   public
     function Rows<T: class, constructor>(): IEnumerableDataset<T>;
@@ -34,13 +44,6 @@ type
     function Count(): integer;
     function IsEmpty(): boolean;
   end;
-
-  FieldName = QueryMapper.Attributes.FieldNameAttribute;
-  FieldNamePrefix = QueryMapper.Attributes.FieldNamePrefixAttribute;
-
-  EQueryMapper = QueryMapper.Exceptions.EQueryMapper;
-  EQueryMapper_EmptyDataset = QueryMapper.Exceptions.EQueryMapper_NotExactlyOneRecord;
-  EQueryMapper_NoEmptyConstructorFound = Querymapper.Exceptions.EQueryMapper_NoEmptyConstructorFound;
 
 implementation
 
@@ -58,7 +61,7 @@ begin
     self.First();
 
     if (self.RecordCount <> 1) then begin
-      raise EQueryMapper_EmptyDataset.Create(self);
+      raise EQueryMapperNotExactlyOneRecord.Create(self);
     end;
 
     rowMapper := TDatasetRowMapper<T>.Create(self.Fields);
@@ -81,7 +84,7 @@ begin
     self.First();
 
     if (self.RecordCount <> 1) then begin
-      raise EQueryMapper_EmptyDataset.Create(self);
+      raise EQueryMapperNotExactlyOneRecord.Create(self);
     end;
 
     rowMapper := TDatasetRowMapper<T>.Create(self.Fields);

@@ -44,7 +44,7 @@ begin
   except
     on e: Exception do begin
       raise EJSONMapperCastingToJSON.CreateFmt(
-        'TCustomMapping<%s>.toJSON(): Failed to convert to JSON. Error: %s',
+        'TCustomMapper<%s>.toJSON(): Failed to convert to JSON. Error: %s',
         [GetTypeName(TypeInfo(T)), e.Message]
       );
     end;
@@ -58,7 +58,7 @@ begin
   except
     on e: Exception do begin
       raise EJSONMapperCastingFromJSON.CreateFmt(
-        'TCustomMapping<%s>.fromJSON(): Failed to convert from JSON. Error: %s',
+        'TCustomMapper<%s>.fromJSON(): Failed to convert from JSON. Error: %s',
         [GetTypeName(TypeInfo(T)), e.Message]
       );
     end;
