@@ -131,11 +131,8 @@ end;
 { TColorMapper }
 
 class function TColorMapper.fromField(field: TField): TColor;
-var
-  colorString: string;
 begin
-  colorString := field.AsString;
-  Result := TColor.fromString(colorString);
+  Result := TColor.fromString(field.AsString);
 end;
 
 initialization
