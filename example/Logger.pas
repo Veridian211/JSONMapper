@@ -38,7 +38,7 @@ end;
 
 procedure TLogger.log(e: Exception);
 begin
-  memo.Lines.Add('Error: ' + e.Message);
+  memo.Lines.Add('Exception: ' + e.Message);
 end;
 
 procedure TLogger.logFmt(msg: string; const Args: array of const);

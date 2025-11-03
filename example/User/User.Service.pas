@@ -4,8 +4,8 @@ interface
 
 uses
   System.Hash,
-  User.Dtos,
-  User.UserDataClass,
+  System.Generics.Collections,
+  User.Model,
   User.Repository;
 
 type
@@ -14,8 +14,9 @@ type
     userRepository: TUserRepository;
   public
     constructor Create();
-    procedure createUser(userDto: TUserDto);
-    procedure getUser(id: integer; var user: TUserDto);
+    procedure createUser(id: integer; name: string);
+    function getUser(id: integer): TUser;
+    function getAllUsers(): TObjectList<TUser>;
   end;
 
 implementation
@@ -26,25 +27,31 @@ begin
   self.userRepository := User.Repository.userRepository;
 end;
 
-procedure TUserService.createUser(userDto: TUserDto);
+procedure TUserService.createUser(id: integer; name: string);
 var
   user: TUser;
 begin
   user := TUser.Create();
   try
-    user.id := userDto.id;
-    user.name := userDto.name;
+    user.id := id;
+    user.name := name;
     user.password := THash.GetRandomString(20);
 
     userRepository.add(user);
   except
     user.Free;
+    raise;
   end;
 end;
 
-procedure TUserService.getUser(id: integer; var user: TUserDto);
+function TUserService.getUser(id: integer): TUser;
 begin
-  user := TUserDto(userRepository.get(id));
+  Result := userRepository.get(id);
+end;
+
+function TUserService.getAllUsers(): TObjectList<TUser>;
+begin
+  Result := userRepository.getAll();
 end;
 
 end.

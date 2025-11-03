@@ -4,7 +4,6 @@ interface
 
 type
   TUserDto = class
-  public
     id: integer;
     name: string;
   end;

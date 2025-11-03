@@ -3,12 +3,11 @@ unit User.Controller;
 interface
 
 uses
+  System.Generics.Collections,
   System.JSON,
-  HttpServer.ControllerAttribute,
-  HttpServer.MethodAttributes,
-  HttpServer.ParamAttributes,
   HttpServer.Router,
   User.Service,
+  User.Model,
   User.Dtos;
 
 type
@@ -23,7 +22,10 @@ type
     procedure createUser([Response] user: TUserDto);
 
     [Post('get-user')]
-    procedure getUser([Request] idDto: TIdDto; [Response] user: TUserDto);
+    procedure getUser([Request] idDto: TIdDto; [Response] user: TUser);
+
+    [Get('all-users')]
+    procedure getAllUsers([Response] users: TObjectList<TUser>);
   end;
 
 implementation
@@ -34,14 +36,19 @@ begin
   userService := TUserService.Create();
 end;
 
-procedure TUserController.createUser([Response] user: TUserDto);
+procedure TUserController.createUser(user: TUserDto);
 begin
-  userService.createUser(user);
+  userService.createUser(user.id, user.name);
 end;
 
-procedure TUserController.getUser([Response]idDto: TIdDto; [Response]user: TUserDto);
+procedure TUserController.getUser(idDto: TIdDto; user: TUser);
 begin
-  userService.getUser(idDto.id, user);
+  user := userService.getUser(idDto.id);
+end;
+
+procedure TUserController.getAllUsers(users: TObjectList<TUser>);
+begin
+  users := userService.getAllUsers();
 end;
 
 initialization

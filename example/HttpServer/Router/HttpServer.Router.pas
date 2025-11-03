@@ -23,6 +23,16 @@ uses
   HttpServer.ParamAttributes;
 
 type
+  ControllerAttribute = HttpServer.ControllerAttribute.ControllerAttribute;
+
+  GetAttribute = HttpServer.MethodAttributes.GetAttribute;
+  PostAttribute = HttpServer.MethodAttributes.PostAttribute;
+  PutAttribute = HttpServer.MethodAttributes.PutAttribute;
+  DeleteAttribute = HttpServer.MethodAttributes.DeleteAttribute;
+
+  RequestAttribute = HttpServer.ParamAttributes.RequestAttribute;
+  ResponseAttribute = HttpServer.ParamAttributes.ResponseAttribute;
+
   THttpRouter = class
   private
     logger: TLogger;

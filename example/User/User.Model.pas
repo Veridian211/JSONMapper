@@ -1,6 +1,9 @@
-unit User.UserDataClass;
+unit User.Model;
 
 interface
+
+uses
+  System.Generics.Collections;
 
 type
   TUser = class

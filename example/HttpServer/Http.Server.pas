@@ -23,7 +23,7 @@ type
       request: TIdHTTPRequestInfo;
       response: TIdHTTPResponseInfo
     );
-    function getRequestBody(request: TIdHTTPRequestInfo): string;
+    function getBodyAsString(request: TIdHTTPRequestInfo): string;
     procedure handleRequest(
       httpMethod: THttpMethod;
       uri: string;
@@ -101,7 +101,7 @@ begin
 
       httpMethod := THttpMethod.fromIndyHttpCommand(request.CommandType);
 
-      requestBody := getRequestBody(request);
+      requestBody := getBodyAsString(request);
       requestJSON := TJSONObject.ParseJSONValue(requestBody) as TJSONObject;
       responseJSON := TJSONObject.Create();
 
@@ -128,7 +128,7 @@ begin
   end;
 end;
 
-function THttpServer.getRequestBody(request: TIdHTTPRequestInfo): string;
+function THttpServer.getBodyAsString(request: TIdHTTPRequestInfo): string;
 var
   stream: TStringStream;
 begin
