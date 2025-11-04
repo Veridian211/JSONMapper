@@ -38,9 +38,6 @@ type
   /// </remarks>
   TJSONMapper = class
   protected
-    class function getJSONKey(rttiField: TRttiField): string; overload; static;
-    class function getJSONKey(rttiProperty: TRttiProperty): string; overload; static;
-
     class function recordToJSON(const rec: TValue): TJSONObject; static;
     class function arrayToJSON(const arr: TValue): TJSONArray; static;
 
@@ -81,7 +78,6 @@ type
   end;
 
   IgnoreAttribute = JSONMapper.Attributes.IgnoreAttribute;
-  JSONKeyAttribute = JSONMapper.Attributes.JSONKeyAttribute;
 
   /// <summary> ISO 8601 conform date conversion </summary>
   TDateFormatter_ISO8601 = JSONMapper.DateTimeFormatter.TDateFormatter_ISO8601;
@@ -127,7 +123,7 @@ begin
     rttiInstanceType := rttiContext.GetType(obj.ClassType) as TRttiInstanceType;
 
     for rttiField in rttiInstanceType.GetPublicFields() do begin
-      jsonKey := getJSONKey(rttiField);
+      jsonKey := rttiField.Name;
       jsonValue := tryCreateJSONValue(obj, rttiField);
 
       jsonPair := TJSONPair.Create(jsonKey, jsonValue);
@@ -135,7 +131,7 @@ begin
     end;
 
     for rttiProperty in rttiInstanceType.GetPublicProperties() do begin
-      jsonKey := getJSONKey(rttiProperty);
+      jsonKey := rttiProperty.Name;
       jsonValue := tryCreateJSONValue(obj, rttiProperty);
 
       jsonPair := TJSONPair.Create(jsonKey, jsonValue);
@@ -458,7 +454,7 @@ begin
     rttiInstanceType := rttiContext.GetType(obj.ClassType) as TRttiInstanceType;
 
     for rttiField in rttiInstanceType.GetPublicFields() do begin
-      jsonKey := getJSONKey(rttiField);
+      jsonKey := rttiField.Name;
       jsonValue := jsonObject.GetValue(jsonKey);
 
       if jsonValue = nil then begin
@@ -470,7 +466,7 @@ begin
     end;
 
     for rttiProperty in rttiInstanceType.GetPublicProperties() do begin
-      jsonKey := getJSONKey(rttiProperty);
+      jsonKey := rttiProperty.Name;
       jsonValue := jsonObject.GetValue(jsonKey);
 
       if jsonValue = nil then begin
@@ -518,7 +514,7 @@ begin
     recordType := rttiContext.GetType(typInfo) as TRttiRecordType;
 
     for rttiField in recordType.GetPublicFields() do begin
-      jsonKey := getJSONKey(rttiField);
+      jsonKey := rttiField.Name;
       jsonValue := jsonObject.GetValue(jsonKey);
 
       if jsonValue = nil then begin
@@ -801,28 +797,6 @@ begin
       raise EJSONToValue.Create();
     end;
   end;
-end;
-
-class function TJSONMapper.getJSONKey(rttiField: TRttiField): string;
-var
-  jsonKeyAttr: JSONKeyAttribute;
-begin
-  jsonKeyAttr := rttiField.GetAttribute<JSONKeyAttribute>();
-  if jsonKeyAttr = nil then begin
-    exit(rttiField.Name);
-  end;
-  exit(jsonKeyAttr.getKey);
-end;
-
-class function TJSONMapper.getJSONKey(rttiProperty: TRttiProperty): string;
-var
-  jsonKeyAttr: JSONKeyAttribute;
-begin
-  jsonKeyAttr := rttiProperty.GetAttribute<JSONKeyAttribute>();
-  if jsonKeyAttr = nil then begin
-    exit(rttiProperty.Name);
-  end;
-  exit(jsonKeyAttr.getKey);
 end;
 
 initialization
