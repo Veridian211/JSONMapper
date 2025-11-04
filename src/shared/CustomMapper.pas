@@ -15,23 +15,22 @@ uses
 type
   TCustomMapper = class
   public
+    class function fieldToValue(field: TField): TValue; virtual; abstract;
     class function valueToJSON(value: TValue): TJSONValue; virtual; abstract;
     class function JSONToValue(jsonValue: TJSONValue): TValue; virtual; abstract;
-
-    class function fieldToValue(field: TField): TValue; virtual; abstract;
   end;
 
   TCustomMapperClass = class of TCustomMapper;
 
   TCustomMapper<T> = class(TCustomMapper)
   public
-    class function valueToJSON(value: TValue): TJSONValue; override;
-    class function JSONToValue(jsonValue: TJSONValue): TValue; override;
     class function fieldToValue(field: TField): TValue; override;
+    class function JSONToValue(jsonValue: TJSONValue): TValue; override;
+    class function valueToJSON(value: TValue): TJSONValue; override;
 
-    class function toJSON(value: T): TJSONValue; virtual; abstract;
-    class function fromJSON(jsonValue: TJSONValue): T; virtual; abstract;
     class function fromField(field: TField): T; virtual; abstract;
+    class function fromJSON(jsonValue: TJSONValue): T; virtual; abstract;
+    class function toJSON(value: T): TJSONValue; virtual; abstract;
   end;
 
   TCustomMappers = TDictionary<PTypeInfo, TCustomMapperClass>;
@@ -61,16 +60,19 @@ implementation
 
 { TCustomMapper<T> }
 
-class function TCustomMapper<T>.valueToJSON(value: TValue): TJSONValue;
+class function TCustomMapper<T>.fieldToValue(field: TField): TValue;
 begin
   try
-    Result := toJSON(value.AsType<T>);
+    Result := TValue.From<T>(fromField(field));
   except
     on e: Exception do begin
-      raise EJSONMapperCastingToJSON.CreateFmt(
-        'TCustomMapper<%s>.toJSON(): Failed to convert to JSON. Error: %s',
-        [GetTypeName(TypeInfo(T)), e.Message]
-      );
+      raise EQueryMapperCastingFromField.CreateFmt(
+        'TCustomMapper<%s>.fromField(): Failed to convert field "%s". Error: %s',
+        [
+          GetTypeName(TypeInfo(T)),
+          field.Name,
+          e.Message
+        ]);
     end;
   end;
 end;
@@ -89,19 +91,16 @@ begin
   end;
 end;
 
-class function TCustomMapper<T>.fieldToValue(field: TField): TValue;
+class function TCustomMapper<T>.valueToJSON(value: TValue): TJSONValue;
 begin
   try
-    Result := TValue.From<T>(fromField(field));
+    Result := toJSON(value.AsType<T>);
   except
     on e: Exception do begin
-      raise EQueryMapperCastingFromField.CreateFmt(
-        'TCustomMapper<%s>.fromField(): Failed to convert field "%s". Error: %s',
-        [
-          GetTypeName(TypeInfo(T)),
-          field.Name,
-          e.Message
-        ]);
+      raise EJSONMapperCastingToJSON.CreateFmt(
+        'TCustomMapper<%s>.toJSON(): Failed to convert to JSON. Error: %s',
+        [GetTypeName(TypeInfo(T)), e.Message]
+      );
     end;
   end;
 end;
