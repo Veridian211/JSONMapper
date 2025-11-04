@@ -134,8 +134,8 @@ begin
     colorObject := TJSONMapper.jsonToObject<TColorObject>(json);
 
     Assert.AreEqual(
-      colorObject.color.toString(),
-      json.GetValue('color').Value
+      json.GetValue('color').Value,
+      colorObject.color.toString()
     );
   finally
     if Assigned(colorObject) then begin

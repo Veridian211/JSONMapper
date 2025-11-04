@@ -217,6 +217,9 @@ begin
     end;
 
     tkRecord: begin
+      if TCustomMapperRegistry.TryGetValue(rttiType.Handle, customMapper) then begin
+        exit(customMapper.fieldToValue(field));
+      end;
 //      rec := jsonToRecord(
 //        fieldValue.GetReferenceToRawData,
 //        rttiType.Handle,

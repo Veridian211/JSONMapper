@@ -411,6 +411,9 @@ begin
     end;
 
     tkRecord: begin
+      if TCustomMapperRegistry.TryGetValue(value.TypeInfo, customMapper) then begin
+        exit(customMapper.valueToJSON(value));
+      end;
       exit(TJSONMapper.recordToJSON(value));
     end;
 
@@ -772,6 +775,9 @@ begin
     end;
 
     tkRecord: begin
+      if TCustomMapperRegistry.TryGetValue(rttiType.Handle, customMapper) then begin
+        exit(customMapper.JSONToValue(jsonValue));
+      end;
       rec := jsonToRecord(
         fieldValue.GetReferenceToRawData,
         rttiType.Handle,
