@@ -6,6 +6,8 @@ uses
   DUnitX.TestFramework,
   System.SysUtils,
   System.JSON,
+  Data.DB,
+  Datasnap.DBClient,
   JSONMapper,
   QueryMapper,
   CustomMapper;
@@ -43,6 +45,7 @@ type
   TTestEnumMapper = class
   private
     colorObject: TColorObject;
+    dataset: TClientDataset;
   public
     [Setup]
     procedure Setup();
@@ -57,6 +60,10 @@ type
     procedure TestFromJSON();
     [Test]
     procedure TestFromJSONWithException();
+    [Test]
+    procedure TestFromField();
+    [Test]
+    procedure TestFromFieldWithException();
   end;
 
 implementation
@@ -64,11 +71,17 @@ implementation
 procedure TTestEnumMapper.Setup();
 begin
   colorObject := TColorObject.Create();
+
+  dataset := TClientDataSet.Create(nil);
+  dataset.FieldDefs.Add('Color', ftString, 50);
+  dataset.CreateDataSet;
 end;
 
 procedure TTestEnumMapper.TearDown();
 begin
   colorObject.Free;
+
+  dataset.Free();
 end;
 
 procedure TTestEnumMapper.TestToJSON();
@@ -154,6 +167,46 @@ begin
       FreeAndNil(colorObject);
     end;
     json.Free();
+  end;
+end;
+
+procedure TTestEnumMapper.TestFromField();
+var
+  colorObject: TColorObject;
+begin
+  dataset.Append;
+  dataset.FieldByName('Color').AsString := 'red';
+  dataset.Post;
+
+  colorObject := dataset.GetOne<TColorObject>();
+  try
+    Assert.AreEqual(clRed, colorObject.color);
+  finally
+    colorObject.Free;
+  end;
+end;
+
+procedure TTestEnumMapper.TestFromFieldWithException();
+var
+  colorObject: TColorObject;
+begin
+  dataset.Append;
+  dataset.FieldByName('Color').AsString := 'not a color';
+  dataset.Post;
+
+  colorObject := nil;
+  try
+    try
+      colorObject := dataset.GetOne<TColorObject>();
+    except
+      on e: Exception do begin
+        Assert.AreEqual(EQueryMapperUnknownType, e.ClassType);
+      end;
+    end;
+  finally
+    if Assigned(colorObject) then begin
+      colorObject.Free;
+    end;
   end;
 end;
 
