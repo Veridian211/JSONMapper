@@ -150,6 +150,7 @@
         <DCCReference Include="User\User.Repository.pas"/>
         <DCCReference Include="User\User.Service.pas"/>
         <DCCReference Include="User\User.Model.pas"/>
+        <DCCReference Include="HttpServer\Logger.Contract.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

@@ -4,7 +4,7 @@ interface
 
 uses
   IdHttpServer, IdCustomHTTPServer, IdContext, System.JSON, System.Classes, SysUtils,
-  Logger,
+  Logger.Contract,
   Http.HTTPMethods,
   Http.Exceptions,
   Http.Request,
@@ -16,7 +16,7 @@ type
     httpServer: TidHttpServer;
     httpRouter: THttpRouter;
 
-    logger: TLogger;
+    logger: ILogger;
     procedure configureHttpServer(port: word);
     procedure onRequestReceived(
       context: TIdContext;
@@ -36,7 +36,7 @@ type
     );
     procedure handleRequestError(response: TIdHttpResponseInfo; e: Exception);
   public
-    constructor Create(port: word; logger: TLogger);
+    constructor Create(port: word; logger: ILogger);
     procedure start();
     procedure stop();
     destructor Destroy(); override;
@@ -44,7 +44,7 @@ type
 
 implementation
 
-constructor THttpServer.Create(port: word; logger: TLogger);
+constructor THttpServer.Create(port: word; logger: ILogger);
 begin
   inherited Create();
   self.logger := logger;

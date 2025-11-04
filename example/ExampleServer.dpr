@@ -20,7 +20,8 @@ uses
   User.Dtos in 'User\User.Dtos.pas',
   User.Repository in 'User\User.Repository.pas',
   User.Service in 'User\User.Service.pas',
-  User.Model in 'User\User.Model.pas';
+  User.Model in 'User\User.Model.pas',
+  Logger.Contract in 'HttpServer\Logger.Contract.pas';
 
 {$R *.res}
 

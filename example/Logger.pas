@@ -3,10 +3,10 @@ unit Logger;
 interface
 
 uses
-  Vcl.StdCtrls, SysUtils;
+  Vcl.StdCtrls, SysUtils, Logger.Contract;
 
 type
-  TLogger = class
+  TLogger = class(TInterfacedObject, ILogger)
   private
     memo: TMemo;
   public

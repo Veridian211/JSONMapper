@@ -10,7 +10,7 @@ uses
   System.SysUtils,
   System.TypInfo,
   System.JSON,
-  Logger,
+  Logger.Contract,
   JSONMapper,
   Http.HTTPMethods,
   Http.Exceptions,
@@ -35,7 +35,7 @@ type
 
   THttpRouter = class
   private
-    logger: TLogger;
+    logger: ILogger;
     routes: TRoutes;
     procedure discoverHttpResources();
     procedure invokeMethod(
@@ -52,7 +52,7 @@ type
       endpointPath: string
     ): TRttiMethod;
   public
-    constructor Create(logger: TLogger);
+    constructor Create(logger: ILogger);
     class procedure register(controller: TClass);
     procedure handleRequest(httpRequest: THttpRequest);
     destructor Destroy(); override;
@@ -60,7 +60,7 @@ type
 
 implementation
 
-constructor THttpRouter.Create(logger: TLogger);
+constructor THttpRouter.Create(logger: ILogger);
 begin
   inherited Create();
   self.logger := logger;
