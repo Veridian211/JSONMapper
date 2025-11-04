@@ -3,14 +3,12 @@ unit JSONMapper.Settings;
 interface
 
 uses
-  JSONMapper.DateTimeFormatter,
-  JSONMapper.CustomMapping;
+  JSONMapper.DateTimeFormatter;
 
 type
   TJSONMapperSettings = record
   public
     dateFormatter: TDateFormatterClass;
-    customMapping: TCustomMappers;
   end;
 
 implementation

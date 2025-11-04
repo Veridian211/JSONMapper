@@ -8,7 +8,7 @@ uses
   Data.DB,
   Datasnap.DBClient,
   QueryMapper,
-  QueryMapper.CustomMapping;
+  CustomMapper;
 
 type
   TColor = (
@@ -137,6 +137,6 @@ end;
 
 initialization
   TDUnitX.RegisterTestFixture(TCustomTypesTest);
-  TCustomMapperRegistry.registerCustomMapper<TColor>(TColorMapper);
+  TCustomMapperRegistry.register<TColor>(TColorMapper);
 
 end.

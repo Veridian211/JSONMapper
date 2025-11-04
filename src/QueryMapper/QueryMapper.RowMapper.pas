@@ -18,7 +18,7 @@ uses
   Data.DB,
   QueryMapper.Attributes,
   QueryMapper.Exceptions,
-  QueryMapper.CustomMapping;
+  CustomMapper;
 
 type
   TFieldMap = TDictionary<TRttiField, TField>;

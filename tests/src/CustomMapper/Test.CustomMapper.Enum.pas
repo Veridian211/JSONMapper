@@ -1,4 +1,4 @@
-unit Test.JSONMapper.CustomMapping;
+unit Test.CustomMapper.Enum;
 
 interface
 
@@ -7,7 +7,8 @@ uses
   System.SysUtils,
   System.JSON,
   JSONMapper,
-  JSONMapper.CustomMapping;
+  QueryMapper,
+  CustomMapper;
 
 type
   TColor = (
@@ -28,6 +29,7 @@ type
   end;
 
   TColorJSONMapper = class(TCustomMapper<TColor>)
+    class function fromField(field: TField): TColor; override;
     class function toJSON(value: TColor): TJSONValue; override;
     class function fromJSON(jsonValue: TJSONValue): TColor; override;
   end;
@@ -38,7 +40,7 @@ type
   end;
 
   [TestFixture]
-  TTestCustomMapping = class
+  TTestEnumMapper = class
   private
     colorObject: TColorObject;
   public
@@ -48,28 +50,28 @@ type
     procedure TearDown();
 
     [Test]
-    procedure TestEnumToJSON();
+    procedure TestToJSON();
     [Test]
-    procedure TestEnumToJSONWithException();
+    procedure TestToJSONWithException();
     [Test]
-    procedure TestJSONToEnum();
+    procedure TestFromJSON();
     [Test]
-    procedure TestJSONToEnumWithException();
+    procedure TestFromJSONWithException();
   end;
 
 implementation
 
-procedure TTestCustomMapping.Setup();
+procedure TTestEnumMapper.Setup();
 begin
   colorObject := TColorObject.Create();
 end;
 
-procedure TTestCustomMapping.TearDown();
+procedure TTestEnumMapper.TearDown();
 begin
   colorObject.Free;
 end;
 
-procedure TTestCustomMapping.TestEnumToJSON();
+procedure TTestEnumMapper.TestToJSON();
 var
   json: TJSONObject;
 begin
@@ -85,7 +87,7 @@ begin
   end;
 end;
 
-procedure TTestCustomMapping.TestEnumToJSONWithException();
+procedure TTestEnumMapper.TestToJSONWithException();
 var
   json: TJSONObject;
 begin
@@ -107,7 +109,7 @@ begin
   end;
 end;
 
-procedure TTestCustomMapping.TestJSONToEnum();
+procedure TTestEnumMapper.TestFromJSON();
 const
   JSON_STRING = '{"color":"green"}';
 var
@@ -130,7 +132,7 @@ begin
   end;
 end;
 
-procedure TTestCustomMapping.TestJSONToEnumWithException();
+procedure TTestEnumMapper.TestFromJSONWithException();
 const
   JSON_STRING = '{"color":"this is no color"}';
 var
@@ -177,6 +179,11 @@ end;
 
 { TColorJSONMapper }
 
+class function TColorJSONMapper.fromField(field: TField): TColor;
+begin
+  Result := TColor.fromString(field.AsString);
+end;
+
 class function TColorJSONMapper.toJSON(value: TColor): TJSONValue;
 begin
   Result := TJSONString.Create(value.toString());
@@ -191,7 +198,7 @@ begin
 end;
 
 initialization
-  TDUnitX.RegisterTestFixture(TTestCustomMapping);
-  TJSONMapper.registerCustomMapper<TColor>(TColorJSONMapper);
+  TDUnitX.RegisterTestFixture(TTestEnumMapper);
+  TCustomMapperRegistry.register<TColor>(TColorJSONMapper);
 
 end.

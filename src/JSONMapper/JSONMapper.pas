@@ -21,8 +21,8 @@ uses
   JSONMapper.ListHelper,
   JSONMapper.DateTimeFormatter,
   JSONMapper.Settings,
-  JSONMapper.CustomMapping,
   JSONMapper.PublicFieldIterator,
+  CustomMapper,
   Nullable;
 
 type
@@ -58,7 +58,6 @@ type
 
   public
     class var dateFormatterClass: TDateFormatterClass;
-    class var customMappers: TCustomMappers;
 
     /// <summary> Maps the public fields of a generic object into a TJSONObject. </summary>
     class procedure objectToJSON(const obj: TObject; var jsonObject: TJSONObject); overload;
@@ -79,16 +78,6 @@ type
     class procedure jsonToList(const jsonArray: TJSONArray; const list: TObject); overload;
     class function jsonToList<T>(const jsonArray: TJSONArray): TList<T>; overload;
     class function jsonToObjectList<T: class, constructor>(const jsonArray: TJSONArray): TObjectList<T>;
-
-    /// <summary> Adds a custom datatype mapper for <c>T</c>.
-    ///  <para> Create a class which inherits from <c>TCustomMapper&lt;T&gt;</c> and
-    ///   override the functions <c>toJSON()</c> and <c>fromJSON()</c>.
-    ///  </para>
-    ///  <para>
-    ///   Then register it with <c>registerCustomMapper&lt;T&gt;()</c>.
-    ///  </para>
-    /// </summary>
-    class procedure registerCustomMapper<T>(mapper: TCustomMapperClass);
   end;
 
   IgnoreAttribute = JSONMapper.Attributes.IgnoreAttribute;
@@ -385,7 +374,7 @@ begin
       if value.TypeInfo = TypeInfo(Boolean) then begin
         exit(TJSONBool.Create(value.AsBoolean));
       end;
-      if customMappers.TryGetValue(value.TypeInfo, customMapper) then begin
+      if TCustomMapperRegistry.TryGetValue(value.TypeInfo, customMapper) then begin
         exit(customMapper.valueToJSON(value));
       end;
       raise EValueToJSON.Create();
@@ -737,7 +726,7 @@ begin
       if rttiType.Handle = TypeInfo(Boolean) then begin
         exit(TJSONBool(jsonValue).AsBoolean);
       end;
-      if customMappers.TryGetValue(rttiType.Handle, customMapper) then begin
+      if TCustomMapperRegistry.TryGetValue(rttiType.Handle, customMapper) then begin
         exit(customMapper.JSONToValue(jsonValue));
       end;
       raise EJSONToValue.Create();
@@ -830,16 +819,7 @@ begin
   exit(jsonKeyAttr.getKey);
 end;
 
-class procedure TJSONMapper.registerCustomMapper<T>(mapper: TCustomMapperClass);
-begin
-  TJSONMapper.customMappers.add<T>(mapper);
-end;
-
 initialization
-  TJSONMapper.customMappers := TCustomMappers.Create();
   TJSONMapper.dateFormatterClass := TDateFormatter_ISO8601;
-
-finalization
-  FreeAndNil(TJSONMapper.customMappers);
 
 end.

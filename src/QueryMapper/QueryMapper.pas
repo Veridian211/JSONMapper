@@ -20,7 +20,7 @@ uses
   QueryMapper.RowMapper,
   QueryMapper.Attributes,
   QueryMapper.Exceptions,
-  QueryMapper.CustomMapping;
+  CustomMapper;
 
 type
   FieldName = QueryMapper.Attributes.FieldNameAttribute;
