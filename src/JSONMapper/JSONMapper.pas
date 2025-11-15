@@ -400,6 +400,9 @@ begin
 
     tkClass: begin
       value_Object := value.AsObject;
+      if value_Object = nil then begin
+        exit(TJSONNull.Create());
+      end;
       if hasGetEnumerator(value_Object) then begin
         exit(TJSONMapper.listToJSON(value_Object));
       end;
